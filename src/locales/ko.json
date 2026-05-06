@@ -1,0 +1,111 @@
+{
+  "common": {
+    "yes": "예",
+    "no": "아니요",
+    "confirm": "확인",
+    "cancel": "취소",
+    "notice": "알림",
+    "save": "저장",
+    "delete": "삭제",
+    "close": "닫기",
+    "loading": "로딩중",
+    "disabled": "비활성화",
+    "success": "성공",
+    "info": "정보",
+    "warning": "경고",
+    "error": "오류",
+    "noData": "데이터가 없습니다."
+  },
+  "ui": {
+    "component": {
+      "calendar": {
+        "format": {
+          "yearMonthFull": "yyyy년 MMMM",
+          "yearMonthShort": "yyyy년 MMM",
+          "yearMonthCompact": "yyyy. MM"
+        },
+        "days": {
+          "full": [
+            "일요일",
+            "월요일",
+            "화요일",
+            "수요일",
+            "목요일",
+            "금요일",
+            "토요일"
+          ],
+          "short": ["일", "월", "화", "수", "목", "금", "토"],
+          "single": ["일", "월", "화", "수", "목", "금", "토"]
+        },
+        "months": {
+          "full": [
+            "1월",
+            "2월",
+            "3월",
+            "4월",
+            "5월",
+            "6월",
+            "7월",
+            "8월",
+            "9월",
+            "10월",
+            "11월",
+            "12월"
+          ],
+          "short": [
+            "1월",
+            "2월",
+            "3월",
+            "4월",
+            "5월",
+            "6월",
+            "7월",
+            "8월",
+            "9월",
+            "10월",
+            "11월",
+            "12월"
+          ]
+        },
+        "label": {
+          "today": "오늘",
+          "setTime": "시간 설정",
+          "start": "시작",
+          "end": "종료",
+          "editTime": "시간 수정",
+          "h": "시",
+          "m": "분",
+          "s": "초"
+        },
+        "action": {
+          "back": "뒤로",
+          "prevMonth": "이전 달",
+          "nextMonth": "다음 달",
+          "close": "닫기"
+        },
+        "msg": {
+          "selectDateFirst": "날짜를 먼저 선택해주세요."
+        }
+      },
+      "accordion": {
+        "action": {
+          "expand": "섹션 열기",
+          "collapse": "섹션 닫기"
+        }
+      },
+      "input": {
+        "clear": "입력 지우기",
+        "showPassword": "비밀번호 표시",
+        "hidePassword": "비밀번호 숨기기"
+      },
+      "select": {
+        "placeholder": "선택해주세요",
+        "empty": "검색 결과가 없습니다."
+      },
+      "modal": {
+        "title": "모달",
+        "close": "모달 닫기"
+      }
+    }
+  }
+}

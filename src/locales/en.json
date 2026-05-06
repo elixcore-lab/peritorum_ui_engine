@@ -1,0 +1,111 @@
+{
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "notice": "Notice",
+    "save": "Save",
+    "delete": "Delete",
+    "close": "Close",
+    "loading": "Loading...",
+    "disabled": "Disabled",
+    "success": "Success",
+    "info": "Information",
+    "warning": "Warning",
+    "error": "Error",
+    "noData": "No data."
+  },
+  "ui": {
+    "component": {
+      "calendar": {
+        "format": {
+          "yearMonthFull": "MMMM yyyy",
+          "yearMonthShort": "MMM yyyy",
+          "yearMonthCompact": "MMM yyyy"
+        },
+        "days": {
+          "full": [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          "short": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+          "single": ["S", "M", "T", "W", "T", "F", "S"]
+        },
+        "months": {
+          "full": [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+          ],
+          "short": [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+          ]
+        },
+        "label": {
+          "today": "Today",
+          "setTime": "Set Time",
+          "start": "Start",
+          "end": "End",
+          "editTime": "Edit Time",
+          "h": "Hr",
+          "m": "Min",
+          "s": "Sec"
+        },
+        "action": {
+          "back": "Back",
+          "prevMonth": "Previous Month",
+          "nextMonth": "Next Month",
+          "close": "Close"
+        },
+        "msg": {
+          "selectDateFirst": "Please select a date first."
+        }
+      },
+      "accordion": {
+        "action": {
+          "expand": "Expand section",
+          "collapse": "Collapse section"
+        }
+      },
+      "input": {
+        "clear": "Clear input",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password"
+      },
+      "select": {
+        "placeholder": "Select...",
+        "empty": "No results found."
+      },
+      "modal": {
+        "title": "Modal",
+        "close": "Close modal"
+      }
+    }
+  }
+}

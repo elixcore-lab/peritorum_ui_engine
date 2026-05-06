@@ -1,0 +1,360 @@
+const palette = {
+  white: "#FFFFFF",
+  black: "#000000",
+  slate950: "#040508",
+  slate900: "#0B0C10",
+  slate800: "#14161C",
+  slate700: "#1F232B",
+  slate600: "#2D333F",
+  slate500: "#4B5563",
+  slate400: "#9CA3AF",
+  slate100: "#F3F4F6",
+  gray50: "#F8FAFC",
+  gray100: "#F1F5F9",
+  gray200: "#E2E8F0",
+  gray300: "#CBD5E1",
+  gray400: "#94A3B8",
+  gray500: "#64748B",
+  gray600: "#475569",
+  gray700: "#334155",
+  gray800: "#1E293B",
+  gray900: "#0F172A",
+  brandCyan: "#00D2FF",
+  brandBlue: "#3A7BD5",
+  brandPurple: "#8E2DE2",
+  brandPurpleDark: "#4A00E0",
+  red500: "#F43F5E",
+  green500: "#10B981",
+  orange500: "#F59E0B",
+};
+
+const breakpoints = { mobile: "768px", tablet: "1024px" };
+
+const media = {
+  mobile: `@media (max-width: ${breakpoints.mobile})`,
+  tablet: `@media (max-width: ${breakpoints.tablet})`,
+  desktop: `@media (min-width: ${breakpoints.tablet})`,
+};
+
+const common = {
+  spacing: {
+    xs: "4px",
+    sm: "8px",
+    base: "12px",
+    md: "16px",
+    lg: "24px",
+    xl: "32px",
+    xxl: "48px",
+  },
+  borderRadius: {
+    sm: "4px",
+    md: "8px",
+    lg: "12px",
+    xl: "16px",
+    round: "9999px",
+  },
+  fontSizes: {
+    xxs: "0.625rem",
+    xs: "0.75rem",
+    sm: "0.875rem",
+    base: "1rem",
+    md: "1.125rem",
+    lg: "1.25rem",
+    xl: "1.5rem",
+  },
+  fontWeights: { regular: 400, medium: 500, bold: 700, extraBold: 800 },
+  transitions: {
+    duration: {
+      fast: "150ms", // 모달, 툴팁, 오버레이 페이드
+      normal: "200ms", // 버튼 호버, 체크박스 트랜지션
+      slow: "400ms", // 아코디언, 드로어 등 큰 영역의 움직임
+    },
+    function: {
+      default: "cubic-bezier(0.4, 0, 0.2, 1)", // 가장 자연스러운 기본 곡선
+      linear: "linear",
+      easeInOut: "ease-in-out",
+      easeOut: "ease-out",
+      spring: "cubic-bezier(0.16, 1, 0.3, 1)", // 통통 튀는 팝업용 (Alert, Modal)
+      bounce: "cubic-bezier(0.87, 0, 0.13, 1)", // 회전, 아이콘 움직임 (Chevron)
+    },
+  },
+  zIndices: {
+    sticky: 10,
+    overlay: 1200,
+    modal: 1300,
+    alert: 1400,
+    popover: 1500,
+    toast: 1600,
+    tooltip: 1700,
+  },
+};
+
+const sizes = {
+  sidebarWidth: "240px",
+  sidebarCollapsedWidth: "64px",
+  headerHeight: "60px",
+  control: {
+    sm: "32px",
+    md: "40px",
+    lg: "48px",
+  },
+  icon: {
+    xs: "14px",
+    sm: "16px",
+    md: "20px",
+    lg: "24px",
+    loading: "28px",
+    xl: "32px",
+  },
+  component: {
+    checkbox: "20px",
+    radio: "20px",
+    radioIndicator: "10px",
+    switch: {
+      sm: { width: "36px", height: "20px", thumb: "14px", offset: "18px" },
+      md: { width: "44px", height: "24px", thumb: "18px", offset: "22px" },
+      lg: { width: "56px", height: "32px", thumb: "26px", offset: "26px" },
+    },
+    badgeMinHeight: "24px",
+    emptyStateHeight: "120px",
+    textareaMinHeight: "80px",
+    dropdownMinWidth: "160px",
+    selectViewportMaxHeight: "250px",
+    tooltipMaxWidth: "250px",
+    modalDefaultWidth: "900px",
+    modalAlertWidth: "400px",
+    datePickerModalWidth: "420px",
+    tabFixedWidth: "120px",
+    calendarDay: "36px",
+    calendarHeaderLabelWidth: "100px",
+    virtualRowHeight: 36,
+    timeWheelHeight: "120px",
+    timeWheelItemHeight: "40px",
+    alertIcon: "56px",
+    eventLineWidth: "16px",
+    dividerThin: "1px",
+    dividerMedium: "2px",
+    overlayBlur: "2px",
+  },
+  offset: {
+    popover: 6,
+    tooltip: 4,
+    toastGutter: 8,
+  },
+};
+
+export const darkTheme = {
+  ...common,
+  mode: "dark" as const, // 🌟 mode만 리터럴 타입으로 고정
+  media,
+  sizes,
+  colors: {
+    background: {
+      page: palette.slate950,
+      surface: palette.slate900,
+      modal: palette.slate800,
+      input: palette.slate950,
+      hover: palette.slate700,
+      overlay: "rgba(0, 0, 0, 0.7)",
+      loadingOverlay: "rgba(11, 12, 16, 0.7)",
+      scrollbar: palette.slate600,
+      scrollbarHover: palette.brandPurple,
+    },
+    text: {
+      primary: palette.white,
+      secondary: palette.slate400,
+      subtle: palette.slate400,
+      disabled: palette.slate500,
+      inverse: palette.slate900,
+      mutedInverse: palette.slate400,
+      brand: palette.brandCyan,
+      success: palette.green500,
+      danger: palette.red500,
+      warning: palette.orange500,
+    },
+    border: {
+      default: palette.slate700,
+      divider: palette.slate700,
+      subtle: palette.slate700,
+      strong: palette.slate400,
+      focused: palette.brandCyan,
+      inverse: "rgba(255, 255, 255, 0.2)",
+    },
+    action: {
+      primary: palette.brandBlue,
+      primaryHover: palette.brandCyan,
+      secondary: palette.slate700,
+      secondaryBorder: palette.slate500,
+    },
+    status: {
+      success: palette.green500,
+      warning: palette.orange500,
+      danger: palette.red500,
+      info: palette.brandCyan,
+      offline: palette.slate500,
+    },
+    statusBg: {
+      success: `${palette.green500}1A`,
+      warning: `${palette.orange500}1A`,
+      danger: `${palette.red500}1A`,
+      info: `${palette.brandCyan}1A`,
+    },
+    effect: {
+      shadow: {
+        base: "0 2px 8px rgba(0, 0, 0, 0.25)",
+        sm: "0 1px 2px rgba(4, 4, 4, 0.3)",
+        md: "0 4px 6px rgba(0, 0, 0, 0.4)",
+        lg: "0 10px 25px rgba(0, 0, 0, 0.5)",
+      },
+      glow: "0 0 12px rgba(0, 229, 255, 0.4)",
+    },
+    brand: {
+      primary: palette.brandBlue,
+      primaryHover: palette.brandCyan,
+      secondary: palette.green500,
+      secondaryHover: palette.green500,
+      accent: palette.orange500,
+      accentSoft: palette.slate700,
+      ink: palette.white,
+      cyan: palette.brandCyan,
+      purple: palette.brandPurple,
+      gradient: `linear-gradient(135deg, ${palette.brandCyan} 0%, ${palette.brandBlue} 50%, ${palette.brandPurple} 100%)`,
+    },
+    surface: {
+      canvas: palette.slate900,
+      raised: palette.slate800,
+      sunken: palette.slate700,
+      inverse: palette.slate950,
+      panel: palette.slate800,
+      overlay: "rgba(0, 0, 0, 0.7)",
+    },
+    chart: {
+      blue: palette.brandBlue,
+      teal: palette.green500,
+      coral: palette.red500,
+      amber: palette.orange500,
+      violet: palette.brandPurple,
+      slate: palette.slate400,
+    },
+    utility: {
+      transparent: "transparent",
+      shadowColor: "rgba(0, 0, 0, 0.34)",
+      shadowStrongColor: "rgba(0, 0, 0, 0.5)",
+      canvasLine: "rgba(255, 255, 255, 0.22)",
+      canvasNode: "rgba(244, 244, 245, 0.86)",
+      canvasGlow: "rgba(0, 210, 255, 0.3)",
+    },
+  },
+}; // 🌟 as const 제거됨 (string 타입 허용)
+
+// 🌟 ThemeType: 색상 구조는 동일하게 유지하되, mode만 dark/light 허용
+export type ThemeType = Omit<typeof darkTheme, "mode"> & {
+  mode: "dark" | "light";
+};
+
+export const lightTheme: ThemeType = {
+  ...common,
+  mode: "light",
+  media,
+  sizes,
+  colors: {
+    background: {
+      page: palette.gray50,
+      surface: palette.white,
+      modal: palette.white,
+      input: palette.white,
+      hover: palette.gray100,
+      overlay: "rgba(0, 0, 0, 0.4)",
+      loadingOverlay: "rgba(255, 255, 255, 0.7)",
+      scrollbar: palette.gray300,
+      scrollbarHover: palette.brandBlue,
+    },
+    text: {
+      primary: palette.gray900,
+      secondary: palette.gray500,
+      subtle: palette.gray500,
+      disabled: palette.gray300,
+      inverse: palette.white,
+      mutedInverse: palette.gray300,
+      brand: palette.brandPurpleDark,
+      success: palette.green500,
+      danger: palette.red500,
+      warning: palette.orange500,
+    },
+    border: {
+      default: palette.gray200,
+      divider: palette.gray100,
+      subtle: palette.gray100,
+      strong: palette.gray400,
+      focused: palette.brandBlue,
+      inverse: "rgba(255, 255, 255, 0.22)",
+    },
+    action: {
+      primary: palette.brandBlue,
+      primaryHover: palette.brandPurpleDark,
+      secondary: palette.gray200,
+      secondaryBorder: palette.gray300,
+    },
+    status: {
+      success: palette.green500,
+      warning: palette.orange500,
+      danger: palette.red500,
+      info: palette.brandBlue,
+      offline: palette.gray400,
+    },
+    statusBg: {
+      success: `${palette.green500}1A`,
+      warning: `${palette.orange500}1A`,
+      danger: `${palette.red500}1A`,
+      info: `${palette.brandBlue}1A`,
+    },
+    effect: {
+      shadow: {
+        base: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        sm: "0 1px 2px rgba(0, 0, 0, 0.05)",
+        md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+      },
+      glow: "0 0 12px rgba(58, 123, 213, 0.4)",
+    },
+    brand: {
+      primary: palette.brandBlue,
+      primaryHover: palette.brandPurpleDark,
+      secondary: palette.green500,
+      secondaryHover: palette.green500,
+      accent: palette.orange500,
+      accentSoft: palette.gray100,
+      ink: palette.gray900,
+      cyan: palette.brandCyan,
+      purple: palette.brandPurple,
+      gradient: `linear-gradient(135deg, ${palette.brandCyan} 0%, ${palette.brandBlue} 50%, ${palette.brandPurpleDark} 100%)`,
+    },
+    surface: {
+      canvas: palette.gray50,
+      raised: palette.white,
+      sunken: palette.gray100,
+      inverse: palette.gray900,
+      panel: palette.gray800,
+      overlay: "rgba(0, 0, 0, 0.4)",
+    },
+    chart: {
+      blue: palette.brandBlue,
+      teal: palette.green500,
+      coral: palette.red500,
+      amber: palette.orange500,
+      violet: palette.brandPurpleDark,
+      slate: palette.gray500,
+    },
+    utility: {
+      transparent: "transparent",
+      shadowColor: "rgba(0, 0, 0, 0.12)",
+      shadowStrongColor: "rgba(0, 0, 0, 0.22)",
+      canvasLine: "rgba(255, 255, 255, 0.34)",
+      canvasNode: "rgba(255, 255, 255, 0.9)",
+      canvasGlow: "rgba(58, 123, 213, 0.3)",
+    },
+  },
+};
+
+// 호스트 앱에서 사용할 기본 테마
+export const theme = darkTheme;
