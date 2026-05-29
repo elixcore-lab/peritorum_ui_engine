@@ -91,7 +91,7 @@ export const customScrollbar = (theme: Theme) => css`
     scrollbar-color: ${theme.colors.background.scrollbar} transparent;
   } */
 
-  crollbar-width: thin;
+  scrollbar-width: thin;
   scrollbar-color: ${theme.colors.background.scrollbar} transparent;
 
   /* Chrome, Edge, Safari 대응 */
