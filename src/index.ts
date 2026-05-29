@@ -1,5 +1,6 @@
 // Components
 export * from "./components";
+export * from "./ConfigProvider";
 
 // Styles & Theme
 export * from "./styles";

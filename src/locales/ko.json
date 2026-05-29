@@ -105,6 +105,10 @@
       "modal": {
         "title": "모달",
         "close": "모달 닫기"
+      },
+      "drawer": {
+        "title": "메뉴",
+        "close": "메뉴 닫기"
       }
     }
   }

@@ -69,21 +69,30 @@ export const lineClamp = (lines: number) => css`
   -webkit-line-clamp: ${lines};
   -webkit-box-orient: vertical;
   overflow: hidden;
+  word-break: break-all;
 `;
 
 export const disabledState = (theme: Theme) => css`
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-  background-color: ${theme.colors.surface.sunken};
+  &:disabled,
+  &[aria-disabled="true"],
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: ${theme.colors.surface.sunken};
+    border-color: ${theme.colors.border.default};
+    pointer-events: none;
+  }
 `;
 
 export const customScrollbar = (theme: Theme) => css`
   /* Firefox 대응 */
-  @supports (-moz-appearance: none) {
+  /* @supports (-moz-appearance: none) {
     scrollbar-width: thin;
     scrollbar-color: ${theme.colors.background.scrollbar} transparent;
-  }
+  } */
+
+  crollbar-width: thin;
+  scrollbar-color: ${theme.colors.background.scrollbar} transparent;
 
   /* Chrome, Edge, Safari 대응 */
   &::-webkit-scrollbar {
@@ -102,14 +111,19 @@ export const customScrollbar = (theme: Theme) => css`
   }
 `;
 
-export const focusRing = (theme: Theme, isError?: boolean) => css`
-  outline: none;
-  border-color: ${isError
+export const focusRing = (theme: Theme, isError?: boolean) => {
+  const borderColor = isError
     ? theme.colors.status.danger
-    : theme.colors.brand.cyan};
-  box-shadow: 0 0 0 ${theme.sizes.component.dividerMedium}
-    ${isError ? theme.colors.statusBg.danger : theme.colors.utility.canvasGlow};
-`;
+    : theme.colors.brand.cyan;
+  const glowColor = isError
+    ? theme.colors.statusBg.danger
+    : theme.colors.utility.canvasGlow;
+  return css`
+    outline: none;
+    border-color: ${borderColor};
+    box-shadow: 0 0 0 ${theme.sizes.component.dividerMedium} ${glowColor};
+  `;
+};
 
 export const applyTransition = (
   theme: Theme,

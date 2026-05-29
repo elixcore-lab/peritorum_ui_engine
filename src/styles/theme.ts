@@ -145,7 +145,7 @@ const sizes = {
 
 export const darkTheme = {
   ...common,
-  mode: "dark" as const, // 🌟 mode만 리터럴 타입으로 고정
+  mode: "dark" as const,
   media,
   sizes,
   colors: {
@@ -245,9 +245,8 @@ export const darkTheme = {
       canvasGlow: "rgba(0, 210, 255, 0.3)",
     },
   },
-}; // 🌟 as const 제거됨 (string 타입 허용)
+};
 
-// 🌟 ThemeType: 색상 구조는 동일하게 유지하되, mode만 dark/light 허용
 export type ThemeType = Omit<typeof darkTheme, "mode"> & {
   mode: "dark" | "light";
 };

@@ -105,6 +105,10 @@
       "modal": {
         "title": "Modal",
         "close": "Close modal"
+      },
+      "drawer": {
+        "title": "Menu",
+        "close": "Close menu"
       }
     }
   }
