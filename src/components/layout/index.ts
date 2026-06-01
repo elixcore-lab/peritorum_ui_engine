@@ -53,11 +53,14 @@ const DataRow = styled.div`
   }
 `;
 
-const InlineActions = styled.div`
+const InlineActions = styled.div<{
+  $justify?: React.CSSProperties["justifyContent"];
+}>`
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing.sm};
+  justify-content: ${({ $justify }) => $justify || "flex-start"};
 `;
 
 const SectionHeader = styled.div<{ $noBorder?: boolean }>`

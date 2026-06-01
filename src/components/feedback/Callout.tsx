@@ -59,7 +59,7 @@ const IconWrapper = styled.div<{ $variant: AlertVariant }>`
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xxs};
+  gap: ${({ theme }) => theme.spacing["2xs"]};
 `;
 
 const CalloutTitle = styled.h5`

@@ -21,7 +21,8 @@ export type ColorVariant =
   | "danger" // 부정적 상태 (빨간색)
   | "warning" // 경고 상태 (노란색)
   | "info" // 정보 상태 (파란색)
-  | "ghost"; // 배경이 없는 투명 상태
+  | "ghost" // 배경이 없는 투명 상태
+  | "outline"; // 테두리만 있는 상태
 
 export type TextColorIntent =
   | "primary"

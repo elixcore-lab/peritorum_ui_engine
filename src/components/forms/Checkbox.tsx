@@ -252,7 +252,7 @@ const StyledCheckBox = styled(CheckBoxPrimitive.Root)<{
   background-color: ${({ theme }) => theme.colors.background.input};
   cursor: pointer;
   flex-shrink: 0;
-  margin-top: ${({ theme }) => theme.spacing.xxs};
+  margin-top: ${({ theme }) => theme.spacing["2xs"]};
 
   ${({ theme }) => transitionBase(theme)}
 
@@ -302,7 +302,7 @@ const SpinnerWrapper = styled.div`
 const CheckBoxLabelContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xxs};
+  gap: ${({ theme }) => theme.spacing["2xs"]};
   cursor: inherit;
 `;
 

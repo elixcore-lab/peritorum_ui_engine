@@ -119,7 +119,7 @@ const SwitchWrapper = styled.div<{ $labelPosition: "left" | "right" }>`
 const SwitchLabelGroup = styled.div<{ $labelPosition: "left" | "right" }>`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xxs};
+  gap: ${({ theme }) => theme.spacing["2xs"]};
   order: ${({ $labelPosition }) => ($labelPosition === "left" ? 0 : 1)};
 `;
 

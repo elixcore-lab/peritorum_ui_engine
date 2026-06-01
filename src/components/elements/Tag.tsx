@@ -61,5 +61,5 @@ const TagCloseWrapper = styled.span<{ $size: ControlSize }>`
   display: inline-flex;
   margin-right: calc(${({ theme }) => theme.spacing.xs} * -1);
   margin-left: ${({ theme, $size }) =>
-    $size === "lg" ? theme.spacing.xs : theme.spacing.xxs};
+    $size === "lg" ? theme.spacing.xs : theme.spacing["2xs"]};
 `;

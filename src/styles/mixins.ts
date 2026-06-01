@@ -233,8 +233,8 @@ export const controlSizeBase = (theme: Theme, size: ControlSize) => {
     case "xs":
       return css`
         height: ${theme.sizes.control.xs};
-        padding: 0 ${theme.spacing.xxs};
-        font-size: ${theme.fontSizes.xxs};
+        padding: 0 ${theme.spacing["2xs"]};
+        font-size: ${theme.fontSizes["2xs"]};
       `;
     case "sm":
       return css`
@@ -268,22 +268,22 @@ export const compactSizeBase = (theme: Theme, size: ControlSize) => {
       `;
     case "sm":
       return css`
-        padding: ${theme.spacing.xxs} ${theme.spacing.xs};
-        font-size: ${theme.fontSizes.xxs};
-        gap: ${theme.spacing.xxs};
+        padding: ${theme.spacing["2xs"]} ${theme.spacing.xs};
+        font-size: ${theme.fontSizes["2xs"]};
+        gap: ${theme.spacing["2xs"]};
       `;
     case "xs":
       return css`
-        padding: ${theme.spacing.xxs} ${theme.spacing.xxs};
-        font-size: ${theme.fontSizes.xxs};
-        gap: ${theme.spacing.xxs};
+        padding: ${theme.spacing["2xs"]} ${theme.spacing["2xs"]};
+        font-size: ${theme.fontSizes["2xs"]};
+        gap: ${theme.spacing["2xs"]};
       `;
     case "md":
     default:
       return css`
-        padding: ${theme.spacing.xxs} ${theme.spacing.sm};
+        padding: ${theme.spacing["2xs"]} ${theme.spacing.sm};
         font-size: ${theme.fontSizes.xs};
-        gap: ${theme.spacing.xxs};
+        gap: ${theme.spacing["2xs"]};
       `;
   }
 };
@@ -364,6 +364,7 @@ export const popoverContentBase = (theme: Theme) => css`
 export const solidVariantStyle = (theme: Theme, variant: ColorVariant) => {
   switch (variant) {
     case "secondary":
+    case "outline":
       return css`
         background-color: ${theme.colors.utility.transparent};
         border-color: ${theme.colors.border.strong};

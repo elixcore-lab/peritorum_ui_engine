@@ -273,7 +273,7 @@ export const TabItem = styled.div<{
 `;
 
 export const TabLabel = styled.span<{ $isActive: boolean }>`
-  font-size: ${({ theme }) => theme.fontSizes.xxs};
+  font-size: ${({ theme }) => theme.fontSizes["2xs"]};
   text-transform: uppercase;
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ $isActive, theme }) =>

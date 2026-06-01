@@ -131,7 +131,7 @@ const StyledMultiSelectTrigger = styled(PopoverPrimitive.Trigger)<{
   width: 100%;
   height: auto;
   min-height: ${({ theme, $size }) => theme.sizes.control[$size]};
-  padding: ${({ theme }) => `${theme.spacing.xxs} ${theme.spacing.sm}`};
+  padding: ${({ theme }) => `${theme.spacing["2xs"]} ${theme.spacing.sm}`};
   cursor: pointer;
   gap: ${({ theme }) => theme.spacing.sm};
 
@@ -146,19 +146,19 @@ const StyledMultiSelectTrigger = styled(PopoverPrimitive.Trigger)<{
 const SelectedContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: ${({ theme }) => theme.spacing.xxs};
+  gap: ${({ theme }) => theme.spacing["2xs"]};
   flex: 1;
 `;
 
 const Tag = styled.span`
   display: inline-flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing.xxs};
+  gap: ${({ theme }) => theme.spacing["2xs"]};
   background-color: ${({ theme }) => theme.colors.brand.accentSoft};
   color: ${({ theme }) => theme.colors.text.primary};
-  padding: ${({ theme }) => `${theme.spacing.xxs} ${theme.spacing.xs}`};
+  padding: ${({ theme }) => `${theme.spacing["2xs"]} ${theme.spacing.xs}`};
   border-radius: ${({ theme }) => theme.borderRadius.sm};
-  font-size: ${({ theme }) => theme.fontSizes.xxs};
+  font-size: ${({ theme }) => theme.fontSizes["2xs"]};
   border: ${({ theme }) => theme.sizes.component.dividerThin} solid
     ${({ theme }) => theme.colors.border.divider};
 `;

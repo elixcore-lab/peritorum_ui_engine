@@ -284,7 +284,7 @@ const ItemContentWrapper = styled.div`
 const ItemTextLayout = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xxs};
+  gap: ${({ theme }) => theme.spacing["2xs"]};
   overflow: hidden;
 `;
 
@@ -294,7 +294,7 @@ const ItemLabel = styled(SelectPrimitive.ItemText)`
 `;
 
 const ItemDescription = styled.span`
-  font-size: ${({ theme }) => theme.fontSizes.xs};
+  font-size: ${({ theme }) => theme.fontSizes["2xs"]};
   color: ${({ theme }) => theme.colors.text.secondary};
   ${textEllipsis}
 `;

@@ -179,7 +179,7 @@ const RadioGroupRoot = styled(RadioGroupPrimitive.Root)<{
     $variant === "segmented" &&
     css`
       background-color: ${theme.colors.surface.sunken};
-      padding: ${theme.spacing.xxs};
+      padding: ${theme.spacing["2xs"]};
       border-radius: ${theme.borderRadius.md};
       gap: 0;
     `}
@@ -241,7 +241,7 @@ const RadioItem = styled(RadioGroupPrimitive.Item)<{
         ${$isError ? theme.colors.status.danger : theme.colors.border.strong};
       background-color: ${theme.colors.background.input};
       flex-shrink: 0;
-      margin-top: ${theme.spacing.xxs};
+      margin-top: ${theme.spacing["2xs"]};
 
       &:hover:not(:disabled):not([data-disabled]) {
         border-color: ${theme.colors.brand.cyan};
@@ -291,7 +291,7 @@ const RadioIndicator = styled(RadioGroupPrimitive.Indicator)`
 const RadioLabelContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xxs};
+  gap: ${({ theme }) => theme.spacing["2xs"]};
   cursor: inherit;
 `;
 

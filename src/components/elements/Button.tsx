@@ -20,7 +20,10 @@ import { useUiConfig } from "../../ConfigProvider";
 import { resolveDisabled } from "../../utils";
 import { Spinner } from "../feedback/Spinner";
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "color"
+> {
   as?: React.ElementType;
   href?: string;
   target?: string;
@@ -101,7 +104,7 @@ export const Button = forwardRef<
             {leftIcon && (
               <ButtonIconWrapper $size={size}>{leftIcon}</ButtonIconWrapper>
             )}
-            {children}
+            {typeof children === "string" ? <span>{children}</span> : children}
             {rightIcon && (
               <ButtonIconWrapper $size={size}>{rightIcon}</ButtonIconWrapper>
             )}
@@ -111,6 +114,7 @@ export const Button = forwardRef<
     );
   },
 );
+
 Button.displayName = "Button";
 
 const ButtonIconWrapper = styled.span<{ $size: ControlSize }>`
@@ -131,6 +135,15 @@ const StyledButton = styled.button<{
   href?: string;
   target?: string;
 }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+
+  & > * {
+    line-height: 1 !important;
+  }
+
   ${({ theme }) => inlineComponentBase(theme)};
   gap: ${({ theme }) => theme.spacing.xs};
   font-family: inherit;

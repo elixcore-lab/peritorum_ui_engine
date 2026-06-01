@@ -156,7 +156,7 @@ const FieldWrapper = styled.div`
 const HeaderWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xxs};
+  gap: ${({ theme }) => theme.spacing["2xs"]};
 `;
 
 const ControlWrapper = styled.div`

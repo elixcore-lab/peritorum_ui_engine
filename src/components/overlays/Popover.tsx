@@ -9,7 +9,7 @@ const PopoverContent = styled(PopoverPrimitive.Content)`
   width: auto;
 
   max-width: ${({ theme }) => theme.sizes.component.modalAlertWidth};
-  max-height: calc(100dvh - ${({ theme }) => theme.spacing.xxl});
+  max-height: calc(100dvh - ${({ theme }) => theme.spacing["2xl"]});
 `;
 
 export const Popover = {
