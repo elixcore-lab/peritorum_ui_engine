@@ -5,13 +5,19 @@ import { X } from "lucide-react";
 import { useTheme } from "@emotion/react";
 import {
   applyAnimation,
-  applyTransition,
-  flexCenter,
   visuallyHidden,
   contentShow,
+  floatingSurface,
 } from "../../styles";
 import { useUiConfig } from "../../ConfigProvider";
 import { Overlay } from "./Overlay";
+import { IconButton } from "../elements/IconButton";
+import {
+  SectionHeader,
+  SectionTitleGroup,
+  SectionBody,
+  SectionFooter,
+} from "../layout";
 
 // --- Types ---
 export interface ModalProps {
@@ -59,14 +65,17 @@ export const Modal = ({
           $maxWidth={maxWidth}
           onPointerDownOutside={handleInteractOutside}
           onEscapeKeyDown={handleInteractOutside}
-          aria-describedby={undefined}
         >
           {(title || !hideCloseButton) && (
-            <Header>
-              <HeaderTitles>
+            <SectionHeader>
+              <SectionTitleGroup>
                 {title ? (
                   <Dialog.Title asChild>
-                    <TitleText>{title}</TitleText>
+                    {typeof title === "string" ? (
+                      <h2>{title}</h2>
+                    ) : (
+                      <div>{title}</div>
+                    )}
                   </Dialog.Title>
                 ) : (
                   <Dialog.Title asChild>
@@ -75,26 +84,37 @@ export const Modal = ({
                     </VisuallyHidden>
                   </Dialog.Title>
                 )}
-                {description && (
+
+                {description ? (
                   <Dialog.Description asChild>
-                    <DescriptionText>{description}</DescriptionText>
+                    <p>{description}</p>
+                  </Dialog.Description>
+                ) : (
+                  <Dialog.Description asChild>
+                    <VisuallyHidden>
+                      {t("ui.component.modal.description")}
+                    </VisuallyHidden>
                   </Dialog.Description>
                 )}
-              </HeaderTitles>
+              </SectionTitleGroup>
 
               {!hideCloseButton && (
                 <Dialog.Close asChild>
-                  <CloseButton aria-label={t("ui.component.modal.close")}>
-                    <CloseIcon />
-                  </CloseButton>
+                  <IconButton
+                    variant="ghost"
+                    icon={<X />}
+                    aria-label={t("ui.component.modal.close")}
+                  />
                 </Dialog.Close>
               )}
-            </Header>
+            </SectionHeader>
           )}
 
-          <Body>{children}</Body>
+          {/* 💡 참고: SectionBody 컴포넌트 내부에 'overflow-y: auto; flex: 1;' 이 적용되어 있어야 
+               모달 높이가 100dvh를 넘을 때 정상적으로 내부 스크롤이 발생합니다. */}
+          <SectionBody>{children}</SectionBody>
 
-          {footer && <Footer>{footer}</Footer>}
+          {footer && <SectionFooter>{footer}</SectionFooter>}
         </Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -104,11 +124,7 @@ export const Modal = ({
 // --- Styled Components ---
 
 const Content = styled(Dialog.Content)<{ $maxWidth: string }>`
-  background-color: ${({ theme }) => theme.colors.background.modal};
-  border: ${({ theme }) => theme.sizes.component.dividerThin} solid
-    ${({ theme }) => theme.colors.border.divider};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  box-shadow: ${({ theme }) => theme.colors.effect.shadow.lg};
+  ${({ theme }) => floatingSurface(theme)}
 
   position: fixed;
   top: 50%;
@@ -116,7 +132,7 @@ const Content = styled(Dialog.Content)<{ $maxWidth: string }>`
   transform: translate(-50%, -50%);
   width: 90vw;
   max-width: ${({ $maxWidth }) => $maxWidth};
-  max-height: 85vh;
+  max-height: 100dvh;
   display: flex;
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndices.modal};
@@ -129,79 +145,6 @@ const Content = styled(Dialog.Content)<{ $maxWidth: string }>`
       theme.transitions.duration.fast,
       theme.transitions.function.spring,
     )}
-`;
-
-const Header = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: ${({ theme }) => theme.spacing.lg};
-  border-bottom: ${({ theme }) => theme.sizes.component.dividerThin} solid
-    ${({ theme }) => theme.colors.border.divider};
-`;
-
-const HeaderTitles = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.xs};
-  flex: 1;
-`;
-
-const TitleText = styled.h2`
-  margin: 0;
-  font-size: ${({ theme }) => theme.fontSizes.lg};
-  font-weight: ${({ theme }) => theme.fontWeights.bold};
-  color: ${({ theme }) => theme.colors.text.primary};
-`;
-
-const DescriptionText = styled.p`
-  margin: 0;
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
-const Body = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
-  overflow-y: auto;
-  background-color: ${({ theme }) => theme.colors.background.page};
-  flex: 1;
-`;
-
-const Footer = styled.div`
-  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
-  border-top: ${({ theme }) => theme.sizes.component.dividerThin} solid
-    ${({ theme }) => theme.colors.border.divider};
-  display: flex;
-  justify-content: flex-end;
-  gap: ${({ theme }) => theme.spacing.sm};
-  background-color: ${({ theme }) => theme.colors.background.surface};
-`;
-
-const CloseButton = styled.button`
-  all: unset;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  border-radius: ${({ theme }) => theme.borderRadius.round};
-  padding: ${({ theme }) => theme.spacing.xs};
-  ${flexCenter}
-
-  ${({ theme }) =>
-    applyTransition(
-      theme,
-      "background-color, color",
-      theme.transitions.duration.fast,
-      theme.transitions.function.easeInOut,
-    )}
-
-  &:hover {
-    background-color: ${({ theme }) => theme.colors.background.hover};
-    color: ${({ theme }) => theme.colors.text.primary};
-  }
-`;
-
-const CloseIcon = styled(X)`
-  width: ${({ theme }) => theme.sizes.icon.md};
-  height: ${({ theme }) => theme.sizes.icon.md};
 `;
 
 const VisuallyHidden = styled.span`

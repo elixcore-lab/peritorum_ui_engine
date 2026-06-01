@@ -1,6 +1,11 @@
 export interface DisabledStateProps {
-  isDisabled?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
+  readOnly?: boolean;
 }
 
-export const resolveDisabled = ({ isDisabled }: DisabledStateProps): boolean =>
-  Boolean(isDisabled);
+export const resolveDisabled = ({
+  disabled,
+  loading,
+  readOnly,
+}: DisabledStateProps): boolean => Boolean(disabled || loading || readOnly);

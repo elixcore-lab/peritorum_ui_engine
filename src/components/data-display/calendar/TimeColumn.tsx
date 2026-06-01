@@ -20,6 +20,7 @@ export const TimeColumn = ({
   const ref = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isScrolling = useRef(false);
+  const isInitialMount = useRef(true);
 
   const activeIndex = useMemo(() => data.indexOf(value), [data, value]);
   const canSelect = useCallback(
@@ -30,14 +31,19 @@ export const TimeColumn = ({
   useEffect(() => {
     const container = ref.current;
     if (!container || isScrolling.current || activeIndex < 0) return;
-    container.scrollTop = activeIndex * itemHeight;
+
+    container.scrollTo({
+      top: activeIndex * itemHeight,
+      // 최초 렌더링 시에는 순간이동(auto), 이후 변경 시에는 부드럽게(smooth)
+      behavior: isInitialMount.current ? "auto" : "smooth",
+    });
+
+    isInitialMount.current = false;
   }, [activeIndex, itemHeight]);
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
@@ -57,40 +63,54 @@ export const TimeColumn = ({
       onChange(nextValue);
     }
 
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     timeoutRef.current = setTimeout(() => {
       isScrolling.current = false;
-      if (container && activeIndex >= 0) {
-        container.scrollTo({
-          top: activeIndex * itemHeight,
-          behavior: "smooth",
-        });
-      }
     }, DEBOUNCE_DELAY);
-  }, [activeIndex, canSelect, data, itemHeight, onChange, value]);
+  }, [canSelect, data, itemHeight, onChange, value]);
 
   const handleItemClick = useCallback(
     (item: number) => {
-      if (canSelect(item)) {
-        onChange(item);
-      }
+      if (!canSelect(item)) return;
+
+      isScrolling.current = true;
+      onChange(item);
+
+      const targetIndex = data.indexOf(item);
+      ref.current?.scrollTo({
+        top: targetIndex * itemHeight,
+        behavior: "smooth",
+      });
+
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        isScrolling.current = false;
+      }, DEBOUNCE_DELAY + 300);
     },
-    [canSelect, onChange],
+    [canSelect, onChange, data, itemHeight],
   );
 
   return (
     <S.TimeColumnWrapper>
-      <S.TimeColumnLabel>{label}</S.TimeColumnLabel>
+      <S.TimeColumnLabel id={`time-label-${label}`}>{label}</S.TimeColumnLabel>
+
       <S.TimeWheelWrapper>
-        <S.HighlightBar />
-        <S.TimeWheelContainer ref={ref} onScroll={handleScroll}>
-          <S.TimeWheelSpacer />
+        <S.HighlightBar aria-hidden="true" />
+        <S.TimeWheelContainer
+          ref={ref}
+          onScroll={handleScroll}
+          role="listbox"
+          aria-labelledby={`time-label-${label}`}
+        >
+          <S.TimeWheelSpacer aria-hidden="true" />
+
           {data.map((item) => (
             <S.TimeWheelItem
               key={item}
+              role="option"
+              aria-selected={item === value}
+              aria-disabled={!canSelect(item)}
               $isActive={item === value}
               $isDisabled={!canSelect(item)}
               onClick={() => handleItemClick(item)}
@@ -98,7 +118,8 @@ export const TimeColumn = ({
               {String(item).padStart(2, "0")}
             </S.TimeWheelItem>
           ))}
-          <S.TimeWheelSpacer />
+
+          <S.TimeWheelSpacer aria-hidden="true" />
         </S.TimeWheelContainer>
       </S.TimeWheelWrapper>
     </S.TimeColumnWrapper>

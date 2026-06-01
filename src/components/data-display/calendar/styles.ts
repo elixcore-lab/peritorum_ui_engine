@@ -1,7 +1,10 @@
 import styled from "@emotion/styled";
-import { type Theme } from "@emotion/react";
-import { squareIconSize } from "../../../styles/componentStyles";
-import { customScrollbar, transitionBase } from "../../../styles/utils";
+import { css, type Theme } from "@emotion/react";
+import {
+  customScrollbar,
+  flexCenter,
+  transitionBase,
+} from "../../../styles/mixins";
 import { SelectionMode } from "./types";
 
 type DayButtonStyleProps = {
@@ -14,81 +17,7 @@ type DayButtonStyleProps = {
   $selectionMode: SelectionMode;
 };
 
-const getDayButtonBorder = ({
-  theme,
-  $isToday,
-  $isSelected,
-  $isDisabled,
-}: DayButtonStyleProps & { theme: Theme }) =>
-  `${theme.sizes.component.dividerThin} solid ${
-    $isToday && !$isSelected && !$isDisabled
-      ? theme.colors.action.primary
-      : theme.colors.utility.transparent
-  }`;
-
-const getDayButtonBackground = ({
-  theme,
-  $isSelected,
-  $isRange,
-  $isDisabled,
-}: DayButtonStyleProps & { theme: Theme }) =>
-  $isDisabled
-    ? theme.colors.utility.transparent
-    : $isSelected
-      ? theme.colors.action.primary
-      : $isRange
-        ? theme.colors.statusBg.info
-        : theme.colors.utility.transparent;
-
-const getDayButtonColor = ({
-  theme,
-  $isSelected,
-  $isToday,
-  $isDisabled,
-}: DayButtonStyleProps & { theme: Theme }) =>
-  $isDisabled
-    ? theme.colors.text.disabled
-    : $isSelected
-      ? theme.colors.text.inverse
-      : $isToday
-        ? theme.colors.action.primary
-        : theme.colors.text.primary;
-
-const getDayButtonBorderRadius = ({
-  theme,
-  $isRangeStart,
-  $isRangeEnd,
-  $isSelected,
-  $selectionMode,
-}: DayButtonStyleProps & { theme: Theme }) => {
-  if ($selectionMode === SelectionMode.single) {
-    return theme.borderRadius.round;
-  }
-
-  if ($isRangeStart) {
-    return `${theme.borderRadius.round} 0 0 ${theme.borderRadius.round}`;
-  }
-
-  if ($isRangeEnd) {
-    return `0 ${theme.borderRadius.round} ${theme.borderRadius.round} 0`;
-  }
-
-  if ($isSelected) {
-    return theme.borderRadius.round;
-  }
-
-  return "0";
-};
-
-const getDayButtonHoverBackground = ({
-  theme,
-  $isSelected,
-  $isRange,
-  $isDisabled,
-}: DayButtonStyleProps & { theme: Theme }) =>
-  !$isDisabled && !$isSelected && !$isRange
-    ? theme.colors.background.hover
-    : undefined;
+// --- Calendar Grid Styles ---
 
 export const CalendarGrid = styled.div`
   display: grid;
@@ -105,6 +34,11 @@ export const WeekdayText = styled.div`
 `;
 
 export const DayButton = styled.button<DayButtonStyleProps>`
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  ${flexCenter}
+
   height: ${({ theme }) => theme.sizes.component.calendarDay};
   width: ${({ $selectionMode, theme }) =>
     $selectionMode === SelectionMode.single
@@ -112,42 +46,78 @@ export const DayButton = styled.button<DayButtonStyleProps>`
       : "100%"};
   margin: ${({ $selectionMode }) =>
     $selectionMode === SelectionMode.single ? "0 auto" : "0"};
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   cursor: ${({ $isDisabled }) => ($isDisabled ? "not-allowed" : "pointer")};
   ${({ theme }) => transitionBase(theme)};
-  border: ${getDayButtonBorder};
-  background-color: ${getDayButtonBackground};
-  color: ${getDayButtonColor};
-  border-radius: ${getDayButtonBorderRadius};
 
-  &:hover {
-    background-color: ${getDayButtonHoverBackground};
-  }
-`;
-
-export const ModalContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing.md};
-`;
-
-export const ModalHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.sm};
-  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  /* 기본 상태 */
+  background-color: transparent;
   color: ${({ theme }) => theme.colors.text.primary};
+  border: ${({ theme }) => theme.sizes.component.dividerThin} solid transparent;
+  border-radius: ${({ $selectionMode, theme }) =>
+    $selectionMode === SelectionMode.single ? theme.borderRadius.round : "0"};
+
+  /* 오늘(Today) 상태 */
+  ${({ $isToday, theme }) =>
+    $isToday &&
+    css`
+      border-color: ${theme.colors.action.primary};
+      color: ${theme.colors.action.primary};
+    `}
+
+  /* 호버 상태 */
+  &:hover {
+    background-color: ${({ $isDisabled, $isSelected, $isRange, theme }) =>
+      !$isDisabled && !$isSelected && !$isRange
+        ? theme.colors.background.hover
+        : "transparent"};
+  }
+
+  /* 비활성화 상태 */
+  ${({ $isDisabled, theme }) =>
+    $isDisabled &&
+    css`
+      color: ${theme.colors.text.disabled};
+      border-color: transparent;
+    `}
+
+  /* 범위(Range) 포함 상태 */
+  ${({ $isRange, theme }) =>
+    $isRange &&
+    css`
+      background-color: ${theme.colors.statusBg.info};
+    `}
+
+  /* 선택(Selected/RangeStart/RangeEnd) 상태 */
+  ${({ $isSelected, theme }) =>
+    $isSelected &&
+    css`
+      background-color: ${theme.colors.action.primary};
+      color: ${theme.colors.text.inverse};
+      border-color: transparent;
+      border-radius: ${theme.borderRadius.round};
+    `}
+
+  /* Range 둥근 모서리 처리 */
+  ${({ $isRangeStart, theme }) =>
+    $isRangeStart &&
+    css`
+      border-radius: ${theme.borderRadius.round} 0 0 ${theme.borderRadius.round};
+    `}
+  ${({ $isRangeEnd, theme }) =>
+    $isRangeEnd &&
+    css`
+      border-radius: 0 ${theme.borderRadius.round} ${theme.borderRadius.round} 0;
+    `}
 `;
 
-export const HeaderIcon = styled.svg`
-  ${({ theme }) => squareIconSize(theme, "sm")}
-  flex-shrink: 0;
-  color: currentColor;
-  stroke-width: ${({ theme }) => theme.sizes.component.dividerMedium};
+export const EventLine = styled.div`
+  position: absolute;
+  bottom: ${({ theme }) => theme.spacing.xs};
+  width: ${({ theme }) => theme.sizes.component.eventLineWidth};
+  height: ${({ theme }) => theme.sizes.component.dividerMedium};
+  background-color: ${({ theme }) => theme.colors.status.danger};
+  border-radius: ${({ theme }) => theme.borderRadius.round};
 `;
 
 export const CurrentMonthLabel = styled.span`
@@ -158,21 +128,7 @@ export const CurrentMonthLabel = styled.span`
   color: ${({ theme }) => theme.colors.text.primary};
 `;
 
-export const ModalBody = styled.div`
-  padding: ${({ theme }) => theme.spacing.sm} 0;
-`;
-
-export const ModalFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
-
-export const FooterGroup = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
-`;
+// --- Time View Styles ---
 
 export const TimeViewContainer = styled.div`
   display: flex;
@@ -220,10 +176,11 @@ export const TimeWheelContainer = styled.div`
   height: ${({ theme }) => theme.sizes.component.timeWheelHeight};
   overflow-y: auto;
   scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
   -ms-overflow-style: none;
   scrollbar-width: none;
   ${({ theme }) => customScrollbar(theme)};
+
+  /* 💡 CSS scroll-behavior: smooth 삭제! JS의 scrollTo와 충돌 방지 */
 
   &::-webkit-scrollbar {
     display: none;
@@ -273,6 +230,8 @@ export const TimeWheelItem = styled.div<{
     $isActive ? theme.fontWeights.bold : theme.fontWeights.regular};
   ${({ theme }) => transitionBase(theme)};
 `;
+
+// --- Tab Styles (For Range Selection) ---
 
 export const TabContainer = styled.div`
   display: flex;
@@ -333,19 +292,4 @@ export const TabValueDate = styled.small`
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme }) => theme.colors.text.secondary};
   margin-right: ${({ theme }) => theme.spacing.xs};
-`;
-
-export const EventLine = styled.div`
-  position: absolute;
-  bottom: ${({ theme }) => theme.spacing.xs};
-  width: ${({ theme }) => theme.sizes.component.eventLineWidth};
-  height: ${({ theme }) => theme.sizes.component.dividerMedium};
-  background-color: ${({ theme }) => theme.colors.status.danger};
-  border-radius: ${({ theme }) => theme.borderRadius.round};
-`;
-
-export const HorizontalSplit = styled.div`
-  width: 100%;
-  height: ${({ theme }) => theme.sizes.component.dividerMedium};
-  background-color: ${({ theme }) => theme.colors.border.divider};
 `;

@@ -1,5 +1,5 @@
 import { Global, css, type Theme } from "@emotion/react";
-import { applyTransition, customScrollbar } from "./utils";
+import { applyTransition, customScrollbar } from "./mixins";
 
 const style = (theme: Theme) => css`
   @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");

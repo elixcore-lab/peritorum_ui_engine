@@ -24,7 +24,7 @@ const StyledOverlay = styled.div<{ $zIndex?: number }>`
       theme,
       overlayShow,
       theme.transitions.duration.fast,
-      theme.transitions.function.spring,
+      theme.transitions.function.easeOut,
     )}
 
   backdrop-filter: blur(${({ theme }) => theme.sizes.component.overlayBlur});

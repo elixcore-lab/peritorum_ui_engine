@@ -1,3 +1,5 @@
+import { Theme } from "@emotion/react";
+
 const palette = {
   white: "#FFFFFF",
   black: "#000000",
@@ -38,6 +40,7 @@ const media = {
 
 const common = {
   spacing: {
+    xxs: "2px",
     xs: "4px",
     sm: "8px",
     base: "12px",
@@ -47,6 +50,7 @@ const common = {
     xxl: "48px",
   },
   borderRadius: {
+    xxs: "2px",
     sm: "4px",
     md: "8px",
     lg: "12px",
@@ -94,11 +98,13 @@ const sizes = {
   sidebarCollapsedWidth: "64px",
   headerHeight: "60px",
   control: {
+    xs: "20px",
     sm: "32px",
     md: "40px",
     lg: "48px",
   },
   icon: {
+    xxs: "12px",
     xs: "14px",
     sm: "16px",
     md: "20px",

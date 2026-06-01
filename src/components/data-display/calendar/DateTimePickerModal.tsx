@@ -1,16 +1,16 @@
 import { useState, useMemo, useEffect } from "react";
+import styled from "@emotion/styled";
 import { useTheme } from "@emotion/react";
 import { ChevronLeft, ChevronRight, Calendar, ArrowLeft } from "lucide-react";
 import { useUiConfig } from "../../../ConfigProvider";
 import {
-  timeToString,
+  formatDate,
   addMonths,
   subMonths,
   isSameMonth,
   getStartOfMonth,
   getEndOfMonth,
 } from "../../../utils/DateUtils";
-import { Button } from "../../elements/Button";
 import { Modal } from "../../overlays/Modal";
 import { PickerStrategy, getFutureLimits } from "./PickerLogic";
 import { CalendarView } from "./CalendarView";
@@ -24,26 +24,28 @@ import {
 } from "./types";
 import * as S from "./styles";
 import { capitalize } from "../../../utils";
+import { Button, IconButton } from "../..";
 
 const TP = "ui.component.calendar";
 
-const DateTimePickerInner = (props: DateTimePickerModalProps) => {
-  const {
-    onConfirm,
-    onSelectMonth,
-    mode = PickerMode.date,
-    selectionMode = SelectionMode.single,
-    initialStartDate,
-    initialEndDate,
-    events = [],
-    dateFormat = DateFormat.compact,
-    weekdayFormat = WeekdayFormat.short,
-    disableFuture = true,
-    onClose,
-  } = props;
-
+export const DateTimePickerModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  onSelectMonth,
+  mode = PickerMode.date,
+  selectionMode = SelectionMode.single,
+  initialStartDate,
+  initialEndDate,
+  events = [],
+  dateFormat = DateFormat.compact,
+  weekdayFormat = WeekdayFormat.short,
+  disableFuture = true,
+}: DateTimePickerModalProps) => {
+  const theme = useTheme();
   const { locale, t } = useUiConfig();
   const isRangeMode = selectionMode === SelectionMode.range;
+
   const initialMonth = useMemo(
     () => initialStartDate || initialEndDate || new Date(),
     [initialStartDate, initialEndDate],
@@ -91,7 +93,7 @@ const DateTimePickerInner = (props: DateTimePickerModalProps) => {
   );
 
   const currentMonthLabel = useMemo(
-    () => timeToString(currentMonth, yearMonthFormatStr, locale),
+    () => formatDate(currentMonth, yearMonthFormatStr, locale),
     [currentMonth, yearMonthFormatStr, locale],
   );
 
@@ -161,60 +163,83 @@ const DateTimePickerInner = (props: DateTimePickerModalProps) => {
     onConfirm(startDate, endDate);
   };
 
-  return (
-    <S.ModalContent>
-      <S.ModalHeader>
-        {step === PickerMode.time && mode === PickerMode.datetime && (
-          <Button
-            variant="ghost"
-            shape="circle"
-            size="sm"
-            onClick={handleBackToDate}
-          >
-            <S.HeaderIcon as={ArrowLeft} />
+  const modalHeader = showDateControls ? (
+    <HeaderLayout>
+      <IconButton
+        variant="ghost"
+        size="sm"
+        shape="circle"
+        icon={<ChevronLeft />}
+        onClick={handlePreviousMonth}
+      />
+      <MonthLabelWrapper>{currentMonthLabel}</MonthLabelWrapper>
+      <IconButton
+        variant="ghost"
+        size="sm"
+        shape="circle"
+        icon={<ChevronRight />}
+        disabled={disableFuture && isSameMonth(currentMonth, new Date())}
+        onClick={handleNextMonth}
+      />
+    </HeaderLayout>
+  ) : (
+    <HeaderLayout>
+      {mode === PickerMode.datetime && (
+        <IconButton
+          variant="ghost"
+          size="sm"
+          shape="circle"
+          icon={<ArrowLeft />}
+          onClick={handleBackToDate}
+        />
+      )}
+      <Calendar size={18} />
+      <span>
+        {activeDate ? formatDate(activeDate, "yyyy. MM. dd", locale) : "-"}
+      </span>
+    </HeaderLayout>
+  );
+
+  const modalFooter = (
+    <FooterLayout>
+      <ActionGroup>
+        {showDateControls && (
+          <Button variant="ghost" onClick={handleGoToday}>
+            {t(`${TP}.label.today`)}
           </Button>
         )}
-
-        {showDateControls ? (
-          <>
-            <Button
-              variant="ghost"
-              shape="circle"
-              size="sm"
-              onClick={handlePreviousMonth}
-            >
-              <S.HeaderIcon as={ChevronLeft} />
-            </Button>
-
-            <S.CurrentMonthLabel>{currentMonthLabel}</S.CurrentMonthLabel>
-
-            <Button
-              variant="ghost"
-              shape="circle"
-              size="sm"
-              isDisabled={
-                disableFuture && isSameMonth(currentMonth, new Date())
-              }
-              onClick={handleNextMonth}
-            >
-              <S.HeaderIcon as={ChevronRight} />
-            </Button>
-          </>
-        ) : (
-          <>
-            <S.HeaderIcon as={Calendar} />
-            <span>
-              {activeDate
-                ? timeToString(activeDate, "yyyy. MM. dd", locale)
-                : "-"}
-            </span>
-          </>
+        {showDateControls && startDate && mode === PickerMode.datetime && (
+          <Button variant="ghost" onClick={handleEditTime}>
+            {t(`${TP}.label.editTime`)}
+          </Button>
         )}
-      </S.ModalHeader>
+      </ActionGroup>
 
-      <S.HorizontalSplit />
+      <ActionGroup>
+        <Button variant="secondary" onClick={onClose}>
+          {t("common.cancel")}
+        </Button>
+        <Button onClick={handleConfirm} disabled={!canConfirm}>
+          {t("common.confirm")}
+        </Button>
+      </ActionGroup>
+    </FooterLayout>
+  );
 
-      <S.ModalBody>
+  if (!isOpen) return null;
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+      width={theme.sizes.component.datePickerModalWidth}
+      title={modalHeader}
+      footer={modalFooter}
+      hideCloseButton
+    >
+      <BodyWrapper>
         {showDateControls ? (
           <CalendarView
             currentMonth={currentMonth}
@@ -237,51 +262,35 @@ const DateTimePickerInner = (props: DateTimePickerModalProps) => {
             onTimeChange={handleTimeChange}
           />
         )}
-      </S.ModalBody>
-
-      <S.HorizontalSplit />
-      <S.ModalFooter>
-        <S.FooterGroup>
-          {showDateControls && (
-            <Button variant="ghost" onClick={handleGoToday}>
-              {t(`${TP}.label.today`)}
-            </Button>
-          )}
-          {showDateControls && startDate && mode === PickerMode.datetime && (
-            <Button variant="ghost" onClick={handleEditTime}>
-              {t(`${TP}.label.editTime`)}
-            </Button>
-          )}
-        </S.FooterGroup>
-
-        <S.FooterGroup>
-          <Button variant="secondary" onClick={onClose}>
-            {t("common.cancel")}
-          </Button>
-          <Button onClick={handleConfirm} isDisabled={!canConfirm}>
-            {t("common.confirm")}
-          </Button>
-        </S.FooterGroup>
-      </S.ModalFooter>
-    </S.ModalContent>
-  );
-};
-
-export const DateTimePickerModal = (props: DateTimePickerModalProps) => {
-  const { isOpen, onClose } = props;
-  const theme = useTheme();
-
-  if (!isOpen) return null;
-
-  return (
-    <Modal
-      isOpen={isOpen}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-      width={theme.sizes.component.datePickerModalWidth}
-    >
-      <DateTimePickerInner {...props} />
+      </BodyWrapper>
     </Modal>
   );
 };
+
+// --- Styled Components ---
+
+const HeaderLayout = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  width: 100%;
+`;
+
+const MonthLabelWrapper = styled(S.CurrentMonthLabel)`
+  flex: 1;
+`;
+
+const FooterLayout = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const ActionGroup = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BodyWrapper = styled.div`
+  padding: ${({ theme }) => theme.spacing.sm} 0;
+`;

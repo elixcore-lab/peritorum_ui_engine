@@ -11,26 +11,25 @@ export const clamp = (value: number, min: number, max: number): number => {
 export const parseRangeString = (input: string): number[] => {
   if (!input) return [];
 
-  const results = new Set<number>(); // 중복 방지를 위해 Set 사용
+  const results = new Set<number>();
 
-  // 쉼표로 분리
   const parts = input.split(",");
 
   parts.forEach((part) => {
     const trimmed = part.trim();
 
+    // 사용자가 "1, , 3" 처럼 입력했을 때 빈 문자열이 0으로 변환되는 버그 차단
+    if (!trimmed) return;
+
     if (trimmed.includes("-")) {
-      // 하이픈이 있는 경우 (범위 처리)
       const [start, end] = trimmed.split("-").map(Number);
 
-      // 유효한 숫자인지 확인 후 루프를 돌며 추가
       if (!isNaN(start) && !isNaN(end)) {
         for (let i = Math.min(start, end); i <= Math.max(start, end); i++) {
           results.add(i);
         }
       }
     } else {
-      // 단일 숫자인 경우
       const num = Number(trimmed);
       if (!isNaN(num)) {
         results.add(num);
@@ -38,13 +37,11 @@ export const parseRangeString = (input: string): number[] => {
     }
   });
 
-  // 배열로 변환 후 오름차순 정렬
   return Array.from(results).sort((a, b) => a - b);
 };
 
 /**
  * 숫자에 1,000 단위 콤마(,)를 찍어주는 함수 (Intl API 활용)
- * @example formatNumber(1234567) // "1,234,567"
  */
 export const formatNumber = (num: number | string): string => {
   const parsed = Number(num);
@@ -54,7 +51,6 @@ export const formatNumber = (num: number | string): string => {
 
 /**
  * 바이트(Byte) 크기를 사람이 읽기 쉬운 단위(KB, MB, GB 등)로 변환
- * @example formatBytes(1048576) // "1 MB"
  */
 export const formatBytes = (bytes: number, decimals = 2): string => {
   if (!+bytes) return "0 Bytes";

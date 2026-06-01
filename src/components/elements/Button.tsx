@@ -2,162 +2,165 @@ import React, { forwardRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import {
-  controlDisabledStyle,
+  type ColorVariant,
+  type ControlSize,
+  type ComponentShape,
+} from "../../styles/types";
+import {
+  solidVariantStyle,
+  controlSizeBase,
+  disabledState,
   focusRing,
   squareComponentSize,
+  squareIconSize,
   transitionBase,
-  transparentBorder,
-} from "../../styles";
+  inlineComponentBase,
+} from "../../styles/mixins";
 import { useUiConfig } from "../../ConfigProvider";
 import { resolveDisabled } from "../../utils";
+import { Spinner } from "../feedback/Spinner";
 
-export interface ButtonProps extends Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "disabled"
-> {
-  variant?: "primary" | "secondary" | "danger" | "ghost" | "warning";
-  size?: "sm" | "md" | "lg";
-  shape?: "square" | "circle";
-  isFullWidth?: boolean;
-  isDisabled?: boolean;
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  as?: React.ElementType;
+  href?: string;
+  target?: string;
+  variant?: ColorVariant;
+  size?: ControlSize;
+  shape?: ComponentShape;
+  fullWidth?: boolean;
   isLoading?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  isIconOnly?: boolean;
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = forwardRef<
+  HTMLButtonElement | HTMLAnchorElement,
+  ButtonProps
+>(
   (
     {
+      as,
+      href,
       children,
       variant = "primary",
       size = "md",
       shape = "square",
-      isFullWidth,
-      isDisabled,
-      isLoading,
+      fullWidth = false,
+      disabled = false,
+      isLoading = false,
+      leftIcon,
+      rightIcon,
+      isIconOnly = false,
       ...props
     },
     ref,
   ) => {
     const { t } = useUiConfig();
-    const resolvedDisabled = resolveDisabled({ isDisabled });
+    const trulyDisabled = resolveDisabled({ disabled, loading: isLoading });
+
+    const Component = as || (href ? "a" : "button");
+    const isAnchor =
+      Component === "a" ||
+      (typeof Component === "string" && Component !== "button");
+
+    const handleAnchorClick = (
+      e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
+    ) => {
+      if (trulyDisabled) e.preventDefault();
+      if (props.onClick)
+        props.onClick(e as React.MouseEvent<HTMLButtonElement>);
+    };
 
     return (
       <StyledButton
-        ref={ref}
+        as={Component}
+        ref={ref as React.ForwardedRef<HTMLButtonElement & HTMLAnchorElement>}
+        href={href}
         $variant={variant}
         $size={size}
         $shape={shape}
-        $fullWidth={isFullWidth}
-        disabled={resolvedDisabled || isLoading}
+        $fullWidth={fullWidth}
+        $isIconOnly={isIconOnly}
+        disabled={!isAnchor ? trulyDisabled : undefined}
+        data-disabled={trulyDisabled ? "" : undefined}
+        aria-disabled={trulyDisabled}
+        aria-busy={isLoading}
+        onClick={isAnchor ? handleAnchorClick : props.onClick}
         {...props}
       >
-        {isLoading ? t("common.loading") : children}
+        {isLoading ? (
+          <>
+            <Spinner size={size === "lg" ? "md" : "sm"} color="currentColor" />
+            {!isIconOnly && shape !== "circle" && (
+              <span>{t("common.loading")}</span>
+            )}
+          </>
+        ) : (
+          <>
+            {leftIcon && (
+              <ButtonIconWrapper $size={size}>{leftIcon}</ButtonIconWrapper>
+            )}
+            {children}
+            {rightIcon && (
+              <ButtonIconWrapper $size={size}>{rightIcon}</ButtonIconWrapper>
+            )}
+          </>
+        )}
       </StyledButton>
     );
   },
 );
-
 Button.displayName = "Button";
 
-// --- Styled Components ---
-
-const StyledButton = styled.button<{
-  $variant: NonNullable<ButtonProps["variant"]>;
-  $size: NonNullable<ButtonProps["size"]>;
-  $shape: NonNullable<ButtonProps["shape"]>;
-  $fullWidth?: boolean;
-}>`
+const ButtonIconWrapper = styled.span<{ $size: ControlSize }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  & > svg {
+    ${({ theme, $size }) => squareIconSize(theme, $size)}
+  }
+`;
+
+const StyledButton = styled.button<{
+  $size: ControlSize;
+  $variant: ColorVariant;
+  $shape: ComponentShape;
+  $fullWidth: boolean;
+  $isIconOnly: boolean;
+  href?: string;
+  target?: string;
+}>`
+  ${({ theme }) => inlineComponentBase(theme)};
+  gap: ${({ theme }) => theme.spacing.xs};
   font-family: inherit;
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
   cursor: pointer;
-  ${({ theme }) => transparentBorder(theme)}
-  width: ${({ $fullWidth }) => ($fullWidth ? "100%" : "auto")};
+  text-decoration: none;
   user-select: none;
+  width: ${({ $fullWidth }) => ($fullWidth ? "100%" : "auto")};
 
   ${({ theme }) => transitionBase(theme)}
+  ${({ theme }) => disabledState(theme)}
 
   &:focus-visible {
     ${({ theme }) => focusRing(theme)}
   }
 
-  &:disabled {
-    ${({ theme }) => controlDisabledStyle(theme)}
-  }
-
-  ${({ $size, $shape, theme }) => {
-    if ($shape === "circle") {
+  ${({ $size, $shape, $isIconOnly, theme }) => {
+    if ($shape === "circle" || $isIconOnly) {
       return css`
         ${squareComponentSize(theme, $size)}
-        border-radius: ${theme.borderRadius.round};
+        border-radius: ${$shape === "circle"
+          ? theme.borderRadius.round
+          : theme.borderRadius.md};
         padding: 0;
       `;
     }
-    const paddingMap = {
-      sm: `0 ${theme.spacing.sm}`,
-      md: `0 ${theme.spacing.base}`,
-      lg: `0 ${theme.spacing.lg}`,
-    };
-    const fontSizeMap = {
-      sm: theme.fontSizes.sm,
-      md: theme.fontSizes.base,
-      lg: theme.fontSizes.lg,
-    };
-
     return css`
-      height: ${theme.sizes.control[$size]};
-      padding: ${paddingMap[$size]};
-      font-size: ${fontSizeMap[$size]};
+      ${controlSizeBase(theme, $size)}
       border-radius: ${theme.borderRadius.md};
     `;
   }}
 
-  /* Variant 스타일링 */
-  ${({ $variant, theme }) => {
-    switch ($variant) {
-      case "secondary":
-        return css`
-          background-color: ${theme.colors.utility.transparent};
-          border-color: ${theme.colors.border.strong};
-          color: ${theme.colors.text.primary};
-          &:hover:not(:disabled) {
-            background-color: ${theme.colors.background.hover};
-          }
-        `;
-      case "danger":
-        return css`
-          background-color: ${theme.colors.status.danger};
-          color: ${theme.colors.text.inverse};
-          &:hover:not(:disabled) {
-            filter: brightness(0.9);
-          }
-        `;
-      case "warning":
-        return css`
-          background-color: ${theme.colors.status.warning};
-          color: ${theme.colors.text.inverse};
-          &:hover:not(:disabled) {
-            filter: brightness(0.9);
-          }
-        `;
-      case "ghost":
-        return css`
-          background-color: ${theme.colors.utility.transparent};
-          color: ${theme.colors.text.primary};
-          &:hover:not(:disabled) {
-            background-color: ${theme.colors.background.hover};
-          }
-        `;
-      case "primary":
-      default:
-        return css`
-          background-color: ${theme.colors.brand.primary};
-          color: ${theme.colors.text.inverse};
-          &:hover:not(:disabled) {
-            background-color: ${theme.colors.brand.primaryHover};
-          }
-        `;
-    }
-  }}
+  ${({ $variant, theme }) => solidVariantStyle(theme, $variant)}
 `;

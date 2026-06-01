@@ -1,65 +1,36 @@
+import React, { forwardRef } from "react";
 import styled from "@emotion/styled";
-import type { Theme } from "@emotion/react";
-import { applyTransition } from "../../styles";
+import { type ColorVariant, type ControlSize } from "../../styles/types";
+import {
+  inlineComponentBase,
+  compactSizeBase,
+  subtleVariantStyle,
+  transitionBase,
+} from "../../styles/mixins";
 
-export type BadgeTone = "neutral" | "success" | "warning" | "danger" | "info";
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: ColorVariant;
+  size?: ControlSize;
+}
 
-const getBackgroundColor = (theme: Theme, tone: BadgeTone) => {
-  switch (tone) {
-    case "success":
-      return theme.colors.statusBg.success;
-    case "warning":
-      return theme.colors.statusBg.warning;
-    case "danger":
-      return theme.colors.statusBg.danger;
-    case "info":
-      return theme.colors.statusBg.info;
-    case "neutral":
-    default:
-      return theme.colors.surface.sunken;
-  }
-};
-
-const getTextColor = (theme: Theme, tone: BadgeTone) => {
-  switch (tone) {
-    case "success":
-      return theme.colors.status.success;
-    case "warning":
-      return theme.colors.status.warning;
-    case "danger":
-      return theme.colors.status.danger;
-    case "info":
-      return theme.colors.status.info;
-    case "neutral":
-    default:
-      return theme.colors.text.secondary;
-  }
-};
-
-export const Badge = styled.span<{ $tone?: BadgeTone }>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: ${({ theme }) => theme.sizes.component.badgeMinHeight};
-
-  padding: 0 ${({ theme }) => theme.spacing.sm};
-  border-radius: ${({ theme }) => theme.borderRadius.round};
-  font-size: ${({ theme }) => theme.fontSizes.xs};
-  font-weight: ${({ theme }) => theme.fontWeights.extraBold};
-
-  background-color: ${({ $tone = "neutral", theme }) =>
-    getBackgroundColor(theme, $tone)};
-  color: ${({ $tone = "neutral", theme }) => getTextColor(theme, $tone)};
-
-  ${({ theme }) =>
-    applyTransition(
-      theme,
-      "background-color, color",
-      theme.transitions.duration.fast,
-      theme.transitions.function.easeInOut,
-    )}
-
-  white-space: nowrap;
-`;
+export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
+  ({ children, variant = "default", size = "sm", ...props }, ref) => {
+    return (
+      <StyledBadge ref={ref} $variant={variant} $size={size} {...props}>
+        {children}
+      </StyledBadge>
+    );
+  },
+);
 
 Badge.displayName = "Badge";
+
+const StyledBadge = styled.span<{ $variant: ColorVariant; $size: ControlSize }>`
+  ${({ theme }) => inlineComponentBase(theme)};
+  ${({ theme, $size }) => compactSizeBase(theme, $size)};
+
+  border-radius: ${({ theme }) => theme.borderRadius.round};
+  font-weight: ${({ theme }) => theme.fontWeights.extraBold};
+  ${({ theme, $variant }) => subtleVariantStyle(theme, $variant)};
+  ${({ theme }) => transitionBase(theme)};
+`;

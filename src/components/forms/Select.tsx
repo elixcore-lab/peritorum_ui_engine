@@ -1,206 +1,69 @@
 import React, { forwardRef } from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import styled from "@emotion/styled";
-import { css, useTheme, type Theme } from "@emotion/react";
-import { ChevronDown, Check } from "lucide-react";
+import { css, useTheme } from "@emotion/react";
+import { ChevronDown, Check, XCircle } from "lucide-react";
+import { type ControlSize } from "../../styles/types";
 import {
   applyAnimation,
   applyTransition,
-  controlBorder,
-  controlDisabledStyle,
   customScrollbar,
-  focusRing,
-  slideDownAndFade,
-} from "../../styles";
+  formControlBase,
+  controlSizeBase,
+  floatingSurface,
+  disabledState,
+  flexCenter,
+  resetButton,
+  squareIconSize,
+  textEllipsis,
+  interactiveTextColor,
+  popoverContentBase,
+  popoverItemBase,
+} from "../../styles/mixins";
 import { useUiConfig } from "../../ConfigProvider";
 import { resolveDisabled } from "../../utils";
+import { Spinner } from "../feedback/Spinner";
+import { slideDownAndFade } from "../../styles";
 
-// --- Types ---
-export interface SelectOption {
+export interface SelectItemData {
   value: string;
   label: string;
   icon?: React.ReactNode;
+  description?: string;
 }
+
+export interface SelectGroupData {
+  groupLabel: string;
+  items: SelectItemData[];
+}
+
+export type SelectOption = SelectItemData | SelectGroupData;
 
 export interface SelectProps {
   value?: string;
   defaultValue?: string;
   options: SelectOption[];
   placeholder?: string;
-  isDisabled?: boolean;
+  disabled?: boolean;
+  isLoading?: boolean;
+  clearable?: boolean;
   width?: string;
   icon?: React.ReactNode;
-  size?: "sm" | "md" | "lg";
+  size?: ControlSize;
   isError?: boolean;
   onChange?: (value: string) => void;
   onOpenChange?: (open: boolean) => void;
+  onClear?: () => void;
 }
 
-// --- Style Lookups ---
-const getSizeStyle = (theme: Theme, size: Required<SelectProps>["size"]) => {
-  const sizeConfig = {
-    sm: {
-      height: theme.sizes.control.sm,
-      fontSize: theme.fontSizes.xs,
-      padding: `0 ${theme.spacing.base}`,
-    },
-    md: {
-      height: theme.sizes.control.md,
-      fontSize: theme.fontSizes.sm,
-      padding: `0 ${theme.spacing.md}`,
-    },
-    lg: {
-      height: theme.sizes.control.lg,
-      fontSize: theme.fontSizes.base,
-      padding: `0 ${theme.spacing.md}`,
-    },
-  };
-  const { height, fontSize, padding } = sizeConfig[size];
-
-  return css`
-    height: ${height};
-    font-size: ${fontSize};
-    padding: ${padding};
-  `;
+const isGroupData = (opt: SelectOption): opt is SelectGroupData => {
+  return "groupLabel" in opt;
 };
 
 const filterProps = {
   shouldForwardProp: (prop: string) =>
-    !["$inputSize", "$isError", "$fullWidth"].includes(prop),
+    !["$inputSize", "$isError", "$fullWidth", "$hasClearBtn"].includes(prop),
 };
-
-// --- Styled Components ---
-
-const Trigger = styled(SelectPrimitive.Trigger, filterProps)<{
-  $inputSize: "sm" | "md" | "lg";
-  $isError?: boolean;
-  $fullWidth?: string;
-}>`
-  all: unset;
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  gap: ${({ theme }) => theme.spacing.sm};
-  width: ${({ $fullWidth }) => $fullWidth || "100%"};
-
-  background-color: ${({ theme }) => theme.colors.background.input};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  color: ${({ theme }) => theme.colors.text.primary};
-  ${({ theme, $isError }) => controlBorder(theme, $isError)}
-
-  ${({ theme }) =>
-    applyTransition(
-      theme,
-      "border-color, box-shadow, background-color",
-      theme.transitions.duration.normal,
-      theme.transitions.function.easeInOut,
-    )}
-
-  ${({ theme, $inputSize }) => getSizeStyle(theme, $inputSize)}
-
-  &:hover:not(:disabled) {
-    border-color: ${({ theme, $isError }) =>
-      $isError ? theme.colors.status.danger : theme.colors.brand.cyan};
-  }
-
-  &:focus {
-    ${({ theme, $isError }) => focusRing(theme, $isError)}
-  }
-
-  &[data-disabled] {
-    ${({ theme }) => controlDisabledStyle(theme)}
-  }
-
-  /* Placeholder 텍스트 색상 처리 */
-  &[data-placeholder] {
-    color: ${({ theme }) => theme.colors.text.disabled};
-  }
-`;
-
-const Content = styled(SelectPrimitive.Content)`
-  overflow: hidden;
-  background-color: ${({ theme }) => theme.colors.background.surface};
-  border: ${({ theme }) => theme.sizes.component.dividerThin} solid
-    ${({ theme }) => theme.colors.border.divider};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  box-shadow: ${({ theme }) => theme.colors.effect.shadow.lg};
-  z-index: ${({ theme }) => theme.zIndices.popover};
-
-  ${({ theme }) =>
-    applyAnimation(
-      theme,
-      slideDownAndFade,
-      theme.transitions.duration.fast,
-      theme.transitions.function.spring,
-    )}
-`;
-
-const Viewport = styled(SelectPrimitive.Viewport)`
-  padding: ${({ theme }) => theme.spacing.xs};
-  max-height: ${({ theme }) => theme.sizes.component.selectViewportMaxHeight};
-  ${({ theme }) => customScrollbar(theme)}
-`;
-
-const Item = styled(SelectPrimitive.Item)`
-  all: unset;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.base}`};
-  border-radius: ${({ theme }) => theme.borderRadius.sm};
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  cursor: pointer;
-  user-select: none;
-  gap: ${({ theme }) => theme.spacing.md};
-
-  ${({ theme }) =>
-    applyTransition(
-      theme,
-      "background-color, color",
-      theme.transitions.duration.fast,
-      theme.transitions.function.easeInOut,
-    )}
-
-  /* 키보드 방향키 이동 및 Hover 시 하이라이트 */
-  &[data-highlighted] {
-    background-color: ${({ theme }) => theme.colors.background.hover};
-    color: ${({ theme }) => theme.colors.text.primary};
-    outline: none;
-  }
-
-  /* 선택된 아이템은 브랜드 컬러 적용 */
-  &[data-state="checked"] {
-    color: ${({ theme }) => theme.colors.brand.cyan};
-    font-weight: ${({ theme }) => theme.fontWeights.bold};
-  }
-`;
-
-const ItemTextWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.sm};
-`;
-
-const ValueContent = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.sm};
-  overflow: hidden;
-`;
-
-const IconSlot = styled.span`
-  display: flex;
-`;
-
-const SelectIcon = styled.svg`
-  width: ${({ theme }) => theme.sizes.icon.sm};
-  height: ${({ theme }) => theme.sizes.icon.sm};
-  flex-shrink: 0;
-`;
-
-// --- Component ---
 
 export const Select = forwardRef<HTMLButtonElement, SelectProps>(
   (
@@ -209,13 +72,16 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       defaultValue,
       options,
       placeholder,
-      isDisabled,
+      disabled,
+      isLoading = false,
+      clearable = false,
       width,
       icon,
       size = "md",
       isError = false,
       onChange,
       onOpenChange,
+      onClear,
     },
     ref,
   ) => {
@@ -223,53 +89,245 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
     const theme = useTheme();
     const resolvedPlaceholder =
       placeholder ?? t("ui.component.select.placeholder");
-    const resolvedDisabled = resolveDisabled({ isDisabled });
+    const trulyDisabled = resolveDisabled({ disabled, loading: isLoading });
+
+    const hasValue = value !== undefined && value !== "";
+    const showClearBtn = clearable && hasValue && !trulyDisabled;
+
+    const handleClear = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (onClear) onClear();
+    };
+
+    const renderItem = (item: SelectItemData) => (
+      <SelectItem key={item.value} value={item.value}>
+        <ItemContentWrapper>
+          {item.icon && <IconSlot>{item.icon}</IconSlot>}
+          <ItemTextLayout>
+            <ItemLabel>{item.label}</ItemLabel>
+            {item.description && (
+              <ItemDescription>{item.description}</ItemDescription>
+            )}
+          </ItemTextLayout>
+        </ItemContentWrapper>
+        <SelectPrimitive.ItemIndicator>
+          <ActionIconWrapper>
+            <Check />
+          </ActionIconWrapper>
+        </SelectPrimitive.ItemIndicator>
+      </SelectItem>
+    );
 
     return (
-      <SelectPrimitive.Root
-        value={value}
-        defaultValue={defaultValue}
-        onValueChange={onChange}
-        onOpenChange={onOpenChange}
-        disabled={resolvedDisabled}
-      >
-        <Trigger
-          ref={ref}
-          $inputSize={size}
-          $isError={isError}
-          $fullWidth={width}
+      <SelectWrapper $fullWidth={width}>
+        <SelectPrimitive.Root
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={onChange}
+          onOpenChange={onOpenChange}
+          disabled={trulyDisabled}
         >
-          <ValueContent>
-            {icon && <IconSlot>{icon}</IconSlot>}
-            <SelectPrimitive.Value placeholder={resolvedPlaceholder} />
-          </ValueContent>
-          <SelectPrimitive.Icon asChild>
-            <SelectIcon as={ChevronDown} />
-          </SelectPrimitive.Icon>
-        </Trigger>
+          <SelectTrigger
+            ref={ref}
+            $inputSize={size}
+            $isError={isError}
+            $hasClearBtn={showClearBtn}
+            aria-invalid={isError}
+          >
+            <ValueContent>
+              {icon && <IconSlot>{icon}</IconSlot>}
+              <SelectPrimitive.Value placeholder={resolvedPlaceholder} />
+            </ValueContent>
 
-        <SelectPrimitive.Portal>
-          <Content position="popper" sideOffset={theme.sizes.offset.popover}>
-            <Viewport>
-              {options.map((opt) => (
-                <Item key={opt.value} value={opt.value}>
-                  <ItemTextWrapper>
-                    {opt.icon && opt.icon}
-                    <SelectPrimitive.ItemText>
-                      {opt.label}
-                    </SelectPrimitive.ItemText>
-                  </ItemTextWrapper>
-                  <SelectPrimitive.ItemIndicator>
-                    <SelectIcon as={Check} />
-                  </SelectPrimitive.ItemIndicator>
-                </Item>
-              ))}
-            </Viewport>
-          </Content>
-        </SelectPrimitive.Portal>
-      </SelectPrimitive.Root>
+            <RightSlot>
+              {isLoading ? (
+                <Spinner size="sm" color="currentColor" />
+              ) : (
+                <SelectPrimitive.Icon asChild>
+                  <ActionIconWrapper>
+                    <ChevronDown />
+                  </ActionIconWrapper>
+                </SelectPrimitive.Icon>
+              )}
+            </RightSlot>
+          </SelectTrigger>
+
+          <SelectPrimitive.Portal>
+            <SelectContent
+              position="popper"
+              sideOffset={theme.sizes.offset.popover}
+            >
+              <SelectViewport>
+                {options.map((opt, index) =>
+                  isGroupData(opt) ? (
+                    <SelectGroup key={`group-${index}`}>
+                      <SelectGroupLabel>{opt.groupLabel}</SelectGroupLabel>
+                      {opt.items.map(renderItem)}
+                    </SelectGroup>
+                  ) : (
+                    renderItem(opt)
+                  ),
+                )}
+              </SelectViewport>
+            </SelectContent>
+          </SelectPrimitive.Portal>
+        </SelectPrimitive.Root>
+
+        {showClearBtn && (
+          <ClearButton
+            type="button"
+            onClick={handleClear}
+            aria-label={t("common.clear")}
+            $inputSize={size}
+          >
+            <ActionIconWrapper>
+              <XCircle />
+            </ActionIconWrapper>
+          </ClearButton>
+        )}
+      </SelectWrapper>
     );
   },
 );
 
 Select.displayName = "Select";
+
+const SelectWrapper = styled.div<{ $fullWidth?: string }>`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: ${({ $fullWidth }) => $fullWidth || "100%"};
+`;
+
+const SelectTrigger = styled(SelectPrimitive.Trigger, filterProps)<{
+  $inputSize: ControlSize;
+  $isError?: boolean;
+  $hasClearBtn?: boolean;
+}>`
+  ${({ theme, $isError }) => formControlBase(theme, $isError)}
+  ${({ theme, $inputSize }) => controlSizeBase(theme, $inputSize)}
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  gap: ${({ theme }) => theme.spacing.sm};
+  width: 100%;
+
+  ${({ theme, $hasClearBtn }) =>
+    $hasClearBtn &&
+    css`
+      padding-right: calc(${theme.spacing.xl} + ${theme.spacing.sm});
+    `}
+
+  &[data-placeholder] {
+    color: ${({ theme }) => theme.colors.text.disabled};
+  }
+
+  &[data-disabled] {
+    ${({ theme }) => disabledState(theme)}
+  }
+`;
+
+const ActionIconWrapper = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  & > svg {
+    ${({ theme }) => squareIconSize(theme, "sm")}
+    flex-shrink: 0;
+  }
+`;
+
+const SelectContent = styled(SelectPrimitive.Content)`
+  ${({ theme }) => popoverContentBase(theme)}
+  overflow: hidden;
+`;
+
+const SelectViewport = styled(SelectPrimitive.Viewport)`
+  padding: ${({ theme }) => theme.spacing.xs};
+  max-height: ${({ theme }) => theme.sizes.component.selectViewportMaxHeight};
+  ${({ theme }) => customScrollbar(theme)}
+`;
+
+const SelectGroup = styled(SelectPrimitive.Group)`
+  padding: ${({ theme }) => theme.spacing.xs} 0;
+
+  &:not(:last-child) {
+    border-bottom: ${({ theme }) => theme.sizes.component.dividerThin} solid
+      ${({ theme }) => theme.colors.border.divider};
+  }
+`;
+
+const SelectGroupLabel = styled(SelectPrimitive.Label)`
+  padding: ${({ theme }) => `${theme.spacing.xs} ${theme.spacing.base}`};
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const SelectItem = styled(SelectPrimitive.Item)`
+  all: unset;
+  ${({ theme }) => popoverItemBase(theme)}
+`;
+
+const ItemContentWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  flex: 1;
+  min-width: 0;
+`;
+
+const ItemTextLayout = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xxs};
+  overflow: hidden;
+`;
+
+const ItemLabel = styled(SelectPrimitive.ItemText)`
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  ${textEllipsis}
+`;
+
+const ItemDescription = styled.span`
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  ${textEllipsis}
+`;
+
+const ValueContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  overflow: hidden;
+  flex: 1;
+`;
+
+const RightSlot = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.xs};
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const IconSlot = styled.span`
+  ${flexCenter}
+`;
+
+const ClearButton = styled.button<{ $inputSize: ControlSize }>`
+  ${resetButton}
+  ${flexCenter}
+  position: absolute;
+
+  right: ${({ theme, $inputSize }) =>
+    $inputSize === "lg" ? theme.spacing.xl : theme.spacing.lg};
+
+  color: ${({ theme }) => theme.colors.text.disabled};
+  z-index: 1;
+
+  ${({ theme }) => interactiveTextColor(theme)}
+`;

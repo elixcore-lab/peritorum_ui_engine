@@ -7,6 +7,8 @@
     "notice": "Notice",
     "save": "Save",
     "delete": "Delete",
+    "remove": "Remove",
+    "clear": "Clear",
     "close": "Close",
     "loading": "Loading...",
     "disabled": "Disabled",
@@ -102,13 +104,33 @@
         "placeholder": "Select...",
         "empty": "No results found."
       },
+      "combobox": {
+        "searching": "Searching...",
+        "noResults": "No matching results."
+      },
       "modal": {
         "title": "Modal",
+        "description": "Modal dialog.",
         "close": "Close modal"
       },
       "drawer": {
         "title": "Menu",
+        "description": "Drawer menu.",
         "close": "Close menu"
+      },
+      "toast": {
+        "close": "Close notification"
+      },
+      "table": {
+        "sortAsc": "Sort ascending",
+        "sortDesc": "Sort descending",
+        "sortNone": "Remove sort"
+      },
+      "pagination": {
+        "prev": "Previous page",
+        "next": "Next page",
+        "first": "First page",
+        "last": "Last page"
       }
     }
   }

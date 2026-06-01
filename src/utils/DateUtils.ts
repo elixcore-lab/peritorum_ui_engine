@@ -13,7 +13,17 @@ interface ExtendedLocale extends Intl.Locale {
 /**
  * 입력을 Date 객체로 안전하게 변환하는 헬퍼 함수
  */
-export const toDate = (date: DateInput): Date => new Date(date);
+export const toDate = (date: DateInput): Date => {
+  const parsedDate = new Date(date);
+
+  // 🚀 방어 로직: 유효하지 않은 날짜 값이 들어오면 현재 시간(또는 null) 반환
+  if (isNaN(parsedDate.getTime())) {
+    console.warn(`[DateUtils] Invalid date input: ${date}`);
+    return new Date(); // 프로젝트 정책에 따라 null을 던질 수도 있습니다.
+  }
+
+  return parsedDate;
+};
 
 /**
  * 명시적으로 전달받은 locale을 기반으로 주 시작 요일을 반환
@@ -104,7 +114,17 @@ export const getEndOfMonth = (date: DateInput): Date => {
  */
 export const addMonths = (date: DateInput, amount: number): Date => {
   const d = toDate(date);
-  d.setMonth(d.getMonth() + amount);
+  const targetMonth = d.getMonth() + amount;
+  const targetDate = d.getDate();
+
+  d.setMonth(targetMonth);
+
+  // 만약 1월 31일 + 1달 = 2월 31일(-> 3월 2일/3일)로 계산되었다면
+  // 달이 한 번 더 넘어가 버린 것이므로, 이전 달의 마지막 날로 맞춥니다.
+  if (d.getMonth() !== ((targetMonth % 12) + 12) % 12) {
+    d.setDate(0);
+  }
+
   return d;
 };
 
@@ -199,8 +219,11 @@ export const isWithinInterval = (
  * 두 날짜 사이의 일(Day) 차이 계산
  */
 export const diffInDays = (d1: DateInput, d2: DateInput): number => {
-  const timeDiff = Math.abs(toDate(d1).getTime() - toDate(d2).getTime());
-  return Math.ceil(timeDiff / (1000 * 3600 * 24));
+  const date1 = getStartOfDay(d1).getTime();
+  const date2 = getStartOfDay(d2).getTime();
+
+  const timeDiff = Math.abs(date1 - date2);
+  return Math.round(timeDiff / (1000 * 3600 * 24));
 };
 
 /**
@@ -221,11 +244,12 @@ export const eachDayOfInterval = (start: DateInput, end: DateInput): Date[] => {
   return days;
 };
 
+const FORMAT_REGEX = /yyyy|MM|M|dd|d|HH|hh|mm|m|ss|s|SSS|a/g;
 /**
  * 날짜 포맷팅 함수 (다국어 AM/PM 완벽 지원)
  * 지원 토큰: yyyy, MM, M, dd, d, HH, hh, mm, m, ss, s, SSS, a
  */
-export const timeToString = (
+export const formatDate = (
   timestampInput: DateInput | null | undefined,
   formatStr: string,
   locale: string = "en",
@@ -251,7 +275,7 @@ export const timeToString = (
   const SSS = date.getMilliseconds();
   const h = H % 12 || 12;
 
-  // 🌟 다국어 완벽 대응 AM/PM 추출 (ko: 오전/오후, en: AM/PM)
+  // 다국어 완벽 대응 AM/PM 추출 (ko: 오전/오후, en: AM/PM)
   let a = H < 12 ? "AM" : "PM";
   try {
     const parts = new Intl.DateTimeFormat(locale, {
@@ -282,8 +306,7 @@ export const timeToString = (
     a: a,
   };
 
-  const regex = /yyyy|MM|M|dd|d|HH|hh|mm|m|ss|s|SSS|a/g;
-  return formatStr.replace(regex, (match) => replacements[match]);
+  return formatStr.replace(FORMAT_REGEX, (match) => replacements[match]);
 };
 
 /**

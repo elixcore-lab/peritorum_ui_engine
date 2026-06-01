@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { forwardRef, useMemo } from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
@@ -10,6 +10,7 @@ import {
   customScrollbar,
   focusRing,
   textEllipsis,
+  squareIconSize,
 } from "../../styles";
 import { resolveDisabled } from "../../utils";
 
@@ -21,69 +22,92 @@ export interface TabItem {
   id: string;
   label?: string | React.ReactNode;
   icon?: React.ReactNode;
+  disabled?: boolean;
   content: React.ReactNode;
-  isDisabled?: boolean;
 }
 
-export interface TabsProps {
+export interface TabsProps extends Omit<
+  TabsPrimitive.TabsProps,
+  "defaultValue" | "value" | "onValueChange"
+> {
   items: TabItem[];
   defaultValue?: string;
-  className?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
   layoutMode?: TabLayoutMode;
   fixedWidth?: string;
   keepAlive?: boolean;
 }
+
 // --- Component ---
 
-export const Tabs = ({
-  items,
-  defaultValue,
-  className,
-  layoutMode = "fit",
-  fixedWidth,
-  keepAlive = true,
-}: TabsProps) => {
-  if (!items.length) return null;
+export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
+  (
+    {
+      items,
+      defaultValue,
+      value,
+      onValueChange,
+      className,
+      layoutMode = "fit",
+      fixedWidth,
+      keepAlive = true,
+      ...props
+    },
+    ref,
+  ) => {
+    if (!items.length) return null;
 
-  const initialValue = useMemo(
-    () => defaultValue || items[0].id,
-    [defaultValue, items],
-  );
+    const initialValue = useMemo(
+      () => defaultValue || items[0].id,
+      [defaultValue, items],
+    );
 
-  return (
-    <StyledTabsRoot className={className} defaultValue={initialValue}>
-      <StyledTabsList layoutMode={layoutMode}>
+    return (
+      <StyledTabsRoot
+        ref={ref}
+        className={className}
+        defaultValue={value === undefined ? initialValue : undefined}
+        value={value}
+        onValueChange={onValueChange}
+        {...props}
+      >
+        <StyledTabsList $layoutMode={layoutMode}>
+          {items.map((item) => (
+            <StyledTabsTrigger
+              key={item.id}
+              value={item.id}
+              disabled={resolveDisabled({ disabled: item.disabled })}
+              $layoutMode={layoutMode}
+              $fixedWidth={fixedWidth}
+              title={typeof item.label === "string" ? item.label : undefined}
+            >
+              {item.icon && <TabIcon>{item.icon}</TabIcon>}
+
+              {layoutMode === "scroll" ? (
+                <span>{item.label}</span>
+              ) : (
+                <TabLabel>{item.label}</TabLabel>
+              )}
+            </StyledTabsTrigger>
+          ))}
+        </StyledTabsList>
+
         {items.map((item) => (
-          <StyledTabsTrigger
+          <StyledTabsContent
             key={item.id}
             value={item.id}
-            disabled={resolveDisabled(item)}
-            layoutMode={layoutMode}
-            fixedWidth={fixedWidth}
-            title={typeof item.label === "string" ? item.label : undefined}
+            forceMount={keepAlive ? true : undefined}
           >
-            {item.icon && <TabIcon>{item.icon}</TabIcon>}
-            {layoutMode === "scroll" ? (
-              <span>{item.label}</span>
-            ) : (
-              <TabLabel>{item.label}</TabLabel>
-            )}
-          </StyledTabsTrigger>
+            {item.content}
+          </StyledTabsContent>
         ))}
-      </StyledTabsList>
+      </StyledTabsRoot>
+    );
+  },
+);
 
-      {items.map((item) => (
-        <StyledTabsContent
-          key={item.id}
-          value={item.id}
-          forceMount={keepAlive ? true : undefined}
-        >
-          {item.content}
-        </StyledTabsContent>
-      ))}
-    </StyledTabsRoot>
-  );
-};
+Tabs.displayName = "Tabs";
 
 // --- Styled Components ---
 
@@ -96,10 +120,8 @@ const StyledTabsRoot = styled(TabsPrimitive.Root)`
   overflow: hidden;
 `;
 
-const StyledTabsList = styled(TabsPrimitive.List, {
-  shouldForwardProp: (prop) => prop !== "layoutMode",
-})<{
-  layoutMode: TabLayoutMode;
+const StyledTabsList = styled(TabsPrimitive.List)<{
+  $layoutMode: TabLayoutMode;
 }>`
   display: flex;
   width: 100%;
@@ -110,8 +132,8 @@ const StyledTabsList = styled(TabsPrimitive.List, {
   list-style: none;
   background-color: ${({ theme }) => theme.colors.background.surface};
 
-  ${({ layoutMode, theme }) =>
-    layoutMode === "scroll"
+  ${({ $layoutMode, theme }) =>
+    $layoutMode === "scroll"
       ? css`
           overflow-x: auto;
           flex-wrap: nowrap;
@@ -128,11 +150,9 @@ const StyledTabsList = styled(TabsPrimitive.List, {
         `}
 `;
 
-const StyledTabsTrigger = styled(TabsPrimitive.Trigger, {
-  shouldForwardProp: (prop) => prop !== "layoutMode" && prop !== "fixedWidth",
-})<{
-  layoutMode: TabLayoutMode;
-  fixedWidth?: string;
+const StyledTabsTrigger = styled(TabsPrimitive.Trigger)<{
+  $layoutMode: TabLayoutMode;
+  $fixedWidth?: string;
 }>`
   all: unset;
   display: flex;
@@ -145,6 +165,7 @@ const StyledTabsTrigger = styled(TabsPrimitive.Trigger, {
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.text.secondary};
   background-color: ${({ theme }) => theme.colors.utility.transparent};
+
   ${({ theme }) =>
     applyTransition(
       theme,
@@ -158,8 +179,8 @@ const StyledTabsTrigger = styled(TabsPrimitive.Trigger, {
     border-radius: ${({ theme }) => theme.borderRadius.sm};
   }
 
-  ${({ layoutMode, fixedWidth, theme }) => {
-    switch (layoutMode) {
+  ${({ $layoutMode, $fixedWidth, theme }) => {
+    switch ($layoutMode) {
       case "fit":
         return css`
           flex: 1;
@@ -168,7 +189,7 @@ const StyledTabsTrigger = styled(TabsPrimitive.Trigger, {
       case "fixed":
         return css`
           flex: none;
-          width: ${fixedWidth || theme.sizes.component.tabFixedWidth};
+          width: ${$fixedWidth || theme.sizes.component.tabFixedWidth};
           min-width: 0;
         `;
       default:
@@ -196,7 +217,6 @@ const StyledTabsTrigger = styled(TabsPrimitive.Trigger, {
   }
 `;
 
-// 텍스트 말줄임 처리를 위한 내부 span
 const TabLabel = styled.span`
   display: block;
   ${textEllipsis}
@@ -204,6 +224,10 @@ const TabLabel = styled.span`
 
 const TabIcon = styled.span`
   display: flex;
+
+  & > svg {
+    ${({ theme }) => squareIconSize(theme, "sm")}
+  }
 `;
 
 const StyledTabsContent = styled(TabsPrimitive.Content)`

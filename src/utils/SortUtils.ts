@@ -6,45 +6,82 @@ export const SortDirection = {
 export type SortDirection = (typeof SortDirection)[keyof typeof SortDirection];
 
 export interface SortConfig {
-  id: string;
+  id: string; // "name" 또는 "user.address.city" 같은 중첩 경로도 가능
   direction: SortDirection;
 }
 
-/**
- * 범용 다중 정렬 유틸리티
- * @param data 정렬할 원본 배열
- * @param sortConfigs 정렬 규칙 배열 (우선순위 순서)
- */
+export const getSortDirectionByColumnId = (sortConfigs: SortConfig[]) => {
+  const directionByColumnId = new Map<string, SortDirection>();
+  for (const { id, direction } of sortConfigs) {
+    directionByColumnId.set(id, direction);
+  }
+  return directionByColumnId;
+};
+
+export const getNextSortConfigs = (
+  currentConfigs: SortConfig[],
+  columnId: string,
+  isMultiSort: boolean,
+): SortConfig[] => {
+  const existingIndex = currentConfigs.findIndex((c) => c.id === columnId);
+  if (isMultiSort) {
+    if (existingIndex === -1)
+      return [
+        ...currentConfigs,
+        { id: columnId, direction: SortDirection.DESC },
+      ];
+    const nextConfigs = [...currentConfigs];
+    nextConfigs[existingIndex] = {
+      ...nextConfigs[existingIndex],
+      direction:
+        nextConfigs[existingIndex].direction === SortDirection.DESC
+          ? SortDirection.ASC
+          : SortDirection.DESC,
+    };
+    return nextConfigs;
+  }
+  if (existingIndex >= 0 && currentConfigs.length === 1) {
+    return currentConfigs[0].direction === SortDirection.DESC
+      ? [{ id: columnId, direction: SortDirection.ASC }]
+      : [];
+  }
+  return [{ id: columnId, direction: SortDirection.DESC }];
+};
+
+const getValueByPath = (obj: Record<string, any>, path: string): any => {
+  return path
+    .split(".")
+    .reduce((acc, part) => (acc ? acc[part] : undefined), obj);
+};
+
 export const multiSort = <T>(data: T[], sortConfigs: SortConfig[]): T[] => {
   if (!sortConfigs || sortConfigs.length === 0) return data;
 
-  // 원본 배열 불변성 유지를 위해 복사 후 정렬
   return [...data].sort((a, b) => {
     for (const config of sortConfigs) {
       const { id, direction } = config;
-      const valA = (a as Record<string, any>)[id];
-      const valB = (b as Record<string, any>)[id];
 
-      // 값이 같으면 다음 우선순위 정렬 규칙으로 넘어감
+      const valA = getValueByPath(a as Record<string, any>, id);
+      const valB = getValueByPath(b as Record<string, any>, id);
+
       if (valA === valB) continue;
 
       const modifier = direction === SortDirection.ASC ? 1 : -1;
 
-      // null 또는 undefined 처리 (항상 뒤로)
       if (valA == null) return 1;
       if (valB == null) return -1;
 
-      // 문자열인 경우 다국어/알파벳 순서 비교
       if (typeof valA === "string" && typeof valB === "string") {
-        const comparison = valA.localeCompare(valB);
+        const comparison = valA.localeCompare(valB, undefined, {
+          numeric: true,
+        });
         if (comparison !== 0) return comparison * modifier;
         continue;
       }
 
-      // 숫자 및 기타 타입 비교
       if (valA < valB) return -1 * modifier;
       if (valA > valB) return 1 * modifier;
     }
-    return 0; // 모든 조건이 같으면 순서 유지
+    return 0;
   });
 };

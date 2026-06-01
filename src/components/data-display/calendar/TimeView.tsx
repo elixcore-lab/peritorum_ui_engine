@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useUiConfig } from "../../../ConfigProvider";
 import { TimeColumn } from "./TimeColumn";
-import { timeToString } from "../../../utils/DateUtils";
+import { formatDate } from "../../../utils/DateUtils";
 import { SelectionMode } from "./types";
 import * as S from "./styles";
 
@@ -45,30 +45,44 @@ export const TimeView = ({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, target: "start" | "end") => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (target === "start") handleStartTabClick();
+      else handleEndTabClick();
+    }
+  };
+
   const formattedStartDate = useMemo(
-    () => (startDate ? timeToString(startDate, "MM-dd", locale) : "-"),
+    () => (startDate ? formatDate(startDate, "MM-dd", locale) : "-"),
     [startDate, locale],
   );
   const formattedEndDate = useMemo(
-    () => (endDate ? timeToString(endDate, "MM-dd", locale) : "-"),
+    () => (endDate ? formatDate(endDate, "MM-dd", locale) : "-"),
     [endDate, locale],
   );
 
   const formattedStartTime = useMemo(
-    () =>
-      startDate ? timeToString(startDate, "HH:mm:ss", locale) : "--:--:--",
+    () => (startDate ? formatDate(startDate, "HH:mm:ss", locale) : "--:--:--"),
     [startDate, locale],
   );
   const formattedEndTime = useMemo(
-    () => (endDate ? timeToString(endDate, "HH:mm:ss", locale) : "--:--:--"),
+    () => (endDate ? formatDate(endDate, "HH:mm:ss", locale) : "--:--:--"),
     [endDate, locale],
   );
 
   return (
     <S.TimeViewContainer>
       {selectionMode === SelectionMode.range && (
-        <S.TabContainer>
-          <S.TabItem $isActive={isStartActive} onClick={handleStartTabClick}>
+        <S.TabContainer role="tablist" aria-label={t(`${TP}.label.rangeTabs`)}>
+          <S.TabItem
+            role="tab"
+            aria-selected={isStartActive}
+            tabIndex={0}
+            $isActive={isStartActive}
+            onClick={handleStartTabClick}
+            onKeyDown={(e) => handleKeyDown(e, "start")}
+          >
             <S.TabLabel $isActive={isStartActive}>
               {t(`${TP}.label.start`)}
             </S.TabLabel>
@@ -79,9 +93,14 @@ export const TimeView = ({
           </S.TabItem>
 
           <S.TabItem
+            role="tab"
+            aria-selected={!isStartActive}
+            aria-disabled={!endDate}
+            tabIndex={endDate ? 0 : -1}
             $isActive={!isStartActive}
             $isDisabled={!endDate}
             onClick={handleEndTabClick}
+            onKeyDown={(e) => handleKeyDown(e, "end")}
           >
             <S.TabLabel $isActive={!isStartActive}>
               {t(`${TP}.label.end`)}
@@ -102,7 +121,9 @@ export const TimeView = ({
           disabledLimit={limits.h}
           onChange={(value) => onTimeChange("h", value)}
         />
-        <S.TimeSeparator>:</S.TimeSeparator>
+
+        <S.TimeSeparator aria-hidden="true">:</S.TimeSeparator>
+
         <TimeColumn
           label={t(`${TP}.label.m`)}
           data={MINUTES_SECONDS}
@@ -110,7 +131,9 @@ export const TimeView = ({
           disabledLimit={limits.m}
           onChange={(value) => onTimeChange("m", value)}
         />
-        <S.TimeSeparator>:</S.TimeSeparator>
+
+        <S.TimeSeparator aria-hidden="true">:</S.TimeSeparator>
+
         <TimeColumn
           label={t(`${TP}.label.s`)}
           data={MINUTES_SECONDS}

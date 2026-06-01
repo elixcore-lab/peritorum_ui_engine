@@ -1,39 +1,157 @@
 import React, { forwardRef } from "react";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import styled from "@emotion/styled";
+import { css } from "@emotion/react";
+import { type ControlSize } from "../../styles/types"; // 💡 통합 타입 임포트
 import {
   applyTransition,
-  controlBorder,
-  controlDisabledStyle,
   focusRing,
   transitionBase,
-} from "../../styles";
+  disabledState,
+  flexCenter,
+  squareIconSize,
+} from "../../styles/mixins";
 import { resolveDisabled } from "../../utils";
+import { Label } from "./Label";
+import { Spinner } from "../feedback/Spinner";
 
-export interface SwitchProps extends Omit<
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitive.Root>,
-  "disabled"
+export type SwitchSize = Extract<ControlSize, "sm" | "md" | "lg">;
+
+export interface SwitchProps extends React.ComponentPropsWithoutRef<
+  typeof SwitchPrimitive.Root
 > {
-  size?: "sm" | "md" | "lg";
+  size?: SwitchSize;
+  label?: string;
+  description?: string;
+  labelPosition?: "left" | "right";
   isError?: boolean;
-  isDisabled?: boolean;
+  isLoading?: boolean;
+  iconOn?: React.ReactNode;
+  iconOff?: React.ReactNode;
 }
 
-const SwitchRoot = styled(SwitchPrimitive.Root)<{
-  $size: "sm" | "md" | "lg";
+export const Switch = forwardRef<
+  React.ElementRef<typeof SwitchPrimitive.Root>,
+  SwitchProps
+>(
+  (
+    {
+      size = "md",
+      label,
+      description,
+      labelPosition = "right",
+      isError,
+      isLoading,
+      disabled,
+      iconOn,
+      iconOff,
+      id,
+      className,
+      checked,
+      ...props
+    },
+    ref,
+  ) => {
+    const trulyDisabled = resolveDisabled({ disabled, loading: isLoading });
+
+    return (
+      <SwitchWrapper className={className} $labelPosition={labelPosition}>
+        {(label || description) && (
+          <SwitchLabelGroup $labelPosition={labelPosition}>
+            {label && (
+              <Label
+                htmlFor={id}
+                disabled={trulyDisabled}
+                style={{ cursor: "inherit" }}
+              >
+                {label}
+              </Label>
+            )}
+            {description && (
+              <SwitchDescription $disabled={trulyDisabled}>
+                {description}
+              </SwitchDescription>
+            )}
+          </SwitchLabelGroup>
+        )}
+
+        <StyledSwitch
+          ref={ref}
+          id={id}
+          $size={size}
+          $isError={isError}
+          disabled={trulyDisabled}
+          aria-invalid={isError}
+          checked={checked}
+          {...props}
+        >
+          <SwitchThumb $size={size}>
+            {isLoading ? (
+              <Spinner size="xxs" color="currentColor" />
+            ) : (
+              <ThumbIconWrapper>{checked ? iconOn : iconOff}</ThumbIconWrapper>
+            )}
+          </SwitchThumb>
+        </StyledSwitch>
+      </SwitchWrapper>
+    );
+  },
+);
+
+Switch.displayName = "Switch";
+
+// --- Styled Components ---
+
+const SwitchWrapper = styled.div<{ $labelPosition: "left" | "right" }>`
+  display: inline-flex;
+  align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing.base};
+
+  ${({ $labelPosition }) =>
+    $labelPosition === "left" &&
+    css`
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+    `}
+`;
+
+const SwitchLabelGroup = styled.div<{ $labelPosition: "left" | "right" }>`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xxs};
+  order: ${({ $labelPosition }) => ($labelPosition === "left" ? 0 : 1)};
+`;
+
+const SwitchDescription = styled.span<{ $disabled?: boolean }>`
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  color: ${({ theme, $disabled }) =>
+    $disabled ? theme.colors.text.disabled : theme.colors.text.secondary};
+`;
+
+const StyledSwitch = styled(SwitchPrimitive.Root)<{
+  $size: SwitchSize;
   $isError?: boolean;
 }>`
   all: unset;
   position: relative;
+  flex-shrink: 0;
   border-radius: ${({ theme }) => theme.borderRadius.round};
   background-color: ${({ theme }) => theme.colors.surface.sunken};
-  ${({ theme, $isError }) => controlBorder(theme, $isError)}
+  border: ${({ theme }) => theme.sizes.component.dividerThin} solid
+    ${({ theme, $isError }) =>
+      $isError ? theme.colors.status.danger : theme.colors.border.strong};
   cursor: pointer;
 
   width: ${({ theme, $size }) => theme.sizes.component.switch[$size].width};
   height: ${({ theme, $size }) => theme.sizes.component.switch[$size].height};
 
   ${({ theme }) => transitionBase(theme)}
+
+  &:hover:not(:disabled):not([data-disabled]) {
+    border-color: ${({ theme, $isError }) =>
+      $isError ? theme.colors.status.danger : theme.colors.brand.cyan};
+  }
 
   &:focus-visible {
     ${({ theme, $isError }) => focusRing(theme, $isError)}
@@ -44,15 +162,13 @@ const SwitchRoot = styled(SwitchPrimitive.Root)<{
     border-color: ${({ theme }) => theme.colors.brand.cyan};
   }
 
-  &[data-disabled] {
-    ${({ theme }) => controlDisabledStyle(theme)}
-  }
+  ${({ theme }) => disabledState(theme)}
 `;
 
 const SwitchThumb = styled(SwitchPrimitive.Thumb)<{
-  $size: "sm" | "md" | "lg";
+  $size: SwitchSize;
 }>`
-  display: block;
+  ${flexCenter}
   background-color: ${({ theme }) => theme.colors.brand.ink};
   border-radius: ${({ theme }) => theme.borderRadius.round};
   box-shadow: ${({ theme }) => theme.colors.effect.shadow.sm};
@@ -63,10 +179,11 @@ const SwitchThumb = styled(SwitchPrimitive.Thumb)<{
   ${({ theme }) =>
     applyTransition(
       theme,
-      "transform",
+      "transform, background-color",
       theme.transitions.duration.fast,
       theme.transitions.function.easeInOut,
     )}
+
   transform: translateX(${({ theme }) => theme.sizes.component.dividerMedium});
   will-change: transform;
 
@@ -77,17 +194,11 @@ const SwitchThumb = styled(SwitchPrimitive.Thumb)<{
   }
 `;
 
-export const Switch = forwardRef<
-  React.ElementRef<typeof SwitchPrimitive.Root>,
-  SwitchProps
->(({ size = "md", isDisabled, ...props }, ref) => {
-  const resolvedDisabled = resolveDisabled({ isDisabled });
+const ThumbIconWrapper = styled.div`
+  ${flexCenter}
+  color: ${({ theme }) => theme.colors.text.secondary};
 
-  return (
-    <SwitchRoot ref={ref} $size={size} disabled={resolvedDisabled} {...props}>
-      <SwitchThumb $size={size} />
-    </SwitchRoot>
-  );
-});
-
-Switch.displayName = "Switch";
+  & > svg {
+    ${({ theme }) => squareIconSize(theme, "xxs")}
+  }
+`;

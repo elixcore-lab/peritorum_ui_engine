@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useMemo } from "react";
 import { ThemeProvider } from "@emotion/react";
-import { darkTheme, lightTheme, GlobalStyle } from "./styles";
+import { darkTheme, lightTheme, GlobalStyle, ThemeType } from "./styles";
 import { ToastProvider } from "./components/feedback/ToastProvider";
 import { getTranslate } from "./locales/I18n";
+import { DeepPartial, mergeTheme } from "./utils/ThemeUtils";
 
 interface ConfigContextState {
   locale: string;
@@ -20,6 +21,7 @@ export interface ConfigProviderProps {
   mode?: "dark" | "light";
   withGlobalStyles?: boolean;
   withToast?: boolean;
+  themeOverride?: DeepPartial<ThemeType>;
   children: React.ReactNode;
 }
 
@@ -28,15 +30,19 @@ export const ConfigProvider = ({
   mode = "dark",
   withGlobalStyles = true,
   withToast = true,
+  themeOverride,
   children,
 }: ConfigProviderProps) => {
   const t = useMemo(() => getTranslate(locale), [locale]);
+  const baseTheme = mode === "dark" ? darkTheme : lightTheme;
   const activeTheme = useMemo(
-    () => (mode === "dark" ? darkTheme : lightTheme),
-    [mode],
+    () => mergeTheme(baseTheme, themeOverride),
+    [baseTheme, themeOverride],
   );
+
+  const contextValue = useMemo(() => ({ locale, mode, t }), [locale, mode, t]);
   return (
-    <ConfigContext.Provider value={{ locale, mode, t }}>
+    <ConfigContext.Provider value={contextValue}>
       <ThemeProvider theme={activeTheme}>
         {withGlobalStyles && <GlobalStyle />}
         {withToast && <ToastProvider />}

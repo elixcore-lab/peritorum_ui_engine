@@ -1,81 +1,32 @@
 import toast from "react-hot-toast";
 
-interface ErrorResponseShape {
-  response?: {
-    data?: {
-      code?: unknown;
-      result?: {
-        reason?: unknown;
-      };
-      status?: unknown;
-      message?: unknown;
-    };
-  };
-}
-
-interface PeritorumErrorShape {
-  code?: unknown;
-  envelope?: {
-    code?: unknown;
-    message?: unknown;
-  };
-  status?: unknown;
-}
-
-const hasErrorResponse = (error: Error): error is Error & ErrorResponseShape =>
-  "response" in error;
-
-const hasPeritorumShape = (error: Error): error is Error & PeritorumErrorShape =>
-  "envelope" in error || "code" in error || "status" in error;
-
 /**
- * unknown 타입의 에러 객체에서 안전하게 에러 메시지를 추출합니다.
+ * UI 엔진은 복잡한 API 규격을 모릅니다.
+ * 표준 Error 객체나 문자열만 안전하게 처리합니다.
  */
 export const getErrorMessage = (
   error: unknown,
   defaultMsg: string = "An error occurred",
 ): string => {
-  if (error instanceof Error) {
-    const peritorumMessage = hasPeritorumShape(error)
-      ? error.envelope?.message
-      : undefined;
-    const peritorumCode = hasPeritorumShape(error) ? error.envelope?.code ?? error.code : undefined;
-    const serverReason = hasErrorResponse(error)
-      ? error.response?.data?.result?.reason
-      : undefined;
-    const serverMessage = hasErrorResponse(error)
-      ? error.response?.data?.message
-      : undefined;
-
-    if (typeof peritorumMessage === "string" && peritorumMessage) {
-      return typeof peritorumCode === "string" && peritorumCode
-        ? `[${peritorumCode}] ${peritorumMessage}`
-        : peritorumMessage;
-    }
-
-    return (
-      (typeof serverReason === "string" && serverReason) ||
-      (typeof serverMessage === "string" && serverMessage) ||
-      error.message ||
-      defaultMsg
-    );
+  if (typeof error === "string" && error.trim() !== "") {
+    return error;
   }
 
-  if (typeof error === "string") {
-    return error;
+  if (error instanceof Error && error.message) {
+    return error.message;
   }
 
   return defaultMsg;
 };
 
 /**
- * 에러를 콘솔에 기록하고 토스트 알림을 띄웁니다.
+ * 에러를 화면(토스트)에 띄워주는 UI 역할만 수행합니다.
  */
 export const handleError = (
   error: unknown,
   defaultMsg: string = "An error occurred",
 ) => {
-  console.error("[ErrorUtils]", defaultMsg, error);
+  console.error("[UI Error]", defaultMsg, error);
   const msg = getErrorMessage(error, defaultMsg);
   toast.error(msg);
 };

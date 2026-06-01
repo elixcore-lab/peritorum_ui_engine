@@ -1,38 +1,55 @@
+import React, { forwardRef } from "react";
 import styled from "@emotion/styled";
 import { Loader2 } from "lucide-react";
+import { css } from "@emotion/react";
 import { spin } from "../../styles/animation";
-import { applyAnimation } from "../../styles";
+import { applyAnimation, IconSize, squareIconSize } from "../../styles";
+import { useUiConfig } from "../../ConfigProvider";
 
-export interface SpinnerProps {
-  size?: number | string;
+export interface SpinnerProps extends React.SVGAttributes<SVGSVGElement> {
+  size?: IconSize | number | string;
   color?: string;
-  className?: string;
 }
 
-const formatSize = (size: SpinnerProps["size"]) =>
-  typeof size === "number" ? `${size}px` : size;
+export const Spinner = forwardRef<SVGSVGElement, SpinnerProps>(
+  ({ size = "md", color, className, ...props }, ref) => {
+    const { t } = useUiConfig();
+
+    return (
+      <StyledSpinner
+        ref={ref}
+        $size={size}
+        $color={color}
+        className={className}
+        role="status"
+        aria-label={props["aria-label"] || t("common.loading")}
+        {...props}
+      />
+    );
+  },
+);
+
+Spinner.displayName = "Spinner";
 
 const StyledSpinner = styled(Loader2)<{
   $color?: string;
   $size?: SpinnerProps["size"];
 }>`
-  width: ${({ theme, $size }) => formatSize($size) || theme.sizes.icon.lg};
-  height: ${({ theme, $size }) => formatSize($size) || theme.sizes.icon.lg};
+  ${({ theme, $size }) => {
+    if (typeof $size === "string" && $size in theme.sizes.icon) {
+      return squareIconSize(theme, $size as IconSize);
+    }
+
+    const customSize = typeof $size === "number" ? `${$size}px` : $size;
+    return css`
+      width: ${customSize || theme.sizes.icon.md};
+      height: ${customSize || theme.sizes.icon.md};
+    `;
+  }}
+
   color: ${({ theme, $color }) => $color || theme.colors.brand.cyan};
 
-  ${({ theme }) =>
-    applyAnimation(
-      theme,
-      spin,
-      theme.transitions.duration.fast,
-      theme.transitions.function.linear,
-    )}
+  ${({ theme }) => applyAnimation(theme, spin, "1s", "linear")}
 
   animation-iteration-count: infinite;
 `;
-
-export const Spinner = ({ size, color, className }: SpinnerProps) => {
-  return <StyledSpinner $size={size} $color={color} className={className} />;
-};
-
-Spinner.displayName = "Spinner";

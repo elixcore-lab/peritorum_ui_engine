@@ -5,3 +5,4 @@ export * from "./NumberUtils";
 export * from "./PropUtils";
 export * from "./SortUtils";
 export * from "./StringUtils";
+export * from "./ThemeUtils";
