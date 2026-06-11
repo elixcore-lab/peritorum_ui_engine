@@ -266,7 +266,7 @@ const addonFilter = {
 const Addon = styled("div", addonFilter)<{ $position: "before" | "after" }>`
   display: inline-flex;
   align-items: center;
-  padding: 0 ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing.md}`};
   background-color: ${({ theme }) => theme.colors.surface.sunken};
   border: ${({ theme }) => theme.sizes.component.dividerThin} solid
     ${({ theme }) => theme.colors.border.strong};
