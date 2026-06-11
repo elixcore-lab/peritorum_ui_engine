@@ -7,11 +7,11 @@ import {
   formControlBase,
   disabledState,
   resetButton,
-  ControlSize,
   controlSizeBase,
   squareIconSize,
   popoverContentBase,
   popoverItemBase,
+  ControlSize,
 } from "../../styles";
 import { resolveDisabled } from "../../utils";
 
@@ -109,12 +109,20 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 
 MultiSelect.displayName = "MultiSelect";
 
+// ==========================================
+// Styled Components
+// ==========================================
+
+const filterProps = {
+  shouldForwardProp: (prop: string) => !["$isError", "$size"].includes(prop),
+};
+
 const MultiSelectWrapper = styled.div<{ $width?: string }>`
   display: inline-flex;
   width: ${({ $width }) => $width || "100%"};
 `;
 
-const StyledMultiSelectTrigger = styled(PopoverPrimitive.Trigger)<{
+const StyledMultiSelectTrigger = styled(PopoverPrimitive.Trigger, filterProps)<{
   $isError?: boolean;
   $size: ControlSize;
 }>`
@@ -154,7 +162,8 @@ const Tag = styled.span`
   color: ${({ theme }) => theme.colors.text.primary};
   padding: ${({ theme }) => `${theme.spacing["2xs"]} ${theme.spacing.xs}`};
   border-radius: ${({ theme }) => theme.borderRadius.sm};
-  font-size: ${({ theme }) => theme.fontSizes["2xs"]};
+
+  font-size: ${({ theme }) => theme.fontSizes.xs};
   border: ${({ theme }) => theme.sizes.component.dividerThin} solid
     ${({ theme }) => theme.colors.border.divider};
 `;
@@ -169,7 +178,7 @@ const TagCloseButton = styled.button`
   }
 
   & > svg {
-    ${({ theme }) => squareIconSize(theme, "2xs")}
+    ${({ theme }) => squareIconSize(theme, "xs")}
   }
 `;
 

@@ -31,44 +31,34 @@ export interface InputProps extends Omit<
   onClear?: () => void;
 }
 
-const getSizeStyle = (
+export const getSizeStyle = (
   theme: Theme,
   size: ControlSize,
   hasLeftIcon: boolean,
   rightIconCount: number,
 ) => {
-  const iconInset = {
-    xs: theme.sizes.control.xs,
-    sm: theme.sizes.control.sm,
-    md: `calc(${theme.sizes.control.md} - ${theme.spacing.xs})`,
-    lg: `calc(${theme.sizes.control.lg} - ${theme.spacing.sm})`,
-  }[size];
-
-  const sizeConfig = {
-    xs: theme.spacing.sm,
-    sm: theme.spacing.base,
-    md: theme.spacing.md,
-    lg: theme.spacing.md,
-  };
-
-  const basePadding = sizeConfig[size];
+  const basePadding =
+    {
+      xs: theme.spacing.sm,
+      sm: theme.spacing.base,
+      md: theme.spacing.md,
+      lg: theme.spacing.md,
+      xl: theme.spacing.lg,
+    }[size] || theme.spacing.md;
+  const iconInset = theme.sizes.control[size];
   const paddingLeft = hasLeftIcon ? iconInset : basePadding;
 
-  const extraRightIconSpacing = Array.from({
-    length: Math.max(0, rightIconCount - 1),
-  })
-    .map(() => theme.spacing.lg)
-    .join(" + ");
+  let paddingRight = basePadding;
 
-  const paddingRight =
-    rightIconCount > 0
-      ? extraRightIconSpacing
-        ? `calc(${iconInset} + ${extraRightIconSpacing})`
-        : iconInset
-      : basePadding;
+  if (rightIconCount === 1) {
+    paddingRight = iconInset;
+  } else if (rightIconCount > 1) {
+    paddingRight = `calc(${iconInset} + (${rightIconCount - 1} * ${theme.spacing.lg}))`;
+  }
 
   return css`
-    padding: 0 ${paddingRight} 0 ${paddingLeft};
+    padding-left: ${paddingLeft};
+    padding-right: ${paddingRight};
   `;
 };
 

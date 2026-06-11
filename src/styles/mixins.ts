@@ -4,6 +4,7 @@ import {
   ColorVariant,
   AppearanceVariant,
   ComponentColor,
+  IconSize,
 } from "./types";
 import { slideDownAndFade } from "./animation";
 
@@ -227,10 +228,7 @@ export const controlBorder = (theme: Theme, isError?: boolean) =>
     isError ? theme.colors.status.danger : theme.colors.border.strong,
   );
 
-export const squareIconSize = (
-  theme: Theme,
-  size: keyof Theme["sizes"]["icon"],
-) => css`
+export const squareIconSize = (theme: Theme, size: IconSize) => css`
   width: ${theme.sizes.icon[size]};
   height: ${theme.sizes.icon[size]};
 `;

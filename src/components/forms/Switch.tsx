@@ -87,7 +87,7 @@ export const Switch = forwardRef<
         >
           <SwitchThumb $size={size}>
             {isLoading ? (
-              <Spinner size="xxs" color="currentColor" />
+              <Spinner size="xs" color="currentColor" />
             ) : (
               <ThumbIconWrapper>{checked ? iconOn : iconOff}</ThumbIconWrapper>
             )}
@@ -100,7 +100,13 @@ export const Switch = forwardRef<
 
 Switch.displayName = "Switch";
 
-// --- Styled Components ---
+// ==========================================
+// Styled Components
+// ==========================================
+
+const filterProps = {
+  shouldForwardProp: (prop: string) => !["$size", "$isError"].includes(prop),
+};
 
 const SwitchWrapper = styled.div<{ $labelPosition: "left" | "right" }>`
   display: inline-flex;
@@ -129,7 +135,7 @@ const SwitchDescription = styled.span<{ $disabled?: boolean }>`
     $disabled ? theme.colors.text.disabled : theme.colors.text.secondary};
 `;
 
-const StyledSwitch = styled(SwitchPrimitive.Root)<{
+const StyledSwitch = styled(SwitchPrimitive.Root, filterProps)<{
   $size: SwitchSize;
   $isError?: boolean;
 }>`
@@ -165,7 +171,7 @@ const StyledSwitch = styled(SwitchPrimitive.Root)<{
   ${({ theme }) => disabledState(theme)}
 `;
 
-const SwitchThumb = styled(SwitchPrimitive.Thumb)<{
+const SwitchThumb = styled(SwitchPrimitive.Thumb, filterProps)<{
   $size: SwitchSize;
 }>`
   ${flexCenter}
@@ -199,6 +205,6 @@ const ThumbIconWrapper = styled.div`
   color: ${({ theme }) => theme.colors.text.secondary};
 
   & > svg {
-    ${({ theme }) => squareIconSize(theme, "2xs")}
+    ${({ theme }) => squareIconSize(theme, "xs")}
   }
 `;

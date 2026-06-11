@@ -230,7 +230,7 @@ export const VirtualScrollTable = <T,>({
       >
         {isLoading && (
           <LoadingOverlay>
-            <Spinner size={theme.sizes.icon.loading} />
+            <Spinner size={theme.sizes.icon.md} />
           </LoadingOverlay>
         )}
         {sortedData.length === 0 ? (
