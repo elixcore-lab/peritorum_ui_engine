@@ -382,9 +382,9 @@ const BaseCell = styled.div<{ $width?: string; $customStyle?: CellStyleProps }>`
   display: flex;
   align-items: center;
   padding: ${({ $customStyle, theme }) =>
-    $customStyle?.padding || `0 ${theme.spacing.sm}`};
+    $customStyle?.padding || `${theme.spacing.none} ${theme.spacing.sm}`};
   background-color: ${({ $customStyle, theme }) =>
-    $customStyle?.background || "transparent"};
+    $customStyle?.background || theme.colors.utility.transparent};
   font-family: ${({ $customStyle }) => $customStyle?.font?.name || "inherit"};
   font-size: ${({ $customStyle }) => $customStyle?.font?.size || "inherit"};
   color: ${({ $customStyle }) => $customStyle?.font?.color || "inherit"};
