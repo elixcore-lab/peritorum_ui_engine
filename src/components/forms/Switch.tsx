@@ -161,13 +161,24 @@ const SwitchDescription = styled.span<{ $disabled?: boolean }>`
     $disabled ? theme.colors.text.disabled : theme.colors.text.secondary};
 `;
 
-const getSwitchMetrics = (theme: Theme, size: string) => {
-  return theme.sizes.component.switch[size] || theme.sizes.component.switch.md;
+type SwitchMetricSize = keyof Theme["sizes"]["component"]["switch"];
+
+const isSwitchMetricSize = (
+  size: ControlSize,
+  metrics: Theme["sizes"]["component"]["switch"],
+): size is SwitchMetricSize => {
+  return size in metrics;
+};
+
+const getSwitchMetrics = (theme: Theme, size: ControlSize) => {
+  const metrics = theme.sizes.component.switch;
+
+  return isSwitchMetricSize(size, metrics) ? metrics[size] : metrics.md;
 };
 
 const StyledSwitch = styled(SwitchPrimitive.Root, switchFilter)<{
-  $size: string;
-  $color: string;
+  $size: ControlSize;
+  $color: ColorVariant;
   $isError?: boolean;
 }>`
   all: unset;
@@ -205,7 +216,7 @@ const StyledSwitch = styled(SwitchPrimitive.Root, switchFilter)<{
 `;
 
 const SwitchThumb = styled(SwitchPrimitive.Thumb, thumbFilter)<{
-  $size: string;
+  $size: ControlSize;
 }>`
   ${flexCenter}
   background-color: ${({ theme }) => theme.colors.brand.ink};
