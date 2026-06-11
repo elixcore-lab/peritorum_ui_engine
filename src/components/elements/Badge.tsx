@@ -12,25 +12,30 @@ import {
   transitionBase,
 } from "../../styles/mixins";
 
+/**
+ * Badge의 형태, 색상, 크기 토큰을 정의합니다.
+ *
+ * 모든 시각 스타일은 theme token과 mixin을 통해 계산되며, 외부 간격은 부모
+ * Layout의 gap/padding으로 제어합니다.
+ */
 export interface BadgeProps extends Omit<
   React.HTMLAttributes<HTMLSpanElement>,
   "color"
 > {
-  /** * 뱃지의 형태 (기본값: "subtle")
-   * - solid: 꽉 찬 배경
-   * - subtle: 연한 배경
-   * - outline: 테두리만
-   * - ghost: 투명
-   */
+  /** Badge의 외형 variant입니다. */
   variant?: AppearanceVariant;
-  /** * 뱃지의 색상 (기본값: "default")
-   * - 테마 토큰 (primary, danger, offline 등) 또는 Hex Color (#RRGGBB) 지원
-   */
+  /** theme color intent 또는 디자인 시스템에서 허용한 컬러 토큰입니다. */
   color?: ColorVariant;
-  /** 뱃지의 크기 (기본값: "sm") */
+  /** theme control size 기반의 밀도 토큰입니다. */
   size?: ControlSize;
 }
 
+/**
+ * 짧은 상태, 카운트, 분류 정보를 표시하는 inline status 컴포넌트입니다.
+ *
+ * span 표준 속성과 ref를 지원하며, `componentColorStyle`과 `compactSizeBase`로
+ * 색상/밀도를 일관되게 계산합니다.
+ */
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   (
     { children, variant = "subtle", color = "default", size = "sm", ...props },
