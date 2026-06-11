@@ -11,7 +11,7 @@ import { fadeIn, applyAnimation, flexColumn } from "../../styles";
  */
 export interface FormFieldProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  "children"
+  "children" | "style"
 > {
   label?: React.ReactNode;
   description?: React.ReactNode;
