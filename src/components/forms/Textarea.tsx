@@ -224,7 +224,7 @@ const StyledTextarea = styled("textarea", textareaFilter)<{
     `;
   }}
 
-  line-height: 1.5;
+  line-height: ${({ theme }) => theme.lineHeights.comfortable};
   resize: ${({ $autoResize }) => ($autoResize ? "none" : "vertical")};
   overflow-y: ${({ $autoResize }) => ($autoResize ? "hidden" : "auto")};
 
