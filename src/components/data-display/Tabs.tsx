@@ -146,7 +146,7 @@ const StyledTabsList = styled(TabsPrimitive.List)<{
   width: 100%;
   border-bottom: ${({ theme }) => theme.sizes.component.dividerThin} solid
     ${({ theme }) => theme.colors.border.divider};
-  padding: 0;
+  padding: ${({ theme }) => theme.spacing.none};
   list-style: none;
   background-color: ${({ theme }) => theme.colors.background.surface};
 
