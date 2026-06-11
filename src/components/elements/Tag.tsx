@@ -23,7 +23,7 @@ import { useUiConfig } from "../../ConfigProvider";
  */
 export interface TagProps extends Omit<
   React.HTMLAttributes<HTMLSpanElement>,
-  "color"
+  "color" | "style"
 > {
   /** Tag의 외형 variant입니다. */
   variant?: AppearanceVariant;
