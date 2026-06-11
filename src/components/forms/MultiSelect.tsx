@@ -2,6 +2,7 @@ import React, { forwardRef } from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import styled from "@emotion/styled";
 import { Check, ChevronDown, X } from "lucide-react";
+import { useTheme } from "@emotion/react";
 import {
   flexCenter,
   formControlBase,
@@ -15,12 +16,19 @@ import {
   type FontSize,
 } from "../../styles";
 import { resolveDisabled } from "../../utils";
+import { useUiConfig } from "../../ConfigProvider";
 
+/**
+ * MultiSelect에서 선택 가능한 단일 옵션 모델입니다.
+ */
 export interface MultiSelectOption {
   value: string;
   label: string;
 }
 
+/**
+ * 다중 선택 값, 옵션 목록, placeholder, 상태, 크기 토큰을 정의합니다.
+ */
 export interface MultiSelectProps {
   options: MultiSelectOption[];
   value: string[];
@@ -33,6 +41,9 @@ export interface MultiSelectProps {
   width?: string;
 }
 
+/**
+ * 여러 옵션을 태그 형태로 표시하고 popover 목록에서 토글 선택하는 컴포넌트입니다.
+ */
 export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
   (
     {
@@ -48,6 +59,8 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
     },
     ref,
   ) => {
+    const theme = useTheme();
+    const { t } = useUiConfig();
     const trulyDisabled = resolveDisabled({ disabled });
 
     const toggleOption = (val: string) => {
@@ -80,6 +93,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                     {options.find((o) => o.value === val)?.label}
                     <TagCloseButton
                       type="button"
+                      aria-label={t("common.remove")}
                       onClick={(e) => removeTag(e, val)}
                     >
                       <X />
@@ -93,7 +107,10 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
             <ChevronDown />
           </StyledMultiSelectTrigger>
           <PopoverPrimitive.Portal>
-            <MultiSelectContent sideOffset={4} align="start">
+            <MultiSelectContent
+              sideOffset={theme.sizes.offset.popover}
+              align="start"
+            >
               {options.map((opt) => {
                 const isChecked = value.includes(opt.value);
                 return (
