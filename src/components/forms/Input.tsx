@@ -15,9 +15,15 @@ import {
 import { resolveDisabled } from "../../utils";
 import { Spinner } from "../feedback/Spinner";
 
+/**
+ * Input의 크기, 상태, 좌우 아이콘, addon, clear action을 정의합니다.
+ *
+ * 디자인 시스템 규칙상 native `style` prop은 제외하며, 모든 시각 표현은 styled
+ * 컴포넌트와 theme token으로 처리합니다.
+ */
 export interface InputProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  "size"
+  "size" | "style"
 > {
   size?: ControlSize;
   fontSize?: FontSize;
@@ -32,6 +38,9 @@ export interface InputProps extends Omit<
   onClear?: () => void;
 }
 
+/**
+ * 아이콘과 addon 수에 따라 input padding을 theme token으로 계산합니다.
+ */
 export const getSizeStyle = (
   theme: Theme,
   size: ControlSize,
@@ -53,7 +62,6 @@ export const getSizeStyle = (
     xl: theme.spacing.lg,
   }[refSize];
 
-  // 테마에 정의된 토큰이면 그 높이를 쓰고, 아니면 입력된 픽셀값 사용
   const iconInset = themeHeight || size;
 
   const paddingLeft = hasLeftIcon ? iconInset : basePadding;
@@ -71,6 +79,12 @@ export const getSizeStyle = (
   `;
 };
 
+/**
+ * 디자인 시스템의 기본 single-line text input입니다.
+ *
+ * password toggle, clear button, loading/success indicator, addon 영역을 지원하고 ref는
+ * 실제 input 엘리먼트로 전달됩니다.
+ */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
@@ -89,7 +103,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       type,
       value,
       className,
-      style,
       ...props
     },
     ref,
@@ -121,12 +134,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const needsOuterWrapper = !!addonBefore || !!addonAfter;
 
     const inputPresentationProps =
-      !needsInnerWrapper && !needsOuterWrapper ? { className, style } : {};
+      !needsInnerWrapper && !needsOuterWrapper ? { className } : {};
     const innerWrapperPresentationProps = !needsOuterWrapper
-      ? { className, style }
+      ? { className }
       : {};
     const outerWrapperPresentationProps = needsOuterWrapper
-      ? { className, style }
+      ? { className }
       : {};
 
     const inputElement = (
@@ -395,7 +408,8 @@ const StyledInput = styled("input", inputFilterProps)<{
       &:focus,
       &:focus-within {
         border-color: ${theme.colors.status.success};
-        box-shadow: 0 0 0 ${theme.sizes.component.dividerMedium}
+        box-shadow: ${theme.spacing.none} ${theme.spacing.none}
+          ${theme.spacing.none} ${theme.sizes.component.dividerMedium}
           ${theme.colors.statusBg.success};
       }
     `}
@@ -403,18 +417,18 @@ const StyledInput = styled("input", inputFilterProps)<{
   ${({ theme, $inputSize, $hasLeftIcon, $rightIconCount }) =>
     getSizeStyle(theme, $inputSize, $hasLeftIcon, $rightIconCount)}
 
-  ${({ $hasAddonBefore }) =>
+  ${({ theme, $hasAddonBefore }) =>
     $hasAddonBefore &&
     css`
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
+      border-top-left-radius: ${theme.spacing.none};
+      border-bottom-left-radius: ${theme.spacing.none};
     `}
 
-  ${({ $hasAddonAfter }) =>
+  ${({ theme, $hasAddonAfter }) =>
     $hasAddonAfter &&
     css`
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+      border-top-right-radius: ${theme.spacing.none};
+      border-bottom-right-radius: ${theme.spacing.none};
     `}
 
   &::placeholder {
