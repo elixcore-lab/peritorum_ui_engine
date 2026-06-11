@@ -8,7 +8,8 @@ import { applyAnimation, skeletonPulse } from "../../styles";
  * width/height는 부모 레이아웃에 맞춘 상대값 또는 theme 기반 CSS 변수 값을 사용하고,
  * 외부 간격은 부모 Layout의 gap/padding으로 제어합니다.
  */
-export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SkeletonProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {
   /** Skeleton의 너비입니다. 기본값은 부모 너비를 채웁니다. */
   width?: string;
   /** Skeleton의 높이입니다. 기본값은 부모 높이를 채웁니다. */
