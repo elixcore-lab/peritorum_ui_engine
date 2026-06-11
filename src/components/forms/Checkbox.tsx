@@ -37,7 +37,7 @@ export interface CheckBoxOption {
  */
 export interface CheckBoxProps extends Omit<
   React.ComponentPropsWithoutRef<typeof CheckBoxPrimitive.Root>,
-  "checked" | "onChange" | "value" | "asChild" | "children"
+  "asChild" | "checked" | "children" | "onChange" | "style" | "value"
 > {
   label?: string;
   description?: string;
