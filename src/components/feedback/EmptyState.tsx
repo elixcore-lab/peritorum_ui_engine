@@ -10,7 +10,8 @@ import { useUiConfig } from "../../ConfigProvider";
  * 모든 간격은 자체 외부 여백이 아니라 flex gap으로 제어되며, 컨테이너는 표준 div
  * 속성을 상속합니다.
  */
-export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface EmptyStateProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {
   icon?: React.ReactNode;
   title?: string;
   description?: string;
