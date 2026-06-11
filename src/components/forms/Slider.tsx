@@ -9,7 +9,14 @@ import {
   resolveThemeColor,
   progressBarHeight,
 } from "../../styles/mixins";
+import { useUiConfig } from "../../ConfigProvider";
 
+/**
+ * Slider의 값, 색상, 크기, thumb 접근성 라벨을 정의합니다.
+ *
+ * Radix Slider Root 속성을 상속하며, color prop은 디자인 시스템 색상 intent로
+ * 재정의합니다.
+ */
 export interface SliderProps extends Omit<
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>,
   "color"
@@ -21,6 +28,12 @@ export interface SliderProps extends Omit<
   thumbAriaLabels?: string[];
 }
 
+/**
+ * 단일 값 또는 범위 값을 조정하는 Radix 기반 slider 컴포넌트입니다.
+ *
+ * thumb 개수는 value/defaultValue 길이에서 계산되며, 접근성 라벨은 i18n 기본값을
+ * 사용하거나 thumbAriaLabels로 개별 지정할 수 있습니다.
+ */
 export const Slider = forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   SliderProps
@@ -32,12 +45,14 @@ export const Slider = forwardRef<
       color = "brand",
       size = "md",
       disabled,
-      thumbAriaLabels = ["Slider thumb"],
+      thumbAriaLabels,
       ...props
     },
     ref,
   ) => {
+    const { t } = useUiConfig();
     const values = value || defaultValue || [0];
+    const defaultThumbLabel = t("ui.component.slider.thumb");
 
     return (
       <StyledSliderRoot
@@ -55,7 +70,7 @@ export const Slider = forwardRef<
         {values.map((_, index) => (
           <StyledThumb
             key={index}
-            aria-label={thumbAriaLabels[index] || "Slider thumb"}
+            aria-label={thumbAriaLabels?.[index] || defaultThumbLabel}
           />
         ))}
       </StyledSliderRoot>
@@ -101,9 +116,7 @@ const StyledSliderRoot = styled(SliderPrimitive.Root, rootFilter)<{
     /* min-height: ${({ theme }) => theme.sizes.component.emptyStateHeight}; */
   }
 
-  &[data-disabled] {
-    ${({ theme }) => disabledState(theme)}
-  }
+  ${({ theme }) => disabledState(theme)}
 `;
 
 const StyledTrack = styled(SliderPrimitive.Track, trackFilter)<{
@@ -113,7 +126,10 @@ const StyledTrack = styled(SliderPrimitive.Track, trackFilter)<{
   position: relative;
   flex-grow: 1;
   border-radius: ${({ theme }) => theme.borderRadius.round};
-  box-shadow: inset 0 1px 2px ${({ theme }) => theme.colors.utility.shadowColor};
+  box-shadow: inset ${({ theme }) => theme.spacing.none}
+    ${({ theme }) => theme.sizes.component.dividerThin}
+    ${({ theme }) => theme.spacing["2xs"]}
+    ${({ theme }) => theme.colors.utility.shadowColor};
 
   &[data-orientation="horizontal"] {
     height: ${({ theme, $size }) => progressBarHeight(theme, $size as string)};
