@@ -13,7 +13,8 @@ import {
  *
  * 표준 label 속성을 상속하며, 크기와 색상은 디자인 시스템 token을 우선 사용합니다.
  */
-export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+export interface LabelProps
+  extends Omit<React.LabelHTMLAttributes<HTMLLabelElement>, "style"> {
   required?: boolean;
   disabled?: boolean;
   /** theme font size 토큰입니다. */
