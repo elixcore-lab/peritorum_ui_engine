@@ -7,7 +7,7 @@ import { ComponentProps, forwardRef } from "react";
  * Stack 기반 레이아웃 컴포넌트가 공유하는 spacing, alignment, sizing 토큰입니다.
  *
  * `$spacing`과 `$padding`은 theme spacing 토큰을 우선 사용하며, 컴포넌트 간 간격은
- * 개별 child margin이 아니라 Stack의 gap으로 제어합니다.
+ * 개별 child 여백 속성이 아니라 Stack의 gap으로 제어합니다.
  */
 export interface StackProp {
   $direction?: React.CSSProperties["flexDirection"];
@@ -30,7 +30,7 @@ export interface StackProp {
 /**
  * 수직/수평 흐름과 gap을 제어하는 가장 기본적인 레이아웃 primitive입니다.
  *
- * 모든 하위 컴포넌트는 margin 대신 Stack의 `$spacing`과 `$padding`을 통해
+ * 모든 하위 컴포넌트는 자체 외부 여백 대신 Stack의 `$spacing`과 `$padding`을 통해
  * 배치되는 것을 기본 컨벤션으로 삼습니다.
  */
 const Stack = styled.div<StackProp>`
