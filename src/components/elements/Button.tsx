@@ -36,7 +36,7 @@ type TextAlign = "left" | "center" | "right";
  */
 export interface ButtonProps extends Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "color"
+  "color" | "style"
 > {
   as?: React.ElementType;
   href?: string;
