@@ -53,7 +53,7 @@ const Container = styled.div`
   padding: ${({ theme }) => theme.spacing.xl};
   text-align: center;
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  background-color: transparent;
+  background-color: ${({ theme }) => theme.colors.utility.transparent};
 `;
 
 const IconWrapper = styled.div`
