@@ -19,7 +19,7 @@ import { useUiConfig } from "../../ConfigProvider";
  */
 export interface SliderProps extends Omit<
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>,
-  "color"
+  "color" | "style"
 > {
   value?: number[];
   defaultValue?: number[];
