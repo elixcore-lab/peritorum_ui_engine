@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 import { useTheme } from "@emotion/react";
 import { ChevronLeft, ChevronRight, Calendar, ArrowLeft } from "lucide-react";
 import { useUiConfig } from "../../../ConfigProvider";
+import { squareIconSize } from "../../../styles";
 import {
   formatDate,
   addMonths,
@@ -28,6 +29,12 @@ import { Button, IconButton } from "../..";
 
 const TP = "ui.component.calendar";
 
+/**
+ * 날짜, 시간, 날짜+시간 선택을 제공하는 모달형 picker 컴포넌트입니다.
+ *
+ * 날짜/시간 계산은 DateUtils와 PickerLogic에 위임하고, 모달 구조와 액션은 공통
+ * Button/Modal 컴포넌트를 재사용합니다.
+ */
 export const DateTimePickerModal = ({
   isOpen,
   onClose,
@@ -193,7 +200,7 @@ export const DateTimePickerModal = ({
           onClick={handleBackToDate}
         />
       )}
-      <Calendar size={18} />
+      <HeaderCalendarIcon aria-hidden="true" />
       <span>
         {activeDate ? formatDate(activeDate, "yyyy. MM. dd", locale) : "-"}
       </span>
@@ -292,5 +299,9 @@ const ActionGroup = styled.div`
 `;
 
 const BodyWrapper = styled.div`
-  padding: ${({ theme }) => theme.spacing.sm} 0;
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.none};
+`;
+
+const HeaderCalendarIcon = styled(Calendar)`
+  ${({ theme }) => squareIconSize(theme, "sm")}
 `;
