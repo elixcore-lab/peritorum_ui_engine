@@ -416,7 +416,7 @@ const CellContent = styled.div<{ $align?: string }>`
   display: flex;
   align-items: center;
   width: 100%;
-  min-width: 0;
+  min-width: ${({ theme }) => theme.spacing.none};
   gap: ${({ theme }) => theme.spacing.xs};
   justify-content: ${({ $align }) =>
     $align === "right"
