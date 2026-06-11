@@ -2,8 +2,20 @@ import { useMemo } from "react";
 import { Toaster, ToasterProps } from "react-hot-toast";
 import { useTheme } from "@emotion/react";
 
+/**
+ * 전역 ToastProvider가 react-hot-toast에 전달할 옵션입니다.
+ *
+ * 기본 스타일은 theme token으로 병합되며, 호스트 앱은 ToasterProps를 그대로
+ * 오버라이드할 수 있습니다.
+ */
 export interface ToastProviderProps extends ToasterProps {}
 
+/**
+ * 디자인 시스템 theme을 적용한 전역 toast host입니다.
+ *
+ * ConfigProvider 내부에서 기본 제공되며, toastOptions는 theme 기반 기본값과
+ * 안전하게 병합됩니다.
+ */
 export const ToastProvider = ({
   position = "bottom-right",
   gutter,
