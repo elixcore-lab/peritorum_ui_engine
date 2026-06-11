@@ -23,7 +23,7 @@ export type TextVariant = "h1" | "h2" | "h3" | "body1" | "body2" | "caption";
  */
 export interface TextProps extends Omit<
   React.HTMLAttributes<HTMLElement>,
-  "color"
+  "color" | "style"
 > {
   as?: React.ElementType;
   variant?: TextVariant;
