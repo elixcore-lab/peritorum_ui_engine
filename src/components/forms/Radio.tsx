@@ -32,7 +32,7 @@ export interface RadioOption {
  */
 export interface RadioProps extends Omit<
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>,
-  "value"
+  "style" | "value"
 > {
   value: SelectionValue;
   label?: string;
@@ -47,7 +47,7 @@ export interface RadioProps extends Omit<
  */
 export interface RadioGroupProps extends Omit<
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>,
-  "dir" | "value" | "defaultValue" | "onValueChange"
+  "defaultValue" | "dir" | "onValueChange" | "style" | "value"
 > {
   options?: RadioOption[];
   value?: SelectionValue;
