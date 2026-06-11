@@ -7,7 +7,8 @@ import styled from "@emotion/styled";
  * 라벨이 있는 구분선은 수평 방향에서만 렌더링되며, 외부 간격은 부모 Layout의
  * gap 또는 padding으로 제어해야 합니다.
  */
-export interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface DividerProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {
   orientation?: "horizontal" | "vertical";
   children?: React.ReactNode;
 }
