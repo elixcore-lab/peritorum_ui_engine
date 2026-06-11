@@ -4,6 +4,11 @@ import { Label } from "./Label";
 import { Text } from "../typography/Text";
 import { fadeIn, applyAnimation, flexColumn } from "../../styles";
 
+/**
+ * FormField가 자식 form control에 주입할 label, description, error, required 상태를 정의합니다.
+ *
+ * 자식은 id/isError/disabled/aria 속성을 받을 수 있는 단일 React element여야 합니다.
+ */
 export interface FormFieldProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
   "children"
@@ -22,6 +27,11 @@ export interface FormFieldProps extends Omit<
   }>;
 }
 
+/**
+ * label, description, control, error message를 하나의 접근성 단위로 묶는 form wrapper입니다.
+ *
+ * useId로 control id를 보장하고, error/description id를 aria-describedby로 연결합니다.
+ */
 export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
   (
     {
@@ -39,7 +49,6 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     const generatedId = useId();
 
     if (!React.isValidElement(children)) {
-      console.warn("FormField: children must be a valid React Element.");
       return <>{children}</>;
     }
 
@@ -50,7 +59,6 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     const hasError =
       error !== undefined && error !== null && error !== false && error !== "";
 
-    // 에러와 설명을 모두 읽어주도록 조합
     const ariaDescribedBy =
       [hasError ? errorId : undefined, description ? descriptionId : undefined]
         .filter(Boolean)
@@ -87,7 +95,6 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     };
 
     const renderError = () => {
-      // 단순히 에러 상태(boolean)만 넘긴 경우 텍스트 영역 렌더링 생략
       if (!hasError || error === true) return null;
 
       if (React.isValidElement(error)) {
@@ -150,13 +157,13 @@ FormField.displayName = "FormField";
 // ==========================================
 
 const FieldWrapper = styled.div`
-  ${flexColumn} /* 💡 mixins 재활용 */
+  ${flexColumn}
   gap: ${({ theme }) => theme.spacing.sm};
   width: 100%;
 `;
 
 const HeaderWrapper = styled.div`
-  ${flexColumn} /* 💡 mixins 재활용 */
+  ${flexColumn}
   gap: ${({ theme }) => theme.spacing["2xs"]};
 `;
 
