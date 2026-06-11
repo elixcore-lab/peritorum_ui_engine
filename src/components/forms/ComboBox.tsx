@@ -129,7 +129,7 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
               role="listbox"
               sideOffset={theme.sizes.offset.popover}
               align="start"
-              onOpenAutoFocus={(e) => e.preventDefault()}
+              onOpenAutoFocus={(event: Event) => event.preventDefault()}
             >
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((opt) => (
