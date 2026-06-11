@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import { type ControlSize } from "../../styles/types"; // 💡 통합 타입 임포트
+import { type ControlSize } from "../../styles/types";
 import {
   applyTransition,
   focusRing,
@@ -199,6 +199,6 @@ const ThumbIconWrapper = styled.div`
   color: ${({ theme }) => theme.colors.text.secondary};
 
   & > svg {
-    ${({ theme }) => squareIconSize(theme, "xxs")}
+    ${({ theme }) => squareIconSize(theme, "2xs")}
   }
 `;

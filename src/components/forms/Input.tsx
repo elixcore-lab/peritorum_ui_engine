@@ -5,7 +5,6 @@ import { XCircle, Eye, EyeOff, Check } from "lucide-react";
 import { useUiConfig } from "../../ConfigProvider";
 import { type ControlSize } from "../../styles/types";
 import {
-  applyTransition,
   flexCenter,
   formControlBase,
   resetButton,

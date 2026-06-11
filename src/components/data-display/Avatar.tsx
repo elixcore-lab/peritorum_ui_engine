@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react"; // 💡 css 임포트
+import { css } from "@emotion/react";
 import { type ControlSize } from "../../styles/types";
 import { flexCenter, squareComponentSize } from "../../styles/mixins";
 
@@ -11,7 +11,7 @@ export interface AvatarProps extends React.ComponentPropsWithoutRef<
   src?: string;
   alt?: string;
   fallback: string;
-  size?: ControlSize | "xl";
+  size?: ControlSize;
 }
 
 export const Avatar = forwardRef<
@@ -27,7 +27,12 @@ export const Avatar = forwardRef<
 });
 Avatar.displayName = "Avatar";
 
-const AvatarRoot = styled(AvatarPrimitive.Root)<{ $size: ControlSize | "xl" }>`
+const filterProps = {
+  shouldForwardProp: (prop: string) => prop !== "$size",
+};
+const AvatarRoot = styled(AvatarPrimitive.Root, filterProps)<{
+  $size: ControlSize;
+}>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -59,7 +64,7 @@ const AvatarFallback = styled(AvatarPrimitive.Fallback)`
   width: 100%;
   height: 100%;
   ${flexCenter}
-  background-color: ${({ theme }) => theme.colors.brand.accentSoft};
+  /* background-color: ${({ theme }) => theme.colors.brand.accentSoft}; */
   color: ${({ theme }) => theme.colors.brand.cyan};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.bold};

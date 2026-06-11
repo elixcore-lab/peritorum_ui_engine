@@ -5,14 +5,11 @@ import { css, useTheme } from "@emotion/react";
 import { Search, ChevronDown, Check } from "lucide-react";
 import {
   formControlBase,
-  floatingSurface,
   disabledState,
-  customScrollbar,
   flexCenter,
   controlSizeBase,
   squareIconSize,
   ControlSize,
-  applyTransition,
   popoverContentBase,
   popoverItemBase,
 } from "../../styles";

@@ -43,10 +43,13 @@ export const parseRangeString = (input: string): number[] => {
 /**
  * 숫자에 1,000 단위 콤마(,)를 찍어주는 함수 (Intl API 활용)
  */
-export const formatNumber = (num: number | string): string => {
+export const formatNumber = (
+  num: number | string,
+  locale: string = "ko-KR",
+): string => {
   const parsed = Number(num);
   if (isNaN(parsed)) return "0";
-  return new Intl.NumberFormat().format(parsed);
+  return new Intl.NumberFormat(locale).format(parsed);
 };
 
 /**

@@ -25,7 +25,7 @@ export interface CheckBoxOption {
 
 export interface CheckBoxProps extends Omit<
   React.ComponentPropsWithoutRef<typeof CheckBoxPrimitive.Root>,
-  "checked" | "onChange" | "value"
+  "checked" | "onChange" | "value" | "asChild" | "children"
 > {
   label?: string;
   description?: string;
@@ -209,7 +209,7 @@ const CheckBoxGroupRoot = styled.div<{
 
 const CheckBoxWrapper = styled.div<{ $variant: SelectionVariant }>`
   display: inline-flex;
-  align-items: flex-start;
+  align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
 
   ${({ theme, $variant }) =>
@@ -237,7 +237,9 @@ const CheckBoxWrapper = styled.div<{ $variant: SelectionVariant }>`
     `}
 `;
 
-const StyledCheckBox = styled(CheckBoxPrimitive.Root)<{
+const StyledCheckBox = styled(CheckBoxPrimitive.Root, {
+  shouldForwardProp: (prop) => prop !== "$isError" && prop !== "$variant",
+})<{
   $isError?: boolean;
   $variant: SelectionVariant;
 }>`

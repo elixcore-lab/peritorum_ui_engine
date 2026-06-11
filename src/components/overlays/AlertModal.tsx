@@ -9,17 +9,20 @@ import {
   XCircle,
   type LucideIcon,
 } from "lucide-react";
-import { Button, type ButtonProps } from "../elements/Button";
+import { Button } from "../elements/Button";
 import {
   applyAnimation,
   flexCenter,
   floatingSurface,
   squareIconSize,
-  contentShow,
-} from "../../styles";
+  componentColorStyle,
+} from "../../styles/mixins";
+import { type ComponentColor } from "../../styles/types";
 import { Overlay } from "./Overlay";
 import { useUiConfig } from "../../ConfigProvider";
-import { SectionHeader, SectionBody, SectionFooter } from "../layout";
+import { SectionBody, SectionFooter } from "../layout";
+import { Text } from "../typography/Text";
+import { contentShow } from "../../styles/animation";
 
 export type AlertVariant = "info" | "success" | "warning" | "danger";
 
@@ -43,9 +46,10 @@ const VARIANT_ICONS: Record<AlertVariant, LucideIcon> = {
   danger: XCircle,
 };
 
-const BUTTON_VARIANT: Record<AlertVariant, ButtonProps["variant"]> = {
+// 💡 버튼의 "색상(Color)"을 매핑하도록 변경 (형태는 모두 solid로 고정)
+const BUTTON_COLOR: Record<AlertVariant, ComponentColor> = {
   info: "primary",
-  success: "primary",
+  success: "primary", // 또는 "success" (기획에 따라 선택)
   warning: "warning",
   danger: "danger",
 };
@@ -103,8 +107,26 @@ export const AlertModal = ({
               <IconWrapper $variant={variant}>
                 <VariantIcon as={IconComponent} />
               </IconWrapper>
-              <Title>{title}</Title>
-              {description && <Description>{description}</Description>}
+
+              {/* 💡 직접 스타일링 대신 우리가 만든 Text 컴포넌트 활용 */}
+              <AlertDialog.Title asChild>
+                <Text variant="h3" weight="bold" align="center">
+                  {title}
+                </Text>
+              </AlertDialog.Title>
+
+              {description && (
+                <AlertDialog.Description asChild>
+                  <Text
+                    variant="body2"
+                    color="secondary"
+                    align="center"
+                    style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}
+                  >
+                    {description}
+                  </Text>
+                </AlertDialog.Description>
+              )}
             </Header>
           </SectionBody>
 
@@ -112,14 +134,22 @@ export const AlertModal = ({
             <ButtonContainer>
               {showCancel && (
                 <AlertDialog.Cancel asChild>
-                  <Button variant="secondary" disabled={isLoading} fullWidth>
+                  {/* 💡 취소 버튼: 형태(outline)와 색상(default) 분리 적용 */}
+                  <Button
+                    variant="outline"
+                    color="default"
+                    disabled={isLoading}
+                    fullWidth
+                  >
                     {cancelText || t("common.cancel")}
                   </Button>
                 </AlertDialog.Cancel>
               )}
               <AlertDialog.Action asChild>
+                {/* 💡 확인 버튼: 꽉 찬 형태(solid)와 상태 색상 적용 */}
                 <Button
-                  variant={BUTTON_VARIANT[variant]}
+                  variant="solid"
+                  color={BUTTON_COLOR[variant]}
                   onClick={handleConfirm}
                   disabled={isLoading}
                   isLoading={isLoading}
@@ -138,7 +168,10 @@ export const AlertModal = ({
 
 AlertModal.displayName = "AlertModal";
 
-// --- Styled Components ---
+// ==========================================
+// Styled Components
+// ==========================================
+
 const Content = styled(AlertDialog.Content)`
   ${({ theme }) => floatingSurface(theme)}
   position: fixed;
@@ -174,29 +207,13 @@ const IconWrapper = styled.div<{ $variant: AlertVariant }>`
   height: ${({ theme }) => theme.sizes.component.alertIcon};
   border-radius: ${({ theme }) => theme.borderRadius.round};
   ${flexCenter};
-  background-color: ${({ theme, $variant }) => theme.colors.statusBg[$variant]};
-  color: ${({ theme, $variant }) => theme.colors.status[$variant]};
-  border: ${({ theme }) => theme.sizes.component.dividerThin} solid
-    ${({ theme, $variant }) => theme.colors.statusBg[$variant]};
+
+  /* 💡 하드코딩된 statusBg, status 색상을 마스터 믹스인으로 완벽하게 교체! */
+  ${({ theme, $variant }) => componentColorStyle(theme, "subtle", $variant)}
 `;
 
 const VariantIcon = styled.svg`
   ${({ theme }) => squareIconSize(theme, "lg")}
-`;
-
-const Title = styled(AlertDialog.Title)`
-  margin: 0;
-  color: ${({ theme }) => theme.colors.text.primary};
-  font-size: ${({ theme }) => theme.fontSizes.lg};
-  font-weight: ${({ theme }) => theme.fontWeights.bold};
-  text-align: center;
-`;
-
-const Description = styled(AlertDialog.Description)`
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  line-height: 1.6;
-  text-align: center;
 `;
 
 const ButtonContainer = styled.div`

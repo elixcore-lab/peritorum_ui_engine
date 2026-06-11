@@ -13,6 +13,14 @@ export type Spacing = keyof Theme["spacing"];
 // 2. 의미론적 타입 (Semantic & Intent)
 // ==========================================
 
+//  외형(모양)을 결정하는 타입
+export type AppearanceVariant =
+  | "solid" // 꽉 찬 배경 (기본적인 버튼 등)
+  | "subtle" // 연한 배경 (뱃지, 태그 등에 주로 사용)
+  | "outline" // 테두리만 있는 상태
+  | "ghost"; // 배경과 테두리가 없는 투명 상태
+
+// 색상(의미)만 남긴 컬러 타입
 export type ColorVariant =
   | "default" // 기본 상태
   | "primary" // 주요/브랜드 컬러
@@ -21,8 +29,10 @@ export type ColorVariant =
   | "danger" // 부정적 상태 (빨간색)
   | "warning" // 경고 상태 (노란색)
   | "info" // 정보 상태 (파란색)
-  | "ghost" // 배경이 없는 투명 상태
-  | "outline"; // 테두리만 있는 상태
+  | "offline"
+  | "brand"; // 브랜드 고유 컬러
+
+export type ComponentColor = ColorVariant | (string & {});
 
 export type TextColorIntent =
   | "primary"
@@ -34,7 +44,9 @@ export type TextColorIntent =
   | "warning"
   | "info"
   | "brand"
-  | "inherit";
+  | "inherit"
+  | "white"
+  | "black";
 
 export type TextAlign = "left" | "center" | "right" | "justify";
 

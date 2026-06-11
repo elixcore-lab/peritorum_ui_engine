@@ -2,12 +2,14 @@ import React, { forwardRef } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import {
-  type ColorVariant,
+  type AppearanceVariant,
+  type ComponentColor,
   type ControlSize,
   type ComponentShape,
+  type Spacing,
 } from "../../styles/types";
 import {
-  solidVariantStyle,
+  componentColorStyle,
   controlSizeBase,
   disabledState,
   focusRing,
@@ -15,10 +17,14 @@ import {
   squareIconSize,
   transitionBase,
   inlineComponentBase,
+  textEllipsis,
 } from "../../styles/mixins";
 import { useUiConfig } from "../../ConfigProvider";
 import { resolveDisabled } from "../../utils";
 import { Spinner } from "../feedback/Spinner";
+
+type IconLayout = "inline" | "edge";
+type TextAlign = "left" | "center" | "right";
 
 export interface ButtonProps extends Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -27,14 +33,30 @@ export interface ButtonProps extends Omit<
   as?: React.ElementType;
   href?: string;
   target?: string;
-  variant?: ColorVariant;
+  /** 버튼의 형태 (기본값: "solid") */
+  variant?: AppearanceVariant;
+  /** 버튼의 색상 (기본값: "primary") - 테마 토큰 및 Hex 문자열 지원 */
+  color?: ComponentColor;
+  /** 버튼 크기 (기본값: "md") */
   size?: ControlSize;
+  /** 버튼 모양 (기본값: "square") */
   shape?: ComponentShape;
+  /** 부모 컨테이너의 너비를 100% 채울지 여부 */
   fullWidth?: boolean;
+  /** 로딩 상태 여부 */
   isLoading?: boolean;
+  /** 텍스트 좌측에 배치할 아이콘 */
   leftIcon?: React.ReactNode;
+  /** 텍스트 우측에 배치할 아이콘 */
   rightIcon?: React.ReactNode;
+  /** 아이콘 전용 버튼 여부 (텍스트 숨김) */
   isIconOnly?: boolean;
+  /** 아이콘 배치 방식 (inline: 텍스트 옆, edge: 양 끝단) */
+  iconLayout?: IconLayout;
+  /** 텍스트 정렬 */
+  textAlign?: TextAlign;
+  /** 아이콘과 텍스트 사이의 간격 */
+  spacing?: Spacing;
 }
 
 export const Button = forwardRef<
@@ -46,7 +68,8 @@ export const Button = forwardRef<
       as,
       href,
       children,
-      variant = "primary",
+      variant = "solid",
+      color = "default",
       size = "md",
       shape = "square",
       fullWidth = false,
@@ -55,6 +78,9 @@ export const Button = forwardRef<
       leftIcon,
       rightIcon,
       isIconOnly = false,
+      iconLayout = "inline",
+      textAlign = "center",
+      spacing = "xs",
       ...props
     },
     ref,
@@ -81,10 +107,12 @@ export const Button = forwardRef<
         ref={ref as React.ForwardedRef<HTMLButtonElement & HTMLAnchorElement>}
         href={href}
         $variant={variant}
+        $color={color}
         $size={size}
         $shape={shape}
         $fullWidth={fullWidth}
         $isIconOnly={isIconOnly}
+        $spacing={spacing}
         disabled={!isAnchor ? trulyDisabled : undefined}
         data-disabled={trulyDisabled ? "" : undefined}
         aria-disabled={trulyDisabled}
@@ -104,7 +132,11 @@ export const Button = forwardRef<
             {leftIcon && (
               <ButtonIconWrapper $size={size}>{leftIcon}</ButtonIconWrapper>
             )}
-            {typeof children === "string" ? <span>{children}</span> : children}
+            {!isIconOnly && shape !== "circle" && (
+              <ButtonTextWrapper $align={textAlign} $iconLayout={iconLayout}>
+                {children}
+              </ButtonTextWrapper>
+            )}
             {rightIcon && (
               <ButtonIconWrapper $size={size}>{rightIcon}</ButtonIconWrapper>
             )}
@@ -117,6 +149,10 @@ export const Button = forwardRef<
 
 Button.displayName = "Button";
 
+// ==========================================
+// Styled Components
+// ==========================================
+
 const ButtonIconWrapper = styled.span<{ $size: ControlSize }>`
   display: inline-flex;
   align-items: center;
@@ -126,37 +162,45 @@ const ButtonIconWrapper = styled.span<{ $size: ControlSize }>`
   }
 `;
 
+const ButtonTextWrapper = styled.span<{
+  $align: TextAlign;
+  $iconLayout: IconLayout;
+}>`
+  flex: ${({ $iconLayout }) => ($iconLayout === "edge" ? 1 : undefined)};
+  text-align: ${({ $align }) => $align};
+
+  ${textEllipsis}
+`;
+
 const StyledButton = styled.button<{
   $size: ControlSize;
-  $variant: ColorVariant;
+  $variant: AppearanceVariant;
+  $color: ComponentColor;
   $shape: ComponentShape;
   $fullWidth: boolean;
   $isIconOnly: boolean;
+  $spacing?: Spacing;
   href?: string;
   target?: string;
 }>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-
-  & > * {
-    line-height: 1 !important;
-  }
-
   ${({ theme }) => inlineComponentBase(theme)};
-  gap: ${({ theme }) => theme.spacing.xs};
+
+  gap: ${({ theme, $spacing }) => {
+    if (!$spacing) return theme.spacing.xs;
+    return theme.spacing[$spacing] || $spacing;
+  }};
+
   font-family: inherit;
   cursor: pointer;
   text-decoration: none;
   user-select: none;
   width: ${({ $fullWidth }) => ($fullWidth ? "100%" : "auto")};
 
-  ${({ theme }) => transitionBase(theme)}
-  ${({ theme }) => disabledState(theme)}
+  ${({ theme }) => transitionBase(theme)};
+  ${({ theme }) => disabledState(theme)};
 
   &:focus-visible {
-    ${({ theme }) => focusRing(theme)}
+    ${({ theme }) => focusRing(theme)};
   }
 
   ${({ $size, $shape, $isIconOnly, theme }) => {
@@ -175,5 +219,6 @@ const StyledButton = styled.button<{
     `;
   }}
 
-  ${({ $variant, theme }) => solidVariantStyle(theme, $variant)}
+  ${({ theme, $variant, $color }) =>
+    componentColorStyle(theme, $variant, $color, true)};
 `;

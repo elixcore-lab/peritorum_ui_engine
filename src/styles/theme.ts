@@ -1,5 +1,3 @@
-import { Theme } from "@emotion/react";
-
 const palette = {
   white: "#FFFFFF",
   black: "#000000",
@@ -40,6 +38,7 @@ const media = {
 
 const common = {
   spacing: {
+    none: "0",
     "2xs": "2px",
     xs: "4px",
     sm: "8px",
@@ -48,6 +47,8 @@ const common = {
     lg: "24px",
     xl: "32px",
     "2xl": "48px",
+    "3xl": "60px",
+    "4xl": "72px",
   },
   borderRadius: {
     "2xs": "2px",
@@ -98,23 +99,78 @@ const common = {
   },
 };
 
-const sizes = {
+// const sizes = {
+//   sidebarWidth: "240px",
+//   sidebarCollapsedWidth: "64px",
+//   headerHeight: "60px",
+//   control: {
+//     xs: "20px",
+//     sm: "32px",
+//     md: "40px",
+//     lg: "48px",
+//   },
+//   icon: {
+//     "2xs": "12px",
+//     xs: "14px",
+//     sm: "16px",
+//     md: "20px",
+//     lg: "24px",
+//     loading: "28px",
+//     xl: "32px",
+//   },
+//   component: {
+//     checkbox: "20px",
+//     radio: "20px",
+//     radioIndicator: "10px",
+//     switch: {
+//       sm: { width: "36px", height: "20px", thumb: "14px", offset: "18px" },
+//       md: { width: "44px", height: "24px", thumb: "18px", offset: "22px" },
+//       lg: { width: "56px", height: "32px", thumb: "26px", offset: "26px" },
+//     },
+//     badgeMinHeight: "24px",
+//     emptyStateHeight: "120px",
+//     textareaMinHeight: "80px",
+//     dropdownMinWidth: "160px",
+//     selectViewportMaxHeight: "250px",
+//     tooltipMaxWidth: "250px",
+//     modalDefaultWidth: "900px",
+//     modalAlertWidth: "400px",
+//     datePickerModalWidth: "420px",
+//     tabFixedWidth: "120px",
+//     calendarDay: "36px",
+//     calendarHeaderLabelWidth: "100px",
+//     virtualRowHeight: 36,
+//     timeWheelHeight: "120px",
+//     timeWheelItemHeight: "40px",
+//     alertIcon: "56px",
+//     eventLineWidth: "16px",
+//     dividerThin: "1px",
+//     dividerMedium: "2px",
+//     overlayBlur: "2px",
+//   },
+//   offset: {
+//     popover: 6,
+//     tooltip: 4,
+//     toastGutter: 8,
+//   },
+// };
+
+export const sizes = {
   sidebarWidth: "240px",
   sidebarCollapsedWidth: "64px",
   headerHeight: "60px",
   control: {
-    xs: "20px",
+    xs: "24px",
     sm: "32px",
     md: "40px",
     lg: "48px",
+    xl: "56px",
   },
   icon: {
-    xxs: "12px",
-    xs: "14px",
+    xs: "12px",
     sm: "16px",
     md: "20px",
     lg: "24px",
-    loading: "28px",
     xl: "32px",
   },
   component: {
@@ -122,33 +178,41 @@ const sizes = {
     radio: "20px",
     radioIndicator: "10px",
     switch: {
-      sm: { width: "36px", height: "20px", thumb: "14px", offset: "18px" },
-      md: { width: "44px", height: "24px", thumb: "18px", offset: "22px" },
-      lg: { width: "56px", height: "32px", thumb: "26px", offset: "26px" },
+      sm: { width: "32px", height: "16px", thumb: "12px", offset: "16px" },
+      md: { width: "40px", height: "24px", thumb: "18px", offset: "16px" },
+      lg: { width: "48px", height: "32px", thumb: "24px", offset: "16px" },
     },
+
+    // 높이 및 너비 제약
     badgeMinHeight: "24px",
     emptyStateHeight: "120px",
     textareaMinHeight: "80px",
     dropdownMinWidth: "160px",
-    selectViewportMaxHeight: "250px",
-    tooltipMaxWidth: "250px",
-    modalDefaultWidth: "900px",
+    selectViewportMaxHeight: "240px",
+    tooltipMaxWidth: "240px",
+
+    // 모달 및 팝업
     modalAlertWidth: "400px",
     datePickerModalWidth: "420px",
+    modalDefaultWidth: "900px",
+
+    // 기타 특수 컴포넌트
     tabFixedWidth: "120px",
-    calendarDay: "36px",
+    calendarDay: "32px",
     calendarHeaderLabelWidth: "100px",
-    virtualRowHeight: 36,
+    virtualRowHeight: 40,
     timeWheelHeight: "120px",
     timeWheelItemHeight: "40px",
     alertIcon: "56px",
     eventLineWidth: "16px",
+
+    // 선 두께 (디자인 토큰)
     dividerThin: "1px",
     dividerMedium: "2px",
-    overlayBlur: "2px",
+    overlayBlur: "4px",
   },
   offset: {
-    popover: 6,
+    popover: 8,
     tooltip: 4,
     toastGutter: 8,
   },
@@ -165,7 +229,7 @@ export const darkTheme = {
       surface: palette.slate900,
       modal: palette.slate800,
       input: palette.slate950,
-      hover: palette.slate700,
+      hover: palette.slate800,
       overlay: "rgba(0, 0, 0, 0.7)",
       loadingOverlay: "rgba(11, 12, 16, 0.7)",
       scrollbar: palette.slate600,
@@ -184,10 +248,10 @@ export const darkTheme = {
       warning: palette.orange500,
     },
     border: {
-      default: palette.slate700,
-      divider: palette.slate700,
-      subtle: palette.slate700,
-      strong: palette.slate400,
+      default: "rgba(255, 255, 255, 0.06)",
+      divider: "rgba(255, 255, 255, 0.06)",
+      subtle: "rgba(255, 255, 255, 0.04)",
+      strong: palette.slate500,
       focused: palette.brandCyan,
       inverse: "rgba(255, 255, 255, 0.2)",
     },
@@ -209,6 +273,7 @@ export const darkTheme = {
       warning: `${palette.orange500}1A`,
       danger: `${palette.red500}1A`,
       info: `${palette.brandCyan}1A`,
+      offline: `${palette.slate500}1A`,
     },
     effect: {
       shadow: {
@@ -229,12 +294,13 @@ export const darkTheme = {
       ink: palette.white,
       cyan: palette.brandCyan,
       purple: palette.brandPurple,
-      gradient: `linear-gradient(135deg, ${palette.brandCyan} 0%, ${palette.brandBlue} 50%, ${palette.brandPurple} 100%)`,
+      gradient: null as string | null,
+      // gradient: `linear-gradient(135deg, ${palette.brandCyan} 0%, ${palette.brandBlue} 50%, ${palette.brandPurple} 100%)`,
     },
     surface: {
       canvas: palette.slate900,
       raised: palette.slate800,
-      sunken: palette.slate700,
+      sunken: "rgba(0, 0, 0, 0.2)", //palette.slate700,
       inverse: palette.slate950,
       panel: palette.slate800,
       overlay: "rgba(0, 0, 0, 0.7)",
@@ -293,7 +359,7 @@ export const lightTheme: ThemeType = {
     },
     border: {
       default: palette.gray200,
-      divider: palette.gray100,
+      divider: palette.gray200,
       subtle: palette.gray100,
       strong: palette.gray400,
       focused: palette.brandBlue,
@@ -317,6 +383,7 @@ export const lightTheme: ThemeType = {
       warning: `${palette.orange500}1A`,
       danger: `${palette.red500}1A`,
       info: `${palette.brandBlue}1A`,
+      offline: `${palette.slate500}1A`,
     },
     effect: {
       shadow: {
@@ -337,7 +404,8 @@ export const lightTheme: ThemeType = {
       ink: palette.gray900,
       cyan: palette.brandCyan,
       purple: palette.brandPurple,
-      gradient: `linear-gradient(135deg, ${palette.brandCyan} 0%, ${palette.brandBlue} 50%, ${palette.brandPurpleDark} 100%)`,
+      gradient: null as string | null,
+      // gradient: `linear-gradient(135deg, ${palette.brandCyan} 0%, ${palette.brandBlue} 50%, ${palette.brandPurpleDark} 100%)`,
     },
     surface: {
       canvas: palette.gray50,

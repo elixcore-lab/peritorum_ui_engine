@@ -1,5 +1,12 @@
 import { css, Keyframes, type Theme } from "@emotion/react";
-import { ControlSize, ColorVariant, slideDownAndFade } from ".";
+import {
+  ControlSize,
+  ColorVariant,
+  AppearanceVariant,
+  ComponentColor,
+} from "./types";
+import { slideDownAndFade } from "./animation";
+
 // ==========================================
 // 1. Layout & Resets (레이아웃 및 초기화)
 // ==========================================
@@ -84,7 +91,6 @@ export const lineClamp = (lines: number) => css`
   -webkit-line-clamp: ${lines};
   -webkit-box-orient: vertical;
   overflow: hidden;
-  word-break: break-all;
 `;
 
 export const customScrollbar = (theme: Theme) => css`
@@ -105,6 +111,15 @@ export const customScrollbar = (theme: Theme) => css`
   &::-webkit-scrollbar-thumb:hover {
     background: ${theme.colors.background.scrollbarHover};
   }
+`;
+
+// 💡 텍스트에 그라데이션을 입히는 믹스인 (Text 컴포넌트 등에서 사용)
+export const textGradientStyle = (gradientString: string) => css`
+  background: ${gradientString};
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent; /* Fallback */
 `;
 
 // ==========================================
@@ -136,7 +151,7 @@ export const applyTransition = (
 export const transitionBase = (theme: Theme) =>
   applyTransition(
     theme,
-    "background-color, border-color, color, box-shadow, transform, opacity",
+    "background, background-color, border-color, color, box-shadow, transform, opacity, filter",
     theme.transitions.duration.normal,
     theme.transitions.function.easeInOut,
   );
@@ -223,9 +238,6 @@ export const squareIconSize = (
 export const squareComponentSize = (theme: Theme, size: ControlSize) => css`
   width: ${theme.sizes.control[size]};
   height: ${theme.sizes.control[size]};
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 export const controlSizeBase = (theme: Theme, size: ControlSize) => {
@@ -344,7 +356,6 @@ export const popoverItemBase = (theme: Theme) => css`
   &[data-state="checked"],
   &[aria-selected="true"] {
     color: ${theme.colors.brand.cyan};
-    /* background-color: ${theme.colors.background.hover}; */
   }
 `;
 
@@ -361,129 +372,6 @@ export const popoverContentBase = (theme: Theme) => css`
   )}
 `;
 
-export const solidVariantStyle = (theme: Theme, variant: ColorVariant) => {
-  switch (variant) {
-    case "secondary":
-    case "outline":
-      return css`
-        background-color: ${theme.colors.utility.transparent};
-        border-color: ${theme.colors.border.strong};
-        color: ${theme.colors.text.primary};
-        &:hover:not(:disabled):not([data-disabled]) {
-          background-color: ${theme.colors.background.hover};
-        }
-      `;
-    case "ghost":
-      return css`
-        background-color: ${theme.colors.utility.transparent};
-        border-color: transparent;
-        color: ${theme.colors.text.primary};
-        &:hover:not(:disabled):not([data-disabled]) {
-          background-color: ${theme.colors.background.hover};
-        }
-      `;
-    case "danger":
-      return css`
-        background-color: ${theme.colors.status.danger};
-        border-color: transparent;
-        color: ${theme.colors.text.inverse};
-        &:hover:not(:disabled):not([data-disabled]) {
-          filter: brightness(0.9);
-        }
-      `;
-    case "warning":
-      return css`
-        background-color: ${theme.colors.status.warning};
-        border-color: transparent;
-        color: ${theme.colors.text.inverse};
-        &:hover:not(:disabled):not([data-disabled]) {
-          filter: brightness(0.9);
-        }
-      `;
-    case "success":
-      return css`
-        background-color: ${theme.colors.status.success};
-        border-color: transparent;
-        color: ${theme.colors.text.inverse};
-        &:hover:not(:disabled):not([data-disabled]) {
-          filter: brightness(0.9);
-        }
-      `;
-    case "info":
-      return css`
-        background-color: ${theme.colors.status.info};
-        border-color: transparent;
-        color: ${theme.colors.text.inverse};
-        &:hover:not(:disabled):not([data-disabled]) {
-          filter: brightness(0.9);
-        }
-      `;
-    case "default":
-      return css`
-        background-color: ${theme.colors.brand.accentSoft};
-        border-color: ${theme.colors.border.divider};
-        color: ${theme.colors.text.primary};
-        &:hover:not(:disabled):not([data-disabled]) {
-          background-color: ${theme.colors.background.hover};
-        }
-      `;
-    case "primary":
-    default:
-      return css`
-        background-color: ${theme.colors.brand.primary};
-        border-color: transparent;
-        color: ${theme.colors.text.inverse};
-        &:hover:not(:disabled):not([data-disabled]) {
-          background-color: ${theme.colors.brand.primaryHover};
-        }
-      `;
-  }
-};
-
-export const subtleVariantStyle = (theme: Theme, variant: ColorVariant) => {
-  switch (variant) {
-    case "primary":
-      return css`
-        background-color: ${theme.colors.brand.primary};
-        color: ${theme.colors.text.inverse};
-        border-color: transparent;
-      `;
-    case "success":
-      return css`
-        background-color: ${theme.colors.statusBg.success};
-        color: ${theme.colors.status.success};
-        border-color: ${theme.colors.status.success};
-      `;
-    case "danger":
-      return css`
-        background-color: ${theme.colors.statusBg.danger};
-        color: ${theme.colors.status.danger};
-        border-color: ${theme.colors.status.danger};
-      `;
-    case "warning":
-      return css`
-        background-color: ${theme.colors.statusBg.warning};
-        color: ${theme.colors.status.warning};
-        border-color: ${theme.colors.status.warning};
-      `;
-    case "info":
-      return css`
-        background-color: ${theme.colors.statusBg.info};
-        color: ${theme.colors.status.info};
-        border-color: ${theme.colors.status.info};
-      `;
-    case "ghost":
-    case "secondary":
-    case "default":
-    default:
-      return css`
-        background-color: ${theme.colors.brand.accentSoft};
-        color: ${theme.colors.text.primary};
-        border-color: ${theme.colors.border.divider};
-      `;
-  }
-};
-
 export const inlineComponentBase = (theme: Theme) => css`
   display: inline-flex;
   align-items: center;
@@ -491,9 +379,7 @@ export const inlineComponentBase = (theme: Theme) => css`
   font-weight: ${theme.fontWeights.medium};
   white-space: nowrap;
   box-sizing: border-box;
-  border-radius: ${theme.borderRadius.sm};
-  border: ${theme.sizes.component.dividerThin} solid
-    ${theme.colors.utility.transparent};
+  border: none;
 `;
 
 export const interactiveTextColor = (
@@ -516,3 +402,199 @@ export const activeTabUnderline = (theme: Theme) => css`
   box-shadow: inset 0 -${theme.sizes.component.dividerMedium} 0 0
     ${theme.colors.brand.cyan};
 `;
+
+// ==========================================
+// 6. 외형(Appearance), 색상(Color), 인터랙션(Hover)을 통제하는 마스터 믹스인
+// ==========================================
+export const componentColorStyle = (
+  theme: Theme,
+  variant: AppearanceVariant,
+  color: ComponentColor,
+  isInteractive: boolean = false,
+) => {
+  let bg = "transparent",
+    textColor = "inherit",
+    borderColor = "transparent",
+    hoverCss = css``;
+
+  const isThemeColor = [
+    "primary",
+    "secondary",
+    "success",
+    "danger",
+    "warning",
+    "info",
+    "offline",
+    "brand",
+    "default",
+  ].includes(color as string);
+
+  if (isThemeColor) {
+    switch (color as ColorVariant) {
+      case "primary":
+        if (variant === "solid" || variant === "subtle") {
+          bg = theme.colors.brand.primary;
+          textColor = theme.colors.text.inverse || "#FFFFFF";
+          borderColor = "transparent";
+          hoverCss = css`
+            background: ${theme.colors.brand.primaryHover};
+          `;
+        } else {
+          textColor = theme.colors.brand.primary;
+          borderColor = theme.colors.brand.primary;
+          hoverCss = css`
+            background: ${theme.colors.background.hover};
+          `;
+        }
+        break;
+
+      case "success":
+      case "danger":
+      case "warning":
+      case "offline": {
+        const statusKey = color as
+          | "success"
+          | "danger"
+          | "warning"
+          | "info"
+          | "offline";
+
+        if (variant === "solid") {
+          bg = theme.colors.status[statusKey];
+          textColor = theme.colors.text.inverse || "#FFFFFF";
+          borderColor = "transparent";
+          hoverCss = css`
+            filter: brightness(0.9);
+          `;
+        } else if (variant === "subtle") {
+          bg = theme.colors.statusBg[statusKey];
+          textColor = theme.colors.status[statusKey];
+          borderColor = theme.colors.status[statusKey];
+          hoverCss = css`
+            filter: brightness(0.9);
+          `;
+        } else {
+          textColor = theme.colors.status[statusKey];
+          borderColor = theme.colors.status[statusKey];
+          hoverCss = css`
+            background: ${theme.colors.background.hover};
+          `;
+        }
+        break;
+      }
+      case "brand":
+        // 테마에 그라데이션 값이 있으면 사용하고, 없으면 안전하게 폴백 컬러 사용
+        const hasGradient = !!theme.colors.brand.gradient;
+        const brandBaseColor =
+          theme.colors.brand.cyan || theme.colors.brand.primary;
+
+        if (variant === "solid") {
+          bg = hasGradient ? theme.colors.brand.gradient! : brandBaseColor;
+          textColor = theme.colors.text.inverse || "#FFFFFF";
+          borderColor = "transparent";
+          hoverCss = css`
+            filter: brightness(1.1);
+          `;
+        } else if (variant === "subtle") {
+          bg = `${brandBaseColor}1A`;
+          textColor = brandBaseColor;
+          borderColor = brandBaseColor;
+          hoverCss = css`
+            filter: brightness(1.1);
+          `;
+        } else {
+          textColor = brandBaseColor;
+          borderColor = brandBaseColor;
+          hoverCss = css`
+            background: ${theme.colors.background.hover};
+          `;
+        }
+        break;
+
+      case "secondary":
+      case "default":
+      default:
+        if (variant === "solid") {
+          bg =
+            color === "secondary"
+              ? theme.colors.utility.transparent
+              : theme.colors.brand.accentSoft;
+          textColor = theme.colors.text.primary;
+          borderColor =
+            color === "secondary"
+              ? theme.colors.border.strong
+              : theme.colors.border.divider;
+        } else if (variant === "subtle") {
+          bg = theme.colors.brand.accentSoft;
+          textColor = theme.colors.text.primary;
+          borderColor = theme.colors.border.divider;
+        } else {
+          textColor =
+            color === "secondary"
+              ? theme.colors.text.secondary
+              : theme.colors.text.primary;
+          borderColor =
+            color === "secondary"
+              ? theme.colors.border.strong
+              : theme.colors.border.divider;
+        }
+        hoverCss = css`
+          background: ${theme.colors.background.hover};
+        `;
+        break;
+    }
+  } else {
+    // --------------------------------------------------------
+    // 직접 주입된 커스텀 Hex 컬러 (#RRGGBB) 처리
+    // --------------------------------------------------------
+    if (variant === "solid") {
+      bg = color;
+      textColor = "#FFFFFF";
+      borderColor = "transparent";
+      hoverCss = css`
+        filter: brightness(1.1);
+      `;
+    } else if (variant === "subtle") {
+      bg = `${color}1A`;
+      textColor = color;
+      borderColor = `${color}40`;
+      hoverCss = css`
+        background: ${color}26;
+      `; // 10% -> 15% 투명도 증가 (Hover)
+    } else {
+      textColor = color;
+      borderColor = color;
+      hoverCss = css`
+        background: ${theme.colors.background.hover};
+      `;
+    }
+  }
+
+  // Ghost, Outline은 기본적으로 배경과 테두리를 투명/없음 처리
+  if (variant === "ghost") {
+    bg = "transparent";
+    borderColor = "transparent";
+  } else if (variant === "outline") {
+    bg = "transparent";
+  }
+
+  // --------------------------------------------------------
+  // 최종 CSS 조립 (background 속성을 사용하여 그라데이션까지 완벽 지원)
+  // --------------------------------------------------------
+  return css`
+    background: ${bg};
+    color: ${textColor};
+    /* border: ${borderColor !== "transparent"
+      ? `1px solid ${borderColor}`
+      : "none"}; */
+    border: 1px solid ${borderColor};
+    background-origin: border-box;
+    /* 인터랙션 플래그가 true인 요소(버튼 등)에만 Hover 효과 부여 */
+    ${isInteractive &&
+    css`
+      &:hover:not(:disabled):not([data-disabled]) {
+        ${hoverCss}
+      }
+    `}
+  `;
+};

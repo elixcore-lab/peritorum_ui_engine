@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import {
-  Panel,
+  Section,
   SectionHeader,
   SectionTitleGroup,
   SectionBody,
@@ -11,9 +11,9 @@ export interface CardProps extends React.HTMLAttributes<HTMLElement> {}
 
 const CardRoot = forwardRef<HTMLElement, CardProps>(
   ({ children, ...props }, ref) => (
-    <Panel ref={ref} $noPadding {...props}>
+    <Section ref={ref} {...props}>
       {children}
-    </Panel>
+    </Section>
   ),
 );
 CardRoot.displayName = "Card";
@@ -21,7 +21,7 @@ CardRoot.displayName = "Card";
 export interface CardBodyProps extends React.HTMLAttributes<HTMLDivElement> {}
 const CardBody = forwardRef<HTMLDivElement, CardBodyProps>(
   ({ children, ...props }, ref) => (
-    <SectionBody ref={ref} $transparent {...props}>
+    <SectionBody ref={ref} {...props}>
       {children}
     </SectionBody>
   ),

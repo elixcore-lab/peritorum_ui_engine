@@ -1,4 +1,3 @@
-// 📍 components/feedback/Callout.tsx
 import React, { forwardRef } from "react";
 import styled from "@emotion/styled";
 import { Info, AlertTriangle, CheckCircle, XCircle } from "lucide-react";

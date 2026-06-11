@@ -216,7 +216,7 @@ export const DateTimePickerModal = ({
       </ActionGroup>
 
       <ActionGroup>
-        <Button variant="secondary" onClick={onClose}>
+        <Button color="secondary" onClick={onClose}>
           {t("common.cancel")}
         </Button>
         <Button onClick={handleConfirm} disabled={!canConfirm}>

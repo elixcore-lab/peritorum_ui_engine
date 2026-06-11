@@ -31,7 +31,9 @@ export const Spinner = forwardRef<SVGSVGElement, SpinnerProps>(
 
 Spinner.displayName = "Spinner";
 
-const StyledSpinner = styled(Loader2)<{
+const StyledSpinner = styled(Loader2, {
+  shouldForwardProp: (prop) => prop !== "$color" && prop !== "$size",
+})<{
   $color?: string;
   $size?: SpinnerProps["size"];
 }>`

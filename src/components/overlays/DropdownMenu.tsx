@@ -1,7 +1,6 @@
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import styled from "@emotion/styled";
 import {
-  applyTransition,
   squareIconSize,
   popoverContentBase,
   popoverItemBase,

@@ -11,7 +11,6 @@ export interface FormFieldProps extends Omit<
 > {
   label?: React.ReactNode;
   description?: React.ReactNode;
-  // 💡 명시적으로 boolean 또는 노드를 받음을 선언
   error?: boolean | React.ReactNode;
   required?: boolean;
   disabled?: boolean;
@@ -114,7 +113,6 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
 
     return (
       <FieldWrapper ref={ref} className={className} {...props}>
-        {/* 💡 Label과 Description을 묶어 시각적 그룹핑(Gestalt) 강화 */}
         {(label || description) && (
           <HeaderWrapper>
             {renderLabel()}

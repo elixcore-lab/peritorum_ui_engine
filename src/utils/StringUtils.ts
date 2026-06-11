@@ -9,7 +9,6 @@ export const isBlank = (str: string | null | undefined): boolean => {
  * 첫 글자만 대문자로 변환합니다. (예: "hello" -> "Hello")
  */
 export const capitalize = (str: string | null | undefined): string => {
-  // 🚀 최적화: TS가 null/undefined를 완벽히 걸러낼 수 있도록 명시적 체크 추가
   if (!str || isBlank(str)) return "";
 
   // 이제 느낌표(!) 없이도 에러가 나지 않습니다.
@@ -21,7 +20,6 @@ export const capitalize = (str: string | null | undefined): string => {
  */
 export const getOnlyNumbers = (str: string | null | undefined): string => {
   if (!str) return "";
-  // 🚀 최적화: [^0-9] 대신 더 간결하고 직관적인 \D 사용
   return str.replace(/\D/g, "");
 };
 

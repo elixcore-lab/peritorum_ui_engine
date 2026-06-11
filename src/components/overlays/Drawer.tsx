@@ -2,9 +2,7 @@ import React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import styled from "@emotion/styled";
 import { useTheme } from "@emotion/react";
-import { X } from "lucide-react";
 import { Overlay } from "./Overlay";
-import { IconButton } from "../elements/IconButton";
 import { useUiConfig } from "../../ConfigProvider";
 import { slideInRight, slideInLeft } from "../../styles/animation";
 import { applyAnimation, visuallyHidden } from "../../styles";
@@ -13,17 +11,20 @@ import {
   SectionTitleGroup,
   SectionBody,
   SectionFooter,
+  Divider,
 } from "../layout";
+
+import { Text } from "..";
 
 export interface DrawerProps {
   children: React.ReactNode;
   description?: React.ReactNode;
   footer?: React.ReactNode;
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
   side?: "left" | "right";
   title?: React.ReactNode;
   width?: string;
+  onOpenChange: (open: boolean) => void;
 }
 
 export const Drawer = ({
@@ -31,10 +32,10 @@ export const Drawer = ({
   description,
   footer,
   isOpen,
-  onOpenChange,
   side = "right",
   title,
   width,
+  onOpenChange,
 }: DrawerProps) => {
   const theme = useTheme();
   const { t } = useUiConfig();
@@ -46,13 +47,17 @@ export const Drawer = ({
         <Dialog.Overlay asChild>
           <Overlay zIndex={theme.zIndices.modal} />
         </Dialog.Overlay>
-        <Content $side={side} $width={resolvedWidth}>
-          <SectionHeader>
+        <Content
+          $side={side}
+          $width={resolvedWidth}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
+          <SectionHeader $padding="0">
             <SectionTitleGroup>
               {title ? (
                 <Dialog.Title asChild>
                   {typeof title === "string" ? (
-                    <h2>{title}</h2>
+                    <Text variant="h2">{title}</Text>
                   ) : (
                     <div>{title}</div>
                   )}
@@ -78,25 +83,45 @@ export const Drawer = ({
               )}
             </SectionTitleGroup>
 
-            <Dialog.Close asChild>
+            {/* <CloseButtonWrapper>
+              <Dialog.Close asChild>
+                <IconButton
+                  variant="ghost"
+                  icon={<X />}
+                  size="xs"
+                  aria-label={t("ui.component.drawer.close")}
+                />
+              </Dialog.Close>
+            </CloseButtonWrapper> */}
+
+            {/* <Dialog.Close asChild>
               <IconButton
                 variant="ghost"
                 icon={<X />}
                 aria-label={t("ui.component.drawer.close")}
               />
-            </Dialog.Close>
+            </Dialog.Close> */}
           </SectionHeader>
+          <Divider />
+          <SectionBody $padding="0">{children}</SectionBody>
 
-          <SectionBody>{children}</SectionBody>
-
-          {footer ? <SectionFooter>{footer}</SectionFooter> : null}
+          {footer ? (
+            <>
+              <Divider />
+              <SectionFooter $padding="0">{footer}</SectionFooter>
+            </>
+          ) : null}
         </Content>
       </Dialog.Portal>
     </Dialog.Root>
   );
 };
 
-const Content = styled(Dialog.Content)<{
+const filterProps = {
+  shouldForwardProp: (prop: string) => !["$side", "$width"].includes(prop),
+};
+
+const Content = styled(Dialog.Content, filterProps)<{
   $side: "left" | "right";
   $width: string;
 }>`
@@ -108,6 +133,8 @@ const Content = styled(Dialog.Content)<{
   display: flex;
   flex-direction: column;
   max-width: min(${({ $width }) => $width}, 92vw);
+  padding: ${({ theme }) => theme.spacing.md};
+  gap: ${({ theme }) => theme.spacing.md};
   outline: none;
   position: fixed;
   top: 0;
@@ -126,4 +153,10 @@ const Content = styled(Dialog.Content)<{
 
 const VisuallyHidden = styled.span`
   ${visuallyHidden}
+`;
+
+const CloseButtonWrapper = styled.div`
+  position: absolute;
+  top: 0; // ${({ theme }) => theme.spacing.md};
+  right: 0; //${({ theme }) => theme.spacing.md};
 `;

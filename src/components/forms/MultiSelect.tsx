@@ -1,16 +1,12 @@
 import React, { forwardRef } from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react";
 import { Check, ChevronDown, X } from "lucide-react";
 import {
   flexCenter,
   formControlBase,
-  transitionBase,
-  floatingSurface,
   disabledState,
   resetButton,
-  customScrollbar,
   ControlSize,
   controlSizeBase,
   squareIconSize,
@@ -173,7 +169,7 @@ const TagCloseButton = styled.button`
   }
 
   & > svg {
-    ${({ theme }) => squareIconSize(theme, "xxs")}
+    ${({ theme }) => squareIconSize(theme, "2xs")}
   }
 `;
 

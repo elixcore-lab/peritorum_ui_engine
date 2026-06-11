@@ -6,20 +6,20 @@ import { useTheme } from "@emotion/react";
 import {
   applyAnimation,
   visuallyHidden,
-  contentShow,
   floatingSurface,
-} from "../../styles";
+} from "../../styles/mixins";
 import { useUiConfig } from "../../ConfigProvider";
 import { Overlay } from "./Overlay";
 import { IconButton } from "../elements/IconButton";
+import { Text } from "../typography/Text";
 import {
   SectionHeader,
   SectionTitleGroup,
   SectionBody,
   SectionFooter,
 } from "../layout";
+import { contentShow } from "../../styles";
 
-// --- Types ---
 export interface ModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -32,7 +32,6 @@ export interface ModalProps {
   preventOutsideClose?: boolean;
 }
 
-// --- Component ---
 export const Modal = ({
   isOpen,
   onOpenChange,
@@ -72,7 +71,9 @@ export const Modal = ({
                 {title ? (
                   <Dialog.Title asChild>
                     {typeof title === "string" ? (
-                      <h2>{title}</h2>
+                      <Text variant="h2" weight="bold" as="h2">
+                        {title}
+                      </Text>
                     ) : (
                       <div>{title}</div>
                     )}
@@ -87,7 +88,14 @@ export const Modal = ({
 
                 {description ? (
                   <Dialog.Description asChild>
-                    <p>{description}</p>
+                    {/* 💡 설명 부분도 Text 컴포넌트로 교체 */}
+                    {typeof description === "string" ? (
+                      <Text variant="body2" color="secondary" as="p">
+                        {description}
+                      </Text>
+                    ) : (
+                      <div>{description}</div>
+                    )}
                   </Dialog.Description>
                 ) : (
                   <Dialog.Description asChild>
@@ -102,6 +110,7 @@ export const Modal = ({
                 <Dialog.Close asChild>
                   <IconButton
                     variant="ghost"
+                    color="default"
                     icon={<X />}
                     aria-label={t("ui.component.modal.close")}
                   />
@@ -110,8 +119,6 @@ export const Modal = ({
             </SectionHeader>
           )}
 
-          {/* 💡 참고: SectionBody 컴포넌트 내부에 'overflow-y: auto; flex: 1;' 이 적용되어 있어야 
-               모달 높이가 100dvh를 넘을 때 정상적으로 내부 스크롤이 발생합니다. */}
           <SectionBody>{children}</SectionBody>
 
           {footer && <SectionFooter>{footer}</SectionFooter>}

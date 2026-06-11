@@ -1,4 +1,3 @@
-import React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import styled from "@emotion/styled";
 import { popoverContentBase } from "../../styles/mixins";

@@ -5,12 +5,9 @@ import { css, useTheme } from "@emotion/react";
 import { ChevronDown, Check, XCircle } from "lucide-react";
 import { type ControlSize } from "../../styles/types";
 import {
-  applyAnimation,
-  applyTransition,
   customScrollbar,
   formControlBase,
   controlSizeBase,
-  floatingSurface,
   disabledState,
   flexCenter,
   resetButton,
@@ -23,7 +20,6 @@ import {
 import { useUiConfig } from "../../ConfigProvider";
 import { resolveDisabled } from "../../utils";
 import { Spinner } from "../feedback/Spinner";
-import { slideDownAndFade } from "../../styles";
 
 export interface SelectItemData {
   value: string;
