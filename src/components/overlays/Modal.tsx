@@ -20,7 +20,17 @@ import {
 } from "../layout";
 import { contentShow } from "../../styles";
 
-export interface ModalProps {
+/**
+ * Modal 컴포넌트의 열림 상태, 접근성 문구, 콘텐츠 슬롯, 닫힘 정책을 정의합니다.
+ *
+ * Radix Dialog.Content 속성을 대부분 상속하지만 인라인 스타일 주입을 막기 위해
+ * `style`은 제외합니다. 폭은 필요 시 전달하고 기본값은 theme 토큰을 사용합니다.
+ */
+export interface ModalProps
+  extends Omit<
+    React.ComponentPropsWithoutRef<typeof Dialog.Content>,
+    "children" | "title" | "style"
+  > {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   title?: React.ReactNode;
@@ -32,6 +42,12 @@ export interface ModalProps {
   preventOutsideClose?: boolean;
 }
 
+/**
+ * 앱 전반에서 사용하는 중앙 정렬 Dialog 컴포넌트입니다.
+ *
+ * header, body, footer 슬롯을 Layout primitive로 구성하고, Overlay와 floatingSurface
+ * mixin을 통해 레이어 표현을 일관되게 유지합니다.
+ */
 export const Modal = ({
   isOpen,
   onOpenChange,
@@ -42,14 +58,41 @@ export const Modal = ({
   width,
   hideCloseButton = false,
   preventOutsideClose = false,
+  onPointerDownOutside,
+  onEscapeKeyDown,
+  ...contentProps
 }: ModalProps) => {
   const theme = useTheme();
   const { t } = useUiConfig();
   const maxWidth = width || theme.sizes.component.modalDefaultWidth;
 
-  const handleInteractOutside = (e: Event) => {
+  const handlePointerDownOutside = (
+    event: Parameters<
+      NonNullable<
+        React.ComponentPropsWithoutRef<
+          typeof Dialog.Content
+        >["onPointerDownOutside"]
+      >
+    >[0],
+  ) => {
+    onPointerDownOutside?.(event);
     if (preventOutsideClose) {
-      e.preventDefault();
+      event.preventDefault();
+    }
+  };
+
+  const handleEscapeKeyDown = (
+    event: Parameters<
+      NonNullable<
+        React.ComponentPropsWithoutRef<
+          typeof Dialog.Content
+        >["onEscapeKeyDown"]
+      >
+    >[0],
+  ) => {
+    onEscapeKeyDown?.(event);
+    if (preventOutsideClose) {
+      event.preventDefault();
     }
   };
 
@@ -62,8 +105,9 @@ export const Modal = ({
 
         <Content
           $maxWidth={maxWidth}
-          onPointerDownOutside={handleInteractOutside}
-          onEscapeKeyDown={handleInteractOutside}
+          {...contentProps}
+          onPointerDownOutside={handlePointerDownOutside}
+          onEscapeKeyDown={handleEscapeKeyDown}
         >
           {(title || !hideCloseButton) && (
             <SectionHeader>
@@ -88,9 +132,8 @@ export const Modal = ({
 
                 {description ? (
                   <Dialog.Description asChild>
-                    {/* 💡 설명 부분도 Text 컴포넌트로 교체 */}
                     {typeof description === "string" ? (
-                      <Text variant="body2" color="secondary" as="p">
+                      <Text variant="body2" color="secondary" as="div">
                         {description}
                       </Text>
                     ) : (
@@ -128,7 +171,7 @@ export const Modal = ({
   );
 };
 
-// --- Styled Components ---
+Modal.displayName = "Modal";
 
 const Content = styled(Dialog.Content)<{ $maxWidth: string }>`
   ${({ theme }) => floatingSurface(theme)}
