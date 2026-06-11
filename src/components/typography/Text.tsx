@@ -15,6 +15,12 @@ import {
 
 export type TextVariant = "h1" | "h2" | "h3" | "body1" | "body2" | "caption";
 
+/**
+ * Text 컴포넌트가 지원하는 시맨틱 태그, 타이포그래피 토큰, 줄임 옵션을 정의합니다.
+ *
+ * `variant`, `size`, `weight`, `color`는 theme 기반 토큰을 우선 사용하며,
+ * 컴포넌트 간 간격은 Text 자체가 아니라 상위 Layout의 gap/padding으로 제어합니다.
+ */
 export interface TextProps extends Omit<
   React.HTMLAttributes<HTMLElement>,
   "color"
@@ -31,6 +37,12 @@ export interface TextProps extends Omit<
   fullWidth?: boolean;
 }
 
+/**
+ * 디자인 시스템 전역에서 사용하는 기본 타이포그래피 컴포넌트입니다.
+ *
+ * 제목, 본문, 캡션, 단일 라인 말줄임, 멀티 라인 클램프를 하나의 API로 제공하며
+ * ref와 표준 HTML 속성을 그대로 전달할 수 있습니다.
+ */
 export const Text = forwardRef<HTMLElement, TextProps>(
   (
     {
@@ -116,7 +128,6 @@ const StyledText = styled("span", filterProps)<{
   $isInlineToken: boolean;
   $fullWidth: boolean;
 }>`
-  margin: 0;
   padding: 0;
   text-align: ${({ $align }) => $align};
   white-space: ${({ $ellipsis }) => ($ellipsis ? undefined : "pre-wrap")};
