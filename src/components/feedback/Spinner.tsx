@@ -6,16 +6,28 @@ import { applyAnimation, squareIconSize } from "../../styles/mixins";
 import { type IconSize, type ColorVariant } from "../../styles/types";
 import { useUiConfig } from "../../ConfigProvider";
 
+/**
+ * Spinner가 사용할 크기와 색상 토큰을 정의합니다.
+ *
+ * 크기와 색상은 디자인 시스템 토큰을 사용하며, 접근성 이름은 `aria-label`로
+ * 오버라이드할 수 있습니다.
+ */
 export interface SpinnerProps extends Omit<
   React.SVGAttributes<SVGSVGElement>,
   "color"
 > {
-  /** 테마 아이콘 사이즈 토큰("md", "lg"), 커스텀 픽셀 문자열("24px"), 또는 숫자(24) 지원 */
-  size?: IconSize | (number & {});
-  /** 테마 컬러 토큰("brand", "success" 등), 커스텀 Hex, 또는 "currentColor" */
+  /** theme icon size 토큰입니다. */
+  size?: IconSize;
+  /** theme color intent 또는 currentColor입니다. */
   color?: ColorVariant | "currentColor";
 }
 
+/**
+ * 비동기 로딩 상태를 나타내는 SVG 기반 spinner입니다.
+ *
+ * 공통 animation mixin과 theme transition token을 사용하며 스크린 리더용 상태
+ * 라벨을 기본 제공합니다.
+ */
 export const Spinner = forwardRef<SVGSVGElement, SpinnerProps>(
   ({ size = "md", color = "brand", className, ...props }, ref) => {
     const { t } = useUiConfig();
@@ -48,10 +60,7 @@ const StyledSpinner = styled(Loader2, filterProps)<{
   $color: string;
   $size: SpinnerProps["size"];
 }>`
-  ${({ theme, $size }) => {
-    const finalSize = typeof $size === "number" ? `${$size}px` : $size || "md";
-    return squareIconSize(theme, finalSize as IconSize);
-  }}
+  ${({ theme, $size }) => squareIconSize(theme, $size || "md")}
 
   color: ${({ theme, $color }) => {
     if ($color === "currentColor" || $color === "inherit") return $color;
@@ -69,6 +78,12 @@ const StyledSpinner = styled(Loader2, filterProps)<{
     return $color;
   }};
 
-  ${({ theme }) => applyAnimation(theme, spin, "1s", "linear")}
+  ${({ theme }) =>
+    applyAnimation(
+      theme,
+      spin,
+      theme.transitions.duration.slow,
+      theme.transitions.function.linear,
+    )}
   animation-iteration-count: infinite;
 `;
