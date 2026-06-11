@@ -16,7 +16,7 @@ import { clamp } from "../../utils";
  */
 export interface ProgressBarProps extends Omit<
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>,
-  "color"
+  "color" | "style"
 > {
   value: number;
   color?: ColorVariant;
