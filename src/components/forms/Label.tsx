@@ -8,17 +8,27 @@ import {
   type ColorVariant,
 } from "../../styles/types";
 
+/**
+ * Label의 필수 표시, disabled 상태, 타이포그래피/색상 토큰을 정의합니다.
+ *
+ * 표준 label 속성을 상속하며, 크기와 색상은 디자인 시스템 token을 우선 사용합니다.
+ */
 export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
   required?: boolean;
   disabled?: boolean;
-  /** 테마 토큰("sm", "lg") 또는 커스텀 픽셀("14px") 허용 */
+  /** theme font size 토큰입니다. */
   size?: FontSize;
-  /** 테마 토큰("medium", "bold") 또는 커스텀 숫자(600) 허용 */
+  /** theme font weight 토큰입니다. */
   weight?: FontWeight;
-  /** 테마 컬러("primary", "danger") 또는 커스텀 Hex("#FF0000") 허용 */
+  /** theme color intent 또는 currentColor입니다. */
   color?: ColorVariant | "currentColor";
 }
 
+/**
+ * form control과 연결되는 기본 label 컴포넌트입니다.
+ *
+ * required mark와 disabled 색상 처리를 내장하고, spacing은 내부 gap만 사용합니다.
+ */
 export const Label = forwardRef<HTMLLabelElement, LabelProps>(
   (
     {
@@ -78,11 +88,9 @@ const StyledLabel = styled("label", filterProps)<{
 
   color: ${({ theme, $color }) => {
     if ($color === "currentColor" || $color === "inherit") return $color;
-    // Label의 기본 primary 색상은 text.primary를 따르게 처리
     if ($color === "primary") return theme.colors.text.primary;
     if ($color === "secondary") return theme.colors.text.secondary;
 
-    // 그 외 상태 컬러(danger 등)나 Hex 값은 믹스인에 위임
     return resolveThemeColor(theme, $color);
   }};
 
