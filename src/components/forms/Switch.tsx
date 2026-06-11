@@ -22,9 +22,11 @@ import { Spinner } from "../feedback/Spinner";
  * Radix Switch Root 속성을 상속하며 disabled/loading 상태는 `resolveDisabled`로
  * 통합 처리합니다.
  */
-export interface SwitchProps extends React.ComponentPropsWithoutRef<
-  typeof SwitchPrimitive.Root
-> {
+export interface SwitchProps
+  extends Omit<
+    React.ComponentPropsWithoutRef<typeof SwitchPrimitive.Root>,
+    "style"
+  > {
   size?: ControlSize;
   color?: ColorVariant;
   label?: React.ReactNode;
