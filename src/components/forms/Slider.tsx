@@ -51,7 +51,7 @@ export const Slider = forwardRef<
     ref,
   ) => {
     const { t } = useUiConfig();
-    const values = value || defaultValue || [0];
+    const values: number[] = value || defaultValue || [0];
     const defaultThumbLabel = t("ui.component.slider.thumb");
 
     return (
@@ -67,7 +67,7 @@ export const Slider = forwardRef<
           <StyledRange $color={color} />
         </StyledTrack>
 
-        {values.map((_, index) => (
+        {values.map((_value: number, index: number) => (
           <StyledThumb
             key={index}
             aria-label={thumbAriaLabels?.[index] || defaultThumbLabel}
