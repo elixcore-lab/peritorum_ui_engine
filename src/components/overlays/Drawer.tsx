@@ -13,10 +13,19 @@ import {
   SectionFooter,
   Divider,
 } from "../layout";
+import { Text } from "../typography/Text";
 
-import { Text } from "..";
-
-export interface DrawerProps {
+/**
+ * Drawer 컴포넌트의 열림 상태, 배치 방향, 콘텐츠 슬롯을 정의합니다.
+ *
+ * `width`는 소비자가 필요할 때만 전달하며, 기본값은 theme sizing 토큰을 사용합니다.
+ * 설명과 footer는 선택 슬롯으로 제공되어 Dialog 접근성 정보를 함께 구성합니다.
+ */
+export interface DrawerProps
+  extends Omit<
+    React.ComponentPropsWithoutRef<typeof Dialog.Content>,
+    "children" | "title"
+  > {
   children: React.ReactNode;
   description?: React.ReactNode;
   footer?: React.ReactNode;
@@ -27,6 +36,12 @@ export interface DrawerProps {
   onOpenChange: (open: boolean) => void;
 }
 
+/**
+ * 화면 가장자리에서 슬라이드되는 패널형 오버레이입니다.
+ *
+ * Radix Dialog의 focus/aria 동작을 유지하면서 레이아웃 primitive와 theme 토큰으로
+ * header, body, footer 구성을 표준화합니다.
+ */
 export const Drawer = ({
   children,
   description,
@@ -36,10 +51,12 @@ export const Drawer = ({
   title,
   width,
   onOpenChange,
+  onCloseAutoFocus,
+  ...contentProps
 }: DrawerProps) => {
   const theme = useTheme();
   const { t } = useUiConfig();
-  const resolvedWidth = width ?? "360px";
+  const resolvedWidth = width ?? theme.sizes.component.modalAlertWidth;
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
@@ -50,9 +67,13 @@ export const Drawer = ({
         <Content
           $side={side}
           $width={resolvedWidth}
-          onCloseAutoFocus={(e) => e.preventDefault()}
+          {...contentProps}
+          onCloseAutoFocus={(event) => {
+            onCloseAutoFocus?.(event);
+            event.preventDefault();
+          }}
         >
-          <SectionHeader $padding="0">
+          <SectionHeader $padding="none">
             <SectionTitleGroup>
               {title ? (
                 <Dialog.Title asChild>
@@ -72,7 +93,13 @@ export const Drawer = ({
 
               {description ? (
                 <Dialog.Description asChild>
-                  <p>{description}</p>
+                  <DrawerDescriptionText
+                    variant="body2"
+                    color="secondary"
+                    as="div"
+                  >
+                    {description}
+                  </DrawerDescriptionText>
                 </Dialog.Description>
               ) : (
                 <Dialog.Description asChild>
@@ -82,33 +109,14 @@ export const Drawer = ({
                 </Dialog.Description>
               )}
             </SectionTitleGroup>
-
-            {/* <CloseButtonWrapper>
-              <Dialog.Close asChild>
-                <IconButton
-                  variant="ghost"
-                  icon={<X />}
-                  size="xs"
-                  aria-label={t("ui.component.drawer.close")}
-                />
-              </Dialog.Close>
-            </CloseButtonWrapper> */}
-
-            {/* <Dialog.Close asChild>
-              <IconButton
-                variant="ghost"
-                icon={<X />}
-                aria-label={t("ui.component.drawer.close")}
-              />
-            </Dialog.Close> */}
           </SectionHeader>
           <Divider />
-          <SectionBody $padding="0">{children}</SectionBody>
+          <SectionBody $padding="none">{children}</SectionBody>
 
           {footer ? (
             <>
               <Divider />
-              <SectionFooter $padding="0">{footer}</SectionFooter>
+              <SectionFooter $padding="none">{footer}</SectionFooter>
             </>
           ) : null}
         </Content>
@@ -116,6 +124,8 @@ export const Drawer = ({
     </Dialog.Root>
   );
 };
+
+Drawer.displayName = "Drawer";
 
 const filterProps = {
   shouldForwardProp: (prop: string) => !["$side", "$width"].includes(prop),
@@ -132,14 +142,15 @@ const Content = styled(Dialog.Content, filterProps)<{
   box-shadow: ${({ theme }) => theme.colors.effect.shadow.lg};
   display: flex;
   flex-direction: column;
-  max-width: min(${({ $width }) => $width}, 92vw);
+  max-width: ${({ $width, theme }) =>
+    `min(${$width}, calc(100vw - ${theme.spacing.lg}))`};
   padding: ${({ theme }) => theme.spacing.md};
   gap: ${({ theme }) => theme.spacing.md};
   outline: none;
   position: fixed;
-  top: 0;
-  bottom: 0;
-  ${({ $side }) => `${$side}: 0;`}
+  top: ${({ theme }) => theme.spacing.none};
+  bottom: ${({ theme }) => theme.spacing.none};
+  ${({ $side, theme }) => `${$side}: ${theme.spacing.none};`}
   width: ${({ $width }) => $width};
   z-index: ${({ theme }) => theme.zIndices.modal};
   ${({ theme, $side }) =>
@@ -155,8 +166,6 @@ const VisuallyHidden = styled.span`
   ${visuallyHidden}
 `;
 
-const CloseButtonWrapper = styled.div`
-  position: absolute;
-  top: 0; // ${({ theme }) => theme.spacing.md};
-  right: 0; //${({ theme }) => theme.spacing.md};
+const DrawerDescriptionText = styled(Text)`
+  white-space: pre-wrap;
 `;
