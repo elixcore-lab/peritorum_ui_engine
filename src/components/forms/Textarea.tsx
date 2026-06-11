@@ -1,4 +1,10 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import { type ControlSize, type FontSize } from "../../styles/types";
@@ -57,6 +63,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref,
   ) => {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const resizeFrameRef = useRef<number>();
 
     const setTextareaRef = (element: HTMLTextAreaElement | null) => {
       textareaRef.current = element;
@@ -72,30 +79,49 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const [textLength, setTextLength] = useState(
       String(value ?? defaultValue ?? "").length,
     );
+    const [autoHeight, setAutoHeight] = useState<string>();
+    const [autoOverflowY, setAutoOverflowY] =
+      useState<React.CSSProperties["overflowY"]>();
 
-    const handleResize = () => {
-      if (!autoResize || !textareaRef.current) return;
-      const textarea = textareaRef.current;
+    const handleResize = useCallback(() => {
+      if (!autoResize || !textareaRef.current) {
+        setAutoHeight(undefined);
+        setAutoOverflowY(undefined);
+        return;
+      }
 
-      // scrollHeight 재계산을 위해 일시적으로 auto 설정 (정석적인 패턴 유지)
-      textarea.style.height = "auto";
-      const nextHeight = textarea.scrollHeight;
-      textarea.style.height = `${nextHeight}px`;
+      if (resizeFrameRef.current) {
+        window.cancelAnimationFrame(resizeFrameRef.current);
+      }
 
-      if (maxRows) {
+      setAutoHeight(undefined);
+
+      resizeFrameRef.current = window.requestAnimationFrame(() => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        const nextHeight = textarea.scrollHeight;
+        setAutoHeight(`${nextHeight}px`);
+
+        if (!maxRows) {
+          setAutoOverflowY("hidden");
+          return;
+        }
+
         const computedStyle = window.getComputedStyle(textarea);
         const maxHeight = parseFloat(computedStyle.maxHeight);
-        if (nextHeight >= maxHeight) {
-          textarea.style.overflowY = "auto";
-        } else {
-          textarea.style.overflowY = "hidden";
-        }
-      }
-    };
+        setAutoOverflowY(nextHeight >= maxHeight ? "auto" : "hidden");
+      });
+    }, [autoResize, maxRows]);
 
     useEffect(() => {
       handleResize();
-    }, [value, autoResize, maxRows]);
+      return () => {
+        if (resizeFrameRef.current) {
+          window.cancelAnimationFrame(resizeFrameRef.current);
+        }
+      };
+    }, [handleResize, value]);
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setTextLength(e.target.value.length);
@@ -121,6 +147,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           $fontSize={fontSize}
           $isError={isError}
           $autoResize={autoResize}
+          $autoHeight={autoHeight}
+          $autoOverflowY={autoOverflowY}
           $maxRows={maxRows}
           rows={minRows}
           maxLength={maxLength}
@@ -156,6 +184,8 @@ const textareaFilter = {
       "$fontSize",
       "$isError",
       "$autoResize",
+      "$autoHeight",
+      "$autoOverflowY",
       "$maxRows",
     ].includes(prop),
 };
@@ -177,6 +207,8 @@ const StyledTextarea = styled("textarea", textareaFilter)<{
   $fontSize?: FontSize | (string & {});
   $isError?: boolean;
   $autoResize?: boolean;
+  $autoHeight?: string;
+  $autoOverflowY?: React.CSSProperties["overflowY"];
   $maxRows?: number;
 }>`
   ${({ theme, $isError }) => formControlBase(theme, $isError)}
@@ -226,7 +258,10 @@ const StyledTextarea = styled("textarea", textareaFilter)<{
 
   line-height: ${({ theme }) => theme.lineHeights.comfortable};
   resize: ${({ $autoResize }) => ($autoResize ? "none" : "vertical")};
-  overflow-y: ${({ $autoResize }) => ($autoResize ? "hidden" : "auto")};
+  height: ${({ $autoResize, $autoHeight }) =>
+    $autoResize ? ($autoHeight ?? "auto") : undefined};
+  overflow-y: ${({ $autoResize, $autoOverflowY }) =>
+    $autoResize ? ($autoOverflowY ?? "hidden") : "auto"};
 
   ${({ theme, $maxRows, $inputSize }) => {
     if (!$maxRows) return null;
@@ -248,7 +283,9 @@ const StyledTextarea = styled("textarea", textareaFilter)<{
     }[refSize];
 
     return css`
-      max-height: calc(${$maxRows} * 1.5em + (${paddingY} * 2));
+      max-height: calc(
+        ${$maxRows} * ${theme.lineHeights.comfortable}em + (${paddingY} * 2)
+      );
     `;
   }}
 
