@@ -17,6 +17,12 @@ import {
 import { useUiConfig } from "../../ConfigProvider";
 import { resolveDisabled } from "../../utils";
 
+/**
+ * Accordion 한 섹션의 값, 헤더, 콘텐츠, 보조 슬롯, 동작 방식을 정의합니다.
+ *
+ * `behavior`가 fixed이면 항상 열림 목록에 포함되며, `weight`는 열린 섹션 사이의
+ * flex 비율을 조정합니다.
+ */
 export interface AccordionItemData {
   value: string;
   header: React.ReactNode;
@@ -30,6 +36,12 @@ export interface AccordionItemData {
   fitContent?: boolean;
 }
 
+/**
+ * Accordion root가 받을 섹션 목록과 표시 variant를 정의합니다.
+ *
+ * Radix multiple accordion 속성을 상속하되, 내부 open state 정책을 보장하기 위해
+ * value/onValueChange/defaultValue/type은 컴포넌트가 직접 관리합니다.
+ */
 export interface AccordionProps extends Omit<
   AccordionPrimitive.AccordionMultipleProps,
   "type" | "value" | "onValueChange" | "defaultValue"
@@ -77,6 +89,12 @@ const getAccordionItemMeta = (items: AccordionItemData[]) => {
   };
 };
 
+/**
+ * 여러 섹션을 접고 펼치는 Radix 기반 disclosure 컴포넌트입니다.
+ *
+ * joined/separated variant와 fixed/defaultOpen 정책을 지원하며, 접근성 라벨은
+ * i18n dictionary를 통해 제공됩니다.
+ */
 export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
   ({ items, variant = "joined", ...rootProps }, ref) => {
     const { t } = useUiConfig();
