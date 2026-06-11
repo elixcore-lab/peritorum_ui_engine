@@ -209,13 +209,15 @@ const InputIconWrapper = styled("div", filterProps)<{
   $size: ControlSize | (string & {});
 }>`
   position: absolute;
-  top: 0;
+  top: ${({ theme }) => theme.spacing.none};
   width: ${({ theme, $size }) =>
     theme.sizes.control[$size as keyof typeof theme.sizes.control] || $size};
   height: 100%;
   ${flexCenter}
 
-  ${({ $position }) => ($position === "left" ? "left: 0;" : "right: 0;")}
+  ${({ $position, theme }) => css`
+    ${$position}: ${theme.spacing.none};
+  `}
   
   color: ${({ theme }) => theme.colors.text.secondary};
   pointer-events: none;
