@@ -13,7 +13,8 @@ import {
  * Card 자체는 spacing을 만들지 않고, 내부 Header/Body/Footer preset의 gap과 padding을
  * 통해 구조화됩니다.
  */
-export interface CardProps extends React.HTMLAttributes<HTMLElement> {}
+export interface CardProps
+  extends Omit<React.HTMLAttributes<HTMLElement>, "style"> {}
 
 /**
  * Card compound component의 root 영역입니다.
@@ -34,7 +35,8 @@ CardRoot.displayName = "Card";
  *
  * 스크롤과 padding 정책은 layout `SectionBody`의 컨벤션을 따릅니다.
  */
-export interface CardBodyProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface CardBodyProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {}
 
 /**
  * Card의 주요 콘텐츠 영역입니다.
