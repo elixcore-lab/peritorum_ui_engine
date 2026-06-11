@@ -21,6 +21,9 @@ import { useUiConfig } from "../../ConfigProvider";
 import { resolveDisabled } from "../../utils";
 import { Spinner } from "../feedback/Spinner";
 
+/**
+ * Select에서 렌더링할 단일 옵션 모델입니다.
+ */
 export interface SelectItemData {
   value: string;
   label: string;
@@ -28,6 +31,9 @@ export interface SelectItemData {
   description?: string;
 }
 
+/**
+ * Select 옵션을 그룹으로 묶기 위한 모델입니다.
+ */
 export interface SelectGroupData {
   groupLabel: string;
   items: SelectItemData[];
@@ -35,6 +41,9 @@ export interface SelectGroupData {
 
 export type SelectOption = SelectItemData | SelectGroupData;
 
+/**
+ * Select의 값, 옵션 목록, 상태, clear action, 크기 토큰을 정의합니다.
+ */
 export interface SelectProps {
   value?: string;
   defaultValue?: string;
@@ -57,6 +66,12 @@ const isGroupData = (opt: SelectOption): opt is SelectGroupData => {
   return "groupLabel" in opt;
 };
 
+/**
+ * Radix Select를 기반으로 한 단일 선택 form control입니다.
+ *
+ * 그룹 옵션, clear button, loading indicator, icon slot을 지원하며 theme token 기반
+ * popover 스타일을 공유합니다.
+ */
 export const Select = forwardRef<HTMLButtonElement, SelectProps>(
   (
     {
@@ -241,9 +256,7 @@ const SelectTrigger = styled(SelectPrimitive.Trigger, triggerFilter)<{
     color: ${({ theme }) => theme.colors.text.disabled};
   }
 
-  &[data-disabled] {
-    ${({ theme }) => disabledState(theme)}
-  }
+  ${({ theme }) => disabledState(theme)}
 `;
 
 const ActionIconWrapper = styled("span", iconFilter)<{
@@ -272,7 +285,7 @@ const SelectViewport = styled(SelectPrimitive.Viewport)`
 `;
 
 const SelectGroup = styled(SelectPrimitive.Group)`
-  padding: ${({ theme }) => theme.spacing.xs} 0;
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.none};
 
   &:not(:last-child) {
     border-bottom: ${({ theme }) => theme.sizes.component.dividerThin} solid
