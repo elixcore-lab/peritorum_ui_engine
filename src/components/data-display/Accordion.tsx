@@ -211,7 +211,7 @@ const AccordionRoot = styled(AccordionPrimitive.Root)<{
         `
       : css`
           gap: ${theme.spacing.sm};
-          background-color: transparent;
+          background-color: ${theme.colors.utility.transparent};
         `}
 `;
 
@@ -257,7 +257,7 @@ const AccordionItem = styled(AccordionPrimitive.Item, {
   }
 
   &[data-state="open"] {
-    min-height: 0;
+    min-height: ${({ theme }) => theme.spacing.none};
     ${({ $fitContent, $weight }) =>
       $fitContent ? `flex: 0 0 auto;` : `flex: ${$weight || 1} 1 0%;`}
   }
@@ -278,7 +278,7 @@ const AccordionTrigger = styled(AccordionPrimitive.Trigger)`
   align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
-  background-color: transparent;
+  background-color: ${({ theme }) => theme.colors.utility.transparent};
   color: ${({ theme }) => theme.colors.text.primary};
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
@@ -312,7 +312,7 @@ const TriggerContent = styled.div`
   gap: ${({ theme }) => theme.spacing.sm};
 
   flex: 1;
-  min-width: 0;
+  min-width: ${({ theme }) => theme.spacing.none};
   ${textEllipsis}
 `;
 
@@ -382,7 +382,7 @@ const ContentInner = styled.div<{
 }>`
   flex: 1;
   overflow-y: auto;
-  min-height: 0;
+  min-height: ${({ theme }) => theme.spacing.none};
   padding: ${({ theme }) => theme.spacing.md};
 
   ${({ theme, $variant }) =>
@@ -395,7 +395,7 @@ const ContentInner = styled.div<{
       : css`
           border-top: ${theme.sizes.component.dividerThin} dashed
             ${theme.colors.border.default};
-          background-color: transparent;
+          background-color: ${theme.colors.utility.transparent};
         `}
 
   ${({ theme }) => customScrollbar(theme)}
