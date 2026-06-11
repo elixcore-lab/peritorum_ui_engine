@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react";
+import { css, type Theme } from "@emotion/react";
 import { type ControlSize, type ColorVariant } from "../../styles/types";
 import {
   applyTransition,
@@ -16,6 +16,12 @@ import { resolveDisabled } from "../../utils";
 import { Label } from "./Label";
 import { Spinner } from "../feedback/Spinner";
 
+/**
+ * Switch의 크기, 색상, 라벨, 설명, 로딩 및 아이콘 슬롯을 정의합니다.
+ *
+ * Radix Switch Root 속성을 상속하며 disabled/loading 상태는 `resolveDisabled`로
+ * 통합 처리합니다.
+ */
 export interface SwitchProps extends React.ComponentPropsWithoutRef<
   typeof SwitchPrimitive.Root
 > {
@@ -30,6 +36,11 @@ export interface SwitchProps extends React.ComponentPropsWithoutRef<
   iconOff?: React.ReactNode;
 }
 
+/**
+ * 켜짐/꺼짐 상태를 전환하는 Radix 기반 switch 컴포넌트입니다.
+ *
+ * 라벨 위치, 설명, 로딩 spinner, checked 상태별 아이콘 슬롯을 지원합니다.
+ */
 export const Switch = forwardRef<
   React.ElementRef<typeof SwitchPrimitive.Root>,
   SwitchProps
@@ -85,7 +96,10 @@ export const Switch = forwardRef<
         >
           <SwitchThumb $size={size}>
             {isLoading ? (
-              <Spinner size={size === "sm" ? 10 : 14} color="currentColor" />
+              <Spinner
+                size={size === "xs" || size === "sm" ? "xs" : "sm"}
+                color="currentColor"
+              />
             ) : (
               <ThumbIconWrapper>{checked ? iconOn : iconOff}</ThumbIconWrapper>
             )}
@@ -145,8 +159,7 @@ const SwitchDescription = styled.span<{ $disabled?: boolean }>`
     $disabled ? theme.colors.text.disabled : theme.colors.text.secondary};
 `;
 
-// 💡 안전한 사이즈 추출 함수 (스위치는 구조가 복잡해 잘못된 픽셀이 들어오면 깨지므로 md로 방어)
-const getSwitchMetrics = (theme: any, size: string) => {
+const getSwitchMetrics = (theme: Theme, size: string) => {
   return theme.sizes.component.switch[size] || theme.sizes.component.switch.md;
 };
 
@@ -183,7 +196,7 @@ const StyledSwitch = styled(SwitchPrimitive.Root, switchFilter)<{
 
   &[data-state="checked"] {
     background: ${({ theme, $color }) => resolveThemeColor(theme, $color)};
-    border-color: transparent;
+    border-color: ${({ theme }) => theme.colors.utility.transparent};
   }
 
   ${({ theme }) => disabledState(theme)}
