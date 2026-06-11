@@ -180,9 +180,9 @@ const Content = styled(Dialog.Content)<{ $maxWidth: string }>`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90vw;
+  width: ${({ theme }) => `calc(100vw - ${theme.spacing.xl})`};
   max-width: ${({ $maxWidth }) => $maxWidth};
-  max-height: 100dvh;
+  max-height: ${({ theme }) => `calc(100dvh - ${theme.spacing.xl})`};
   display: flex;
   flex-direction: column;
   z-index: ${({ theme }) => theme.zIndices.modal};
