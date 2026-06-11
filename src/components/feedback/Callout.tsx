@@ -11,7 +11,7 @@ import { flexCenter, squareIconSize } from "../../styles/mixins";
  */
 export interface CalloutProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  "title"
+  "style" | "title"
 > {
   variant?: AlertVariant;
   title?: React.ReactNode;
