@@ -15,6 +15,11 @@ import {
 import { SelectionMode, type CalendarEvent } from "./types";
 import * as S from "./styles";
 
+/**
+ * CalendarView가 월 단위 날짜 grid를 렌더링하기 위해 필요한 상태와 이벤트를 정의합니다.
+ *
+ * 날짜 선택, 범위 선택, 이벤트 표시, 미래 날짜 비활성화 정책은 상위 picker가 주입합니다.
+ */
 interface CalendarViewProps {
   currentMonth: Date;
   startDate?: Date;
@@ -26,6 +31,12 @@ interface CalendarViewProps {
   onSelect: (day: Date) => void;
 }
 
+/**
+ * 현재 월의 날짜 grid를 렌더링하는 calendar 하위 뷰입니다.
+ *
+ * 날짜 계산은 DateUtils를 사용하고, row layout은 styled wrapper로 분리해 inline style을
+ * 사용하지 않습니다.
+ */
 export const CalendarView = ({
   currentMonth,
   startDate,
@@ -66,20 +77,16 @@ export const CalendarView = ({
 
   return (
     <S.CalendarGrid role="grid">
-      <div role="row" style={{ display: "contents" }}>
+      <S.CalendarGridRow role="row">
         {weekdays.map((weekday, index) => (
           <S.WeekdayText key={`weekday-${index}`} role="columnheader">
             {weekday}
           </S.WeekdayText>
         ))}
-      </div>
+      </S.CalendarGridRow>
 
       {weeks.map((week, weekIndex) => (
-        <div
-          key={`week-${weekIndex}`}
-          role="row"
-          style={{ display: "contents" }}
-        >
+        <S.CalendarGridRow key={`week-${weekIndex}`} role="row">
           {week.map((day) => {
             const dateStr = formatDate(day, "yyyy-MM-dd", locale);
             const fullDateAria = formatDate(day, "yyyy MMMM d", locale);
@@ -123,7 +130,7 @@ export const CalendarView = ({
               </S.DayButton>
             );
           })}
-        </div>
+        </S.CalendarGridRow>
       ))}
     </S.CalendarGrid>
   );
