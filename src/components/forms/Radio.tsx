@@ -16,6 +16,9 @@ import {
 } from "../../styles/mixins";
 import { resolveDisabled } from "../../utils";
 
+/**
+ * RadioGroup에서 렌더링할 단일 radio 옵션 모델입니다.
+ */
 export interface RadioOption {
   label: string;
   value: SelectionValue;
@@ -24,6 +27,9 @@ export interface RadioOption {
   icon?: React.ReactNode;
 }
 
+/**
+ * 단일 Radio item의 값, 라벨, 설명, 아이콘, 상태 variant를 정의합니다.
+ */
 export interface RadioProps extends Omit<
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>,
   "value"
@@ -36,6 +42,9 @@ export interface RadioProps extends Omit<
   variant?: RadioVariant;
 }
 
+/**
+ * RadioGroup의 옵션, 값 제어, 방향, variant, 간격을 정의합니다.
+ */
 export interface RadioGroupProps extends Omit<
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>,
   "dir" | "value" | "defaultValue" | "onValueChange"
@@ -50,6 +59,9 @@ export interface RadioGroupProps extends Omit<
   gap?: Spacing | number;
 }
 
+/**
+ * 하나의 선택지만 고르는 Radix 기반 radio item 컴포넌트입니다.
+ */
 export const Radio = forwardRef<HTMLButtonElement, RadioProps>(
   (
     {
@@ -111,6 +123,9 @@ export const Radio = forwardRef<HTMLButtonElement, RadioProps>(
 
 Radio.displayName = "Radio";
 
+/**
+ * Radio item 목록을 렌더링하거나 children 기반 합성을 지원하는 Radix RadioGroup입니다.
+ */
 export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
   (
     {
@@ -191,10 +206,11 @@ const RadioGroupRoot = styled(RadioGroupPrimitive.Root, groupFilter)<{
   display: flex;
   flex-direction: ${({ $direction }) => $direction};
 
-  /* 💡 4. 커스텀 숫자, 픽셀, 테마 토큰을 모두 지원하는 gap 폴백 */
   gap: ${({ theme, $gap }) => {
     if (!$gap) return theme.spacing.sm;
-    if (typeof $gap === "number") return `${$gap}px`;
+    if (typeof $gap === "number") {
+      return `calc(${theme.sizes.component.dividerThin} * ${$gap})`;
+    }
     return theme.spacing[$gap as keyof typeof theme.spacing] || $gap;
   }};
 
@@ -204,7 +220,7 @@ const RadioGroupRoot = styled(RadioGroupPrimitive.Root, groupFilter)<{
       background-color: ${theme.colors.surface.sunken};
       padding: ${theme.spacing["2xs"]};
       border-radius: ${theme.borderRadius.md};
-      gap: 0;
+      gap: ${theme.spacing.none};
     `}
 `;
 
@@ -270,7 +286,7 @@ const RadioItem = styled(RadioGroupPrimitive.Item, itemFilter)<{
       background-color: ${theme.colors.background.input};
       flex-shrink: 0;
 
-      transform: translateY(2px);
+      transform: translateY(${theme.spacing["2xs"]});
 
       &:hover:not(:disabled):not([data-disabled]) {
         border-color: ${theme.colors.brand.cyan || theme.colors.brand.primary};
