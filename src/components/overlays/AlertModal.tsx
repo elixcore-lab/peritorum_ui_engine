@@ -26,6 +26,12 @@ import { contentShow } from "../../styles/animation";
 
 export type AlertVariant = "info" | "success" | "warning" | "danger";
 
+/**
+ * AlertModal 컴포넌트가 표시할 상태, 문구, 액션 동작을 정의합니다.
+ *
+ * 확인/취소 문구는 명시하지 않으면 ConfigProvider의 i18n 텍스트를 사용하며,
+ * 비동기 확인 동작 중에는 모달 닫힘과 중복 실행을 방지합니다.
+ */
 export interface AlertModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -46,14 +52,19 @@ const VARIANT_ICONS: Record<AlertVariant, LucideIcon> = {
   danger: XCircle,
 };
 
-// 💡 버튼의 "색상(Color)"을 매핑하도록 변경 (형태는 모두 solid로 고정)
 const BUTTON_COLOR: Record<AlertVariant, ColorVariant> = {
   info: "primary",
-  success: "primary", // 또는 "success" (기획에 따라 선택)
+  success: "primary",
   warning: "warning",
   danger: "danger",
 };
 
+/**
+ * 중요한 상태 전환이나 파괴적 액션을 확인하는 디자인 시스템 모달입니다.
+ *
+ * Radix AlertDialog의 접근성 동작을 유지하면서 theme 기반 아이콘, 버튼 컬러,
+ * 로딩 제어를 일관된 API로 제공합니다.
+ */
 export const AlertModal = ({
   open,
   onOpenChange,
@@ -80,8 +91,8 @@ export const AlertModal = ({
         setInternalLoading(true);
         if (onConfirm) await onConfirm();
         onOpenChange(false);
-      } catch (error) {
-        console.error("Alert Action Failed:", error);
+      } catch {
+        // 확인 액션 실패 시 모달을 유지합니다.
       } finally {
         setInternalLoading(false);
       }
@@ -108,7 +119,6 @@ export const AlertModal = ({
                 <VariantIcon as={IconComponent} />
               </IconWrapper>
 
-              {/* 💡 직접 스타일링 대신 우리가 만든 Text 컴포넌트 활용 */}
               <AlertDialog.Title asChild>
                 <Text variant="h3" weight="bold" align="center">
                   {title}
@@ -117,14 +127,13 @@ export const AlertModal = ({
 
               {description && (
                 <AlertDialog.Description asChild>
-                  <Text
+                  <AlertDescriptionText
                     variant="body2"
                     color="secondary"
                     align="center"
-                    style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}
                   >
                     {description}
-                  </Text>
+                  </AlertDescriptionText>
                 </AlertDialog.Description>
               )}
             </Header>
@@ -134,7 +143,6 @@ export const AlertModal = ({
             <ButtonContainer>
               {showCancel && (
                 <AlertDialog.Cancel asChild>
-                  {/* 💡 취소 버튼: 형태(outline)와 색상(default) 분리 적용 */}
                   <Button
                     variant="outline"
                     color="default"
@@ -146,7 +154,6 @@ export const AlertModal = ({
                 </AlertDialog.Cancel>
               )}
               <AlertDialog.Action asChild>
-                {/* 💡 확인 버튼: 꽉 찬 형태(solid)와 상태 색상 적용 */}
                 <Button
                   variant="solid"
                   color={BUTTON_COLOR[variant]}
@@ -167,10 +174,6 @@ export const AlertModal = ({
 };
 
 AlertModal.displayName = "AlertModal";
-
-// ==========================================
-// Styled Components
-// ==========================================
 
 const Content = styled(AlertDialog.Content)`
   ${({ theme }) => floatingSurface(theme)}
@@ -199,7 +202,8 @@ const Header = styled.div`
   flex-direction: column;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
-  padding: ${({ theme }) => theme.spacing.lg} 0 0 0;
+  padding: ${({ theme }) =>
+    `${theme.spacing.lg} ${theme.spacing.none} ${theme.spacing.none}`};
 `;
 
 const IconWrapper = styled.div<{ $variant: AlertVariant }>`
@@ -208,12 +212,15 @@ const IconWrapper = styled.div<{ $variant: AlertVariant }>`
   border-radius: ${({ theme }) => theme.borderRadius.round};
   ${flexCenter};
 
-  /* 💡 하드코딩된 statusBg, status 색상을 마스터 믹스인으로 완벽하게 교체! */
   ${({ theme, $variant }) => componentColorStyle(theme, "subtle", $variant)}
 `;
 
 const VariantIcon = styled.svg`
   ${({ theme }) => squareIconSize(theme, "lg")}
+`;
+
+const AlertDescriptionText = styled(Text)`
+  white-space: pre-wrap;
 `;
 
 const ButtonContainer = styled.div`
