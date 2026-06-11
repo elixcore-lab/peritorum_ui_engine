@@ -15,24 +15,31 @@ import {
 import { IconButton } from "./IconButton";
 import { useUiConfig } from "../../ConfigProvider";
 
+/**
+ * Tag의 형태, 색상, 크기, 닫기 액션을 정의합니다.
+ *
+ * 모든 시각 스타일은 theme token과 mixin으로 계산되며, 외부 간격은 부모 Layout의
+ * gap/padding으로 제어합니다.
+ */
 export interface TagProps extends Omit<
   React.HTMLAttributes<HTMLSpanElement>,
   "color"
 > {
-  /** * 태그의 형태 (기본값: "subtle")
-   * - solid, subtle, outline, ghost
-   */
+  /** Tag의 외형 variant입니다. */
   variant?: AppearanceVariant;
-  /** * 태그의 색상 (기본값: "default")
-   * - 테마 토큰 (primary, warning 등) 또는 Hex Color 지원
-   */
+  /** theme color intent 또는 디자인 시스템에서 허용한 컬러 토큰입니다. */
   color?: ColorVariant;
-  /** 태그의 크기 (기본값: "md") */
+  /** theme control size 기반의 밀도 토큰입니다. */
   size?: ControlSize;
-  /** 닫기 버튼 클릭 이벤트 (함수 주입 시 우측에 'X' 버튼이 자동 렌더링됩니다) */
+  /** 닫기 버튼 클릭 이벤트입니다. 제공 시 우측에 제거 액션이 렌더링됩니다. */
   onClose?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
+/**
+ * 선택된 필터, 상태 라벨, 분류 값을 표시하는 compact inline 컴포넌트입니다.
+ *
+ * `onClose`가 제공되면 접근성 라벨이 있는 icon-only 제거 버튼을 함께 렌더링합니다.
+ */
 export const Tag = forwardRef<HTMLSpanElement, TagProps>(
   (
     {
@@ -68,15 +75,14 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(
         {/* onClose 이벤트가 있을 때만 닫기 버튼을 렌더링합니다 */}
         {onClose && (
           <TagCloseWrapper $size={size}>
-            <IconButton
-              variant="ghost" // 투명한 배경
+            <TagCloseButton
+              variant="ghost"
               color="default"
               size={closeBtnSize}
               shape="circle"
               icon={<X />}
               onClick={handleClose}
               aria-label={t("common.remove")}
-              style={{ color: "inherit" }}
             />
           </TagCloseWrapper>
         )}
@@ -110,9 +116,8 @@ const StyledTag = styled.span<{
 const TagCloseWrapper = styled.span<{ $size: ControlSize }>`
   display: inline-flex;
   align-items: center;
+`;
 
-  /* 태그 우측 패딩을 상쇄하여 닫기 버튼이 예쁘게 끝에 붙도록 마진 조정 */
-  margin-right: calc(${({ theme }) => theme.spacing.xs} * -1);
-  margin-left: ${({ theme, $size }) =>
-    $size === "lg" ? theme.spacing.xs : theme.spacing["2xs"]};
+const TagCloseButton = styled(IconButton)`
+  color: inherit;
 `;
