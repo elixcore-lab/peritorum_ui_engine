@@ -184,7 +184,7 @@ SectionHeader.displayName = "SectionHeader";
  */
 const SectionTitleGroup = styled(Stack)`
   flex: ${({ $flex }) => ($flex === undefined ? 1 : $flex)};
-  min-width: 0;
+  min-width: ${({ theme }) => theme.spacing.none};
 `;
 
 /**
