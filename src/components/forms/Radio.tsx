@@ -349,14 +349,14 @@ const RadioTitleWrapper = styled.span<{ $disabled?: boolean }>`
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme, $disabled }) =>
     $disabled ? theme.colors.text.disabled : theme.colors.text.primary};
-  line-height: 1.4;
+  line-height: ${({ theme }) => theme.lineHeights.normal};
 `;
 
 const OptionDescription = styled.span<{ $disabled?: boolean }>`
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme, $disabled }) =>
     $disabled ? theme.colors.text.disabled : theme.colors.text.secondary};
-  line-height: 1.4;
+  line-height: ${({ theme }) => theme.lineHeights.normal};
 `;
 
 const SegmentedLabel = styled.span`
