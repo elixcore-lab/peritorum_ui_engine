@@ -20,7 +20,7 @@ import {
  */
 export interface BadgeProps extends Omit<
   React.HTMLAttributes<HTMLSpanElement>,
-  "color"
+  "color" | "style"
 > {
   /** Badge의 외형 variant입니다. */
   variant?: AppearanceVariant;
