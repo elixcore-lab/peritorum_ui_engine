@@ -77,6 +77,11 @@ const common = {
     "5xl": "3.75rem",
   },
   fontWeights: { regular: 400, medium: 500, bold: 700, extraBold: 800 },
+  lineHeights: {
+    tight: 1.2,
+    normal: 1.4,
+    relaxed: 1.6,
+  },
   transitions: {
     duration: {
       fast: "150ms",
