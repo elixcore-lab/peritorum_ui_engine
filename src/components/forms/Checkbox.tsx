@@ -18,6 +18,9 @@ import {
 import { resolveDisabled } from "../../utils";
 import { Spinner } from "../feedback/Spinner";
 
+/**
+ * CheckBoxGroup에서 렌더링할 단일 체크 옵션 모델입니다.
+ */
 export interface CheckBoxOption {
   label: string;
   value: SelectionValue;
@@ -26,6 +29,12 @@ export interface CheckBoxOption {
   icon?: React.ReactNode;
 }
 
+/**
+ * 단일 CheckBox의 라벨, 설명, 상태, 선택값, 변경 콜백을 정의합니다.
+ *
+ * Radix Checkbox Root 속성을 상속하되 checked/onChange/value는 디자인 시스템 API로
+ * 재정의합니다.
+ */
 export interface CheckBoxProps extends Omit<
   React.ComponentPropsWithoutRef<typeof CheckBoxPrimitive.Root>,
   "checked" | "onChange" | "value" | "asChild" | "children"
@@ -40,6 +49,11 @@ export interface CheckBoxProps extends Omit<
   onChange?: (checked: boolean | "indeterminate") => void;
 }
 
+/**
+ * 여러 CheckBox를 하나의 값 배열로 제어하기 위한 group props입니다.
+ *
+ * 간격은 theme spacing token 또는 token 기반 계산값으로 처리합니다.
+ */
 export interface CheckBoxGroupProps {
   options: CheckBoxOption[];
   value: SelectionValue[];
@@ -53,6 +67,9 @@ export interface CheckBoxGroupProps {
   gap?: Spacing | number;
 }
 
+/**
+ * boolean 또는 indeterminate 상태를 표시하는 Radix 기반 checkbox 컴포넌트입니다.
+ */
 export const CheckBox = forwardRef<HTMLButtonElement, CheckBoxProps>(
   (
     {
@@ -95,7 +112,7 @@ export const CheckBox = forwardRef<HTMLButtonElement, CheckBoxProps>(
         >
           {isLoading ? (
             <SpinnerWrapper>
-              <Spinner size={12} color="currentColor" />
+              <Spinner size="xs" color="currentColor" />
             </SpinnerWrapper>
           ) : (
             <CheckBoxPrimitive.Indicator asChild>
@@ -127,6 +144,9 @@ export const CheckBox = forwardRef<HTMLButtonElement, CheckBoxProps>(
 
 CheckBox.displayName = "CheckBox";
 
+/**
+ * 여러 checkbox 옵션을 배열 값으로 제어하는 group 컴포넌트입니다.
+ */
 export const CheckBoxGroup = forwardRef<HTMLDivElement, CheckBoxGroupProps>(
   (
     {
@@ -216,7 +236,9 @@ const CheckBoxGroupRoot = styled("div", groupFilter)<{
 
   gap: ${({ theme, $gap }) => {
     if (!$gap) return theme.spacing.sm;
-    if (typeof $gap === "number") return `${$gap}px`;
+    if (typeof $gap === "number") {
+      return `calc(${theme.sizes.component.dividerThin} * ${$gap})`;
+    }
     return theme.spacing[$gap as keyof typeof theme.spacing] || $gap;
   }};
 `;
@@ -296,7 +318,7 @@ const StyledCheckBox = styled(CheckBoxPrimitive.Root, checkboxFilter)<{
 `;
 
 const CheckBoxIndicator = styled.div`
-  color: ${({ theme }) => theme.colors.text.inverse || "#FFFFFF"};
+  color: ${({ theme }) => theme.colors.text.inverse};
   ${flexCenter}
 `;
 
@@ -317,7 +339,7 @@ const SpinnerWrapper = styled.div`
 
   [data-state="checked"] &,
   &[data-state="indeterminate"] & {
-    color: ${({ theme }) => theme.colors.text.inverse || "#FFFFFF"};
+    color: ${({ theme }) => theme.colors.text.inverse};
   }
 `;
 
