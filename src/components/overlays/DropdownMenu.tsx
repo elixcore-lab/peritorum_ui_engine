@@ -20,9 +20,7 @@ const StyledItem = styled(DropdownMenuPrimitive.Item)<{ $danger?: boolean }>`
 
   &[data-highlighted] {
     background-color: ${({ theme, $danger }) =>
-      $danger
-        ? `${theme.colors.status.danger}1A`
-        : theme.colors.background.hover};
+      $danger ? theme.colors.statusBg.danger : theme.colors.background.hover};
     color: ${({ theme, $danger }) =>
       $danger ? theme.colors.status.danger : theme.colors.text.primary};
   }
@@ -39,7 +37,7 @@ const StyledItem = styled(DropdownMenuPrimitive.Item)<{ $danger?: boolean }>`
 const StyledSeparator = styled(DropdownMenuPrimitive.Separator)`
   height: ${({ theme }) => theme.sizes.component.dividerThin};
   background-color: ${({ theme }) => theme.colors.border.divider};
-  margin: ${({ theme }) => theme.spacing.xs} -${({ theme }) => theme.spacing.xs};
+  width: 100%;
 `;
 
 const StyledLabel = styled(DropdownMenuPrimitive.Label)`
@@ -49,6 +47,12 @@ const StyledLabel = styled(DropdownMenuPrimitive.Label)`
   font-weight: ${({ theme }) => theme.fontWeights.bold};
 `;
 
+/**
+ * Radix DropdownMenu primitive를 디자인 시스템 스타일로 감싼 compound API입니다.
+ *
+ * Content, Item, Separator, Label은 theme 토큰과 공통 popover mixin을 사용해
+ * 프로젝트 전반의 메뉴 밀도, hover, disabled 표현을 통일합니다.
+ */
 export const DropdownMenu = {
   Root: DropdownMenuPrimitive.Root,
   Trigger: DropdownMenuPrimitive.Trigger,
