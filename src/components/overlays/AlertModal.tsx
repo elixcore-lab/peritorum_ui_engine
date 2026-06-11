@@ -181,7 +181,7 @@ const Content = styled(AlertDialog.Content)`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90vw;
+  width: ${({ theme }) => `calc(100vw - ${theme.spacing.xl})`};
   max-width: ${({ theme }) => theme.sizes.component.modalAlertWidth};
   z-index: ${({ theme }) => theme.zIndices.alert};
   outline: none;
