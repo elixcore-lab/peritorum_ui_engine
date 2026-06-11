@@ -231,7 +231,7 @@ const StyledButton = styled("button", filterProps)<{
         border-radius: ${$shape === "circle"
           ? theme.borderRadius.round
           : theme.borderRadius.md};
-        padding: 0;
+        padding: ${theme.spacing.none};
       `;
     }
     return css`
