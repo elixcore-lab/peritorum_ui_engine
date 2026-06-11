@@ -25,6 +25,10 @@ export const CalendarGrid = styled.div`
   gap: ${({ theme }) => theme.spacing.xs};
 `;
 
+export const CalendarGridRow = styled.div`
+  display: contents;
+`;
+
 export const WeekdayText = styled.div`
   text-align: center;
   font-size: ${({ theme }) => theme.fontSizes.xs};
@@ -44,18 +48,21 @@ export const DayButton = styled.button<DayButtonStyleProps>`
     $selectionMode === SelectionMode.single
       ? theme.sizes.component.calendarDay
       : "100%"};
-  margin: ${({ $selectionMode }) =>
-    $selectionMode === SelectionMode.single ? "0 auto" : "0"};
+  justify-self: ${({ $selectionMode }) =>
+    $selectionMode === SelectionMode.single ? "center" : "stretch"};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   cursor: ${({ $isDisabled }) => ($isDisabled ? "not-allowed" : "pointer")};
   ${({ theme }) => transitionBase(theme)};
 
   /* 기본 상태 */
-  background-color: transparent;
+  background-color: ${({ theme }) => theme.colors.utility.transparent};
   color: ${({ theme }) => theme.colors.text.primary};
-  border: ${({ theme }) => theme.sizes.component.dividerThin} solid transparent;
+  border: ${({ theme }) => theme.sizes.component.dividerThin} solid
+    ${({ theme }) => theme.colors.utility.transparent};
   border-radius: ${({ $selectionMode, theme }) =>
-    $selectionMode === SelectionMode.single ? theme.borderRadius.round : "0"};
+    $selectionMode === SelectionMode.single
+      ? theme.borderRadius.round
+      : theme.spacing.none};
 
   /* 오늘(Today) 상태 */
   ${({ $isToday, theme }) =>
@@ -70,7 +77,7 @@ export const DayButton = styled.button<DayButtonStyleProps>`
     background-color: ${({ $isDisabled, $isSelected, $isRange, theme }) =>
       !$isDisabled && !$isSelected && !$isRange
         ? theme.colors.background.hover
-        : "transparent"};
+        : theme.colors.utility.transparent};
   }
 
   /* 비활성화 상태 */
@@ -78,7 +85,7 @@ export const DayButton = styled.button<DayButtonStyleProps>`
     $isDisabled &&
     css`
       color: ${theme.colors.text.disabled};
-      border-color: transparent;
+      border-color: ${theme.colors.utility.transparent};
     `}
 
   /* 범위(Range) 포함 상태 */
@@ -94,7 +101,7 @@ export const DayButton = styled.button<DayButtonStyleProps>`
     css`
       background-color: ${theme.colors.action.primary};
       color: ${theme.colors.text.inverse};
-      border-color: transparent;
+      border-color: ${theme.colors.utility.transparent};
       border-radius: ${theme.borderRadius.round};
     `}
 
@@ -102,12 +109,14 @@ export const DayButton = styled.button<DayButtonStyleProps>`
   ${({ $isRangeStart, theme }) =>
     $isRangeStart &&
     css`
-      border-radius: ${theme.borderRadius.round} 0 0 ${theme.borderRadius.round};
+      border-radius: ${theme.borderRadius.round} ${theme.spacing.none}
+        ${theme.spacing.none} ${theme.borderRadius.round};
     `}
   ${({ $isRangeEnd, theme }) =>
     $isRangeEnd &&
     css`
-      border-radius: 0 ${theme.borderRadius.round} ${theme.borderRadius.round} 0;
+      border-radius: ${theme.spacing.none} ${theme.borderRadius.round}
+        ${theme.borderRadius.round} ${theme.spacing.none};
     `}
 `;
 
@@ -136,6 +145,7 @@ export const TimeViewContainer = styled.div`
   height: 100%;
   align-items: center;
   justify-content: center;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 export const TimeColumnsWrapper = styled.div`
@@ -150,7 +160,6 @@ export const TimeSeparator = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.xl};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.text.primary};
-  margin-top: ${({ theme }) => theme.spacing.base};
 `;
 
 export const TimeColumnWrapper = styled.div`
@@ -239,7 +248,6 @@ export const TabContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.background.input};
   padding: ${({ theme }) => theme.spacing.xs};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
   gap: ${({ theme }) => theme.spacing.xs};
   border: ${({ theme }) => theme.sizes.component.dividerThin} solid
     ${({ theme }) => theme.colors.border.divider};
@@ -281,6 +289,9 @@ export const TabLabel = styled.span<{ $isActive: boolean }>`
 `;
 
 export const TabValue = styled.span<{ $isActive: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.xs};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ $isActive, theme }) =>
     $isActive ? theme.fontWeights.bold : theme.fontWeights.medium};
@@ -291,5 +302,4 @@ export const TabValue = styled.span<{ $isActive: boolean }>`
 export const TabValueDate = styled.small`
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme }) => theme.colors.text.secondary};
-  margin-right: ${({ theme }) => theme.spacing.xs};
 `;
