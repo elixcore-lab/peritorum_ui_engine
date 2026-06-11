@@ -200,7 +200,7 @@ const InputWrapper = styled.div`
 
 const SearchIconWrapper = styled.div<{ $size: ControlSize }>`
   position: absolute;
-  left: 0;
+  left: ${({ theme }) => theme.spacing.none};
   ${flexCenter}
   width: ${({ theme, $size }) =>
     theme.sizes.control[$size as keyof typeof theme.sizes.control] || $size};
@@ -217,7 +217,7 @@ const SearchIconWrapper = styled.div<{ $size: ControlSize }>`
 
 const SpinnerWrapper = styled.div<{ $size: ControlSize }>`
   position: absolute;
-  right: 0;
+  right: ${({ theme }) => theme.spacing.none};
   ${flexCenter}
   width: ${({ theme, $size }) =>
     theme.sizes.control[$size as keyof typeof theme.sizes.control] || $size};
@@ -253,7 +253,7 @@ const DropdownList = styled.ul`
   ${({ theme }) => popoverContentBase(theme)}
   position: absolute;
   top: calc(100% + ${({ theme }) => theme.spacing.sm});
-  left: 0;
+  left: ${({ theme }) => theme.spacing.none};
   display: block;
   width: 100%;
   max-height: ${({ theme }) => theme.sizes.component.selectViewportMaxHeight};
