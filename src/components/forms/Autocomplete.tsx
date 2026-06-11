@@ -26,11 +26,19 @@ import { useOnClickOutside } from "../../hooks";
 import { Spinner } from "../feedback/Spinner";
 import { resolveDisabled } from "../../utils";
 
+/**
+ * Autocomplete와 ComboBox 계열에서 공유하는 선택 옵션 모델입니다.
+ */
 export interface ComboboxOption {
   value: string;
   label: string;
 }
 
+/**
+ * Autocomplete 입력, 검색 콜백, 선택 콜백, 시각 상태를 정의합니다.
+ *
+ * 표준 input 속성을 상속하되, size/onSelect는 디자인 시스템 API로 재정의합니다.
+ */
 export interface AutocompleteProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "size" | "onSelect"
@@ -46,6 +54,12 @@ export interface AutocompleteProps extends Omit<
   isError?: boolean;
 }
 
+/**
+ * 검색어 입력과 옵션 선택을 결합한 자동완성 입력 컴포넌트입니다.
+ *
+ * 검색 debounce는 공통 hook을 사용하고, 외부 클릭 닫힘은 useOnClickOutside에
+ * 위임합니다.
+ */
 export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
   (
     {
@@ -234,13 +248,15 @@ const StyledInput = styled("input", filterProps)<{
 `;
 
 const DropdownList = styled.ul`
+  all: unset;
+  box-sizing: border-box;
   ${({ theme }) => popoverContentBase(theme)}
   position: absolute;
-  top: calc(100% + ${({ theme }) => theme.sizes.offset.popover}px);
+  top: calc(100% + ${({ theme }) => theme.spacing.sm});
   left: 0;
+  display: block;
   width: 100%;
   max-height: ${({ theme }) => theme.sizes.component.selectViewportMaxHeight};
-  margin: 0;
   padding: ${({ theme }) => theme.spacing.xs};
   list-style: none;
 `;
