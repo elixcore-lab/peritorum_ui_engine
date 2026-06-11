@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
-import { type ControlSize } from "../../styles/types";
+import { type ControlSize, type ColorVariant } from "../../styles/types";
 import {
   applyTransition,
   focusRing,
@@ -10,19 +10,19 @@ import {
   disabledState,
   flexCenter,
   squareIconSize,
+  resolveThemeColor,
 } from "../../styles/mixins";
 import { resolveDisabled } from "../../utils";
 import { Label } from "./Label";
 import { Spinner } from "../feedback/Spinner";
 
-export type SwitchSize = Extract<ControlSize, "sm" | "md" | "lg">;
-
 export interface SwitchProps extends React.ComponentPropsWithoutRef<
   typeof SwitchPrimitive.Root
 > {
-  size?: SwitchSize;
-  label?: string;
-  description?: string;
+  size?: ControlSize;
+  color?: ColorVariant;
+  label?: React.ReactNode;
+  description?: React.ReactNode;
   labelPosition?: "left" | "right";
   isError?: boolean;
   isLoading?: boolean;
@@ -37,6 +37,7 @@ export const Switch = forwardRef<
   (
     {
       size = "md",
+      color = "brand",
       label,
       description,
       labelPosition = "right",
@@ -59,11 +60,7 @@ export const Switch = forwardRef<
         {(label || description) && (
           <SwitchLabelGroup $labelPosition={labelPosition}>
             {label && (
-              <Label
-                htmlFor={id}
-                disabled={trulyDisabled}
-                style={{ cursor: "inherit" }}
-              >
+              <Label htmlFor={id} disabled={trulyDisabled}>
                 {label}
               </Label>
             )}
@@ -79,6 +76,7 @@ export const Switch = forwardRef<
           ref={ref}
           id={id}
           $size={size}
+          $color={color}
           $isError={isError}
           disabled={trulyDisabled}
           aria-invalid={isError}
@@ -87,7 +85,7 @@ export const Switch = forwardRef<
         >
           <SwitchThumb $size={size}>
             {isLoading ? (
-              <Spinner size="xs" color="currentColor" />
+              <Spinner size={size === "sm" ? 10 : 14} color="currentColor" />
             ) : (
               <ThumbIconWrapper>{checked ? iconOn : iconOff}</ThumbIconWrapper>
             )}
@@ -104,13 +102,23 @@ Switch.displayName = "Switch";
 // Styled Components
 // ==========================================
 
-const filterProps = {
-  shouldForwardProp: (prop: string) => !["$size", "$isError"].includes(prop),
+// 💡 DOM 속성 누수(Prop Leakage) 완벽 차단
+const wrapperFilter = {
+  shouldForwardProp: (prop: string) => !["$labelPosition"].includes(prop),
+};
+const switchFilter = {
+  shouldForwardProp: (prop: string) =>
+    !["$size", "$isError", "$color"].includes(prop),
+};
+const thumbFilter = {
+  shouldForwardProp: (prop: string) => !["$size"].includes(prop),
 };
 
-const SwitchWrapper = styled.div<{ $labelPosition: "left" | "right" }>`
+const SwitchWrapper = styled("div", wrapperFilter)<{
+  $labelPosition: "left" | "right";
+}>`
   display: inline-flex;
-  align-items: flex-start;
+  align-items: center;
   gap: ${({ theme }) => theme.spacing.base};
 
   ${({ $labelPosition }) =>
@@ -122,7 +130,9 @@ const SwitchWrapper = styled.div<{ $labelPosition: "left" | "right" }>`
     `}
 `;
 
-const SwitchLabelGroup = styled.div<{ $labelPosition: "left" | "right" }>`
+const SwitchLabelGroup = styled("div", wrapperFilter)<{
+  $labelPosition: "left" | "right";
+}>`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing["2xs"]};
@@ -135,8 +145,14 @@ const SwitchDescription = styled.span<{ $disabled?: boolean }>`
     $disabled ? theme.colors.text.disabled : theme.colors.text.secondary};
 `;
 
-const StyledSwitch = styled(SwitchPrimitive.Root, filterProps)<{
-  $size: SwitchSize;
+// 💡 안전한 사이즈 추출 함수 (스위치는 구조가 복잡해 잘못된 픽셀이 들어오면 깨지므로 md로 방어)
+const getSwitchMetrics = (theme: any, size: string) => {
+  return theme.sizes.component.switch[size] || theme.sizes.component.switch.md;
+};
+
+const StyledSwitch = styled(SwitchPrimitive.Root, switchFilter)<{
+  $size: string;
+  $color: string;
   $isError?: boolean;
 }>`
   all: unset;
@@ -144,19 +160,21 @@ const StyledSwitch = styled(SwitchPrimitive.Root, filterProps)<{
   flex-shrink: 0;
   border-radius: ${({ theme }) => theme.borderRadius.round};
   background-color: ${({ theme }) => theme.colors.surface.sunken};
+
   border: ${({ theme }) => theme.sizes.component.dividerThin} solid
     ${({ theme, $isError }) =>
       $isError ? theme.colors.status.danger : theme.colors.border.strong};
+
   cursor: pointer;
 
-  width: ${({ theme, $size }) => theme.sizes.component.switch[$size].width};
-  height: ${({ theme, $size }) => theme.sizes.component.switch[$size].height};
+  width: ${({ theme, $size }) => getSwitchMetrics(theme, $size).width};
+  height: ${({ theme, $size }) => getSwitchMetrics(theme, $size).height};
 
   ${({ theme }) => transitionBase(theme)}
 
   &:hover:not(:disabled):not([data-disabled]) {
-    border-color: ${({ theme, $isError }) =>
-      $isError ? theme.colors.status.danger : theme.colors.brand.cyan};
+    border-color: ${({ theme, $isError, $color }) =>
+      $isError ? theme.colors.status.danger : resolveThemeColor(theme, $color)};
   }
 
   &:focus-visible {
@@ -164,23 +182,23 @@ const StyledSwitch = styled(SwitchPrimitive.Root, filterProps)<{
   }
 
   &[data-state="checked"] {
-    background-color: ${({ theme }) => theme.colors.brand.cyan};
-    border-color: ${({ theme }) => theme.colors.brand.cyan};
+    background: ${({ theme, $color }) => resolveThemeColor(theme, $color)};
+    border-color: transparent;
   }
 
   ${({ theme }) => disabledState(theme)}
 `;
 
-const SwitchThumb = styled(SwitchPrimitive.Thumb, filterProps)<{
-  $size: SwitchSize;
+const SwitchThumb = styled(SwitchPrimitive.Thumb, thumbFilter)<{
+  $size: string;
 }>`
   ${flexCenter}
   background-color: ${({ theme }) => theme.colors.brand.ink};
   border-radius: ${({ theme }) => theme.borderRadius.round};
   box-shadow: ${({ theme }) => theme.colors.effect.shadow.sm};
 
-  width: ${({ theme, $size }) => theme.sizes.component.switch[$size].thumb};
-  height: ${({ theme, $size }) => theme.sizes.component.switch[$size].thumb};
+  width: ${({ theme, $size }) => getSwitchMetrics(theme, $size).thumb};
+  height: ${({ theme, $size }) => getSwitchMetrics(theme, $size).thumb};
 
   ${({ theme }) =>
     applyTransition(
@@ -195,7 +213,7 @@ const SwitchThumb = styled(SwitchPrimitive.Thumb, filterProps)<{
 
   &[data-state="checked"] {
     transform: translateX(
-      ${({ theme, $size }) => theme.sizes.component.switch[$size].offset}
+      ${({ theme, $size }) => getSwitchMetrics(theme, $size).offset}
     );
   }
 `;

@@ -17,7 +17,7 @@ import {
   squareIconSize,
   componentColorStyle,
 } from "../../styles/mixins";
-import { type ComponentColor } from "../../styles/types";
+import { type ColorVariant } from "../../styles/types";
 import { Overlay } from "./Overlay";
 import { useUiConfig } from "../../ConfigProvider";
 import { SectionBody, SectionFooter } from "../layout";
@@ -47,7 +47,7 @@ const VARIANT_ICONS: Record<AlertVariant, LucideIcon> = {
 };
 
 // 💡 버튼의 "색상(Color)"을 매핑하도록 변경 (형태는 모두 solid로 고정)
-const BUTTON_COLOR: Record<AlertVariant, ComponentColor> = {
+const BUTTON_COLOR: Record<AlertVariant, ColorVariant> = {
   info: "primary",
   success: "primary", // 또는 "success" (기획에 따라 선택)
   warning: "warning",

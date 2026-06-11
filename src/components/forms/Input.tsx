@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { css, type Theme } from "@emotion/react";
 import { XCircle, Eye, EyeOff, Check } from "lucide-react";
 import { useUiConfig } from "../../ConfigProvider";
-import { type ControlSize } from "../../styles/types";
+import { type ControlSize, type FontSize } from "../../styles/types";
 import {
   flexCenter,
   formControlBase,
@@ -20,6 +20,7 @@ export interface InputProps extends Omit<
   "size"
 > {
   size?: ControlSize;
+  fontSize?: FontSize;
   isError?: boolean;
   isSuccess?: boolean;
   isLoading?: boolean;
@@ -37,17 +38,25 @@ export const getSizeStyle = (
   hasLeftIcon: boolean,
   rightIconCount: number,
 ) => {
-  const basePadding =
-    {
-      xs: theme.spacing.sm,
-      sm: theme.spacing.base,
-      md: theme.spacing.md,
-      lg: theme.spacing.md,
-      xl: theme.spacing.lg,
-    }[size] || theme.spacing.md;
-  const iconInset = theme.sizes.control[size];
-  const paddingLeft = hasLeftIcon ? iconInset : basePadding;
+  const themeHeight =
+    theme.sizes.control[size as keyof typeof theme.sizes.control];
 
+  const refSize = themeHeight
+    ? (size as "xs" | "sm" | "md" | "lg" | "xl")
+    : "md";
+
+  const basePadding = {
+    xs: theme.spacing.sm,
+    sm: theme.spacing.base,
+    md: theme.spacing.md,
+    lg: theme.spacing.md,
+    xl: theme.spacing.lg,
+  }[refSize];
+
+  // 테마에 정의된 토큰이면 그 높이를 쓰고, 아니면 입력된 픽셀값 사용
+  const iconInset = themeHeight || size;
+
+  const paddingLeft = hasLeftIcon ? iconInset : basePadding;
   let paddingRight = basePadding;
 
   if (rightIconCount === 1) {
@@ -62,23 +71,11 @@ export const getSizeStyle = (
   `;
 };
 
-const filterProps = {
-  shouldForwardProp: (prop: string) =>
-    ![
-      "$inputSize",
-      "$isError",
-      "$isSuccess",
-      "$hasLeftIcon",
-      "$rightIconCount",
-      "$hasAddonBefore",
-      "$hasAddonAfter",
-    ].includes(prop),
-};
-
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
       size = "md",
+      fontSize,
       isError = false,
       isSuccess = false,
       isLoading = false,
@@ -138,6 +135,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         type={actualType}
         value={value}
         $inputSize={size}
+        $fontSize={fontSize}
         $isError={isError}
         $isSuccess={isSuccess}
         $hasLeftIcon={hasLeftIcon}
@@ -184,7 +182,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                   aria-label={t("ui.component.input.clear")}
                   tabIndex={-1}
                 >
-                  <ActionIconWrapper>
+                  <ActionIconWrapper $size={size}>
                     <XCircle />
                   </ActionIconWrapper>
                 </ActionButton>
@@ -199,19 +197,23 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                       : t("ui.component.input.showPassword")
                   }
                 >
-                  <ActionIconWrapper>
+                  <ActionIconWrapper $size={size}>
                     {isPasswordVisible ? <EyeOff /> : <Eye />}
                   </ActionIconWrapper>
                 </ActionButton>
               )}
-              {rightIcon && <ActionIconWrapper>{rightIcon}</ActionIconWrapper>}
+              {rightIcon && (
+                <ActionIconWrapper $size={size}>{rightIcon}</ActionIconWrapper>
+              )}
               {isLoading && (
-                <ActionIconWrapper>
-                  <Spinner size="sm" />
+                <ActionIconWrapper $size={size}>
+                  <Spinner
+                    size={size === "xs" || size === "sm" ? "xs" : "sm"}
+                  />
                 </ActionIconWrapper>
               )}
               {isSuccess && !isLoading && (
-                <ActionIconWrapper>
+                <ActionIconWrapper $size={size}>
                   <Check />
                 </ActionIconWrapper>
               )}
@@ -235,12 +237,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
 Input.displayName = "Input";
 
+// ==========================================
+// Styled Components
+// ==========================================
+
 const OuterWrapper = styled.div`
   display: flex;
   width: 100%;
 `;
 
-const Addon = styled.div<{ $position: "before" | "after" }>`
+const addonFilter = {
+  shouldForwardProp: (prop: string) => !["$position"].includes(prop),
+};
+
+const Addon = styled("div", addonFilter)<{ $position: "before" | "after" }>`
   display: inline-flex;
   align-items: center;
   padding: 0 ${({ theme }) => theme.spacing.md};
@@ -273,7 +283,18 @@ const InputWrapper = styled.div`
   flex: 1;
 `;
 
-const IconWrapper = styled.div<{
+const iconWrapperFilter = {
+  shouldForwardProp: (prop: string) =>
+    ![
+      "$position",
+      "$isError",
+      "$isSuccess",
+      "$interactive",
+      "$disabled",
+    ].includes(prop),
+};
+
+const IconWrapper = styled("div", iconWrapperFilter)<{
   $position: "left" | "right";
   $isError?: boolean;
   $isSuccess?: boolean;
@@ -316,19 +337,41 @@ const ActionButton = styled.button`
   }
 `;
 
-const ActionIconWrapper = styled.span`
+const actionIconFilter = {
+  shouldForwardProp: (prop: string) => !["$size"].includes(prop),
+};
+
+const ActionIconWrapper = styled("span", actionIconFilter)<{
+  $size: ControlSize;
+}>`
   pointer-events: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   & > svg {
-    ${({ theme }) => squareIconSize(theme, "sm")}
+    ${({ theme, $size }) =>
+      squareIconSize(theme, $size === "xs" || $size === "sm" ? "xs" : "sm")}
   }
 `;
 
-const StyledInput = styled("input", filterProps)<{
+const inputFilterProps = {
+  shouldForwardProp: (prop: string) =>
+    ![
+      "$inputSize",
+      "$fontSize",
+      "$isError",
+      "$isSuccess",
+      "$hasLeftIcon",
+      "$rightIconCount",
+      "$hasAddonBefore",
+      "$hasAddonAfter",
+    ].includes(prop),
+};
+
+const StyledInput = styled("input", inputFilterProps)<{
   $inputSize: ControlSize;
+  $fontSize?: FontSize;
   $isError?: boolean;
   $isSuccess?: boolean;
   $hasLeftIcon: boolean;
@@ -337,7 +380,9 @@ const StyledInput = styled("input", filterProps)<{
   $hasAddonAfter: boolean;
 }>`
   ${({ theme, $isError }) => formControlBase(theme, $isError)}
-  ${({ theme, $inputSize }) => controlSizeBase(theme, $inputSize)}
+
+  ${({ theme, $inputSize, $fontSize }) =>
+    controlSizeBase(theme, $inputSize as ControlSize, $fontSize)}
 
   ${({ theme, $isSuccess, $isError }) =>
     $isSuccess &&

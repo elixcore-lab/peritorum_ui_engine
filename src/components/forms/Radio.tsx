@@ -1,8 +1,12 @@
 import React, { forwardRef } from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react";
-import { type RadioVariant, type SelectionValue } from "../../styles/types";
+import { css, type Theme } from "@emotion/react";
+import {
+  Spacing,
+  type RadioVariant,
+  type SelectionValue,
+} from "../../styles/types";
 import {
   flexCenter,
   focusRing,
@@ -11,7 +15,14 @@ import {
   squareIconSize,
 } from "../../styles/mixins";
 import { resolveDisabled } from "../../utils";
-import { Label } from "./Label";
+
+export interface RadioOption {
+  label: string;
+  value: SelectionValue;
+  description?: string;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+}
 
 export interface RadioProps extends Omit<
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>,
@@ -23,6 +34,20 @@ export interface RadioProps extends Omit<
   icon?: React.ReactNode;
   isError?: boolean;
   variant?: RadioVariant;
+}
+
+export interface RadioGroupProps extends Omit<
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>,
+  "dir" | "value" | "defaultValue" | "onValueChange"
+> {
+  options?: RadioOption[];
+  value?: SelectionValue;
+  defaultValue?: SelectionValue;
+  onValueChange?: (value: string) => void;
+  isError?: boolean;
+  direction?: "row" | "column";
+  variant?: RadioVariant;
+  gap?: Spacing | number;
 }
 
 export const Radio = forwardRef<HTMLButtonElement, RadioProps>(
@@ -45,7 +70,11 @@ export const Radio = forwardRef<HTMLButtonElement, RadioProps>(
     const domId = id || stringValue;
 
     return (
-      <RadioOptionWrapper $variant={variant}>
+      <RadioOptionWrapper
+        htmlFor={domId}
+        $variant={variant}
+        data-disabled={trulyDisabled ? "" : undefined}
+      >
         <RadioItem
           ref={ref}
           value={stringValue}
@@ -63,16 +92,10 @@ export const Radio = forwardRef<HTMLButtonElement, RadioProps>(
         {variant !== "segmented" && (label || description) && (
           <RadioLabelContent>
             {label && (
-              <Label
-                htmlFor={domId}
-                disabled={trulyDisabled}
-                style={{ cursor: "inherit" }}
-              >
-                <LabelTitleWrapper>
-                  {icon && <IconSlot>{icon}</IconSlot>}
-                  {label}
-                </LabelTitleWrapper>
-              </Label>
+              <RadioTitleWrapper $disabled={trulyDisabled}>
+                {icon && <IconSlot>{icon}</IconSlot>}
+                {label}
+              </RadioTitleWrapper>
             )}
             {description && (
               <OptionDescription $disabled={trulyDisabled}>
@@ -88,27 +111,6 @@ export const Radio = forwardRef<HTMLButtonElement, RadioProps>(
 
 Radio.displayName = "Radio";
 
-export interface RadioOption {
-  label: string;
-  value: SelectionValue;
-  description?: string;
-  disabled?: boolean;
-  icon?: React.ReactNode;
-}
-
-export interface RadioGroupProps extends Omit<
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>,
-  "dir" | "value" | "defaultValue" | "onValueChange"
-> {
-  options?: RadioOption[];
-  value?: SelectionValue;
-  defaultValue?: SelectionValue;
-  onValueChange?: (value: string) => void;
-  isError?: boolean;
-  direction?: "row" | "column";
-  variant?: RadioVariant;
-}
-
 export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
   (
     {
@@ -118,6 +120,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
       disabled,
       direction = "column",
       variant = "default",
+      gap,
       value,
       defaultValue,
       ...props
@@ -136,6 +139,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
         disabled={trulyDisabled}
         $direction={direction}
         $variant={variant}
+        $gap={gap}
         {...props}
       >
         {options
@@ -164,16 +168,35 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
 
 RadioGroup.displayName = "RadioGroup";
 
-const RadioGroupRoot = styled(RadioGroupPrimitive.Root)<{
+// ==========================================
+// Styled Components
+// ==========================================
+
+const groupFilter = {
+  shouldForwardProp: (prop: string) =>
+    !["$direction", "$variant", "$gap"].includes(prop),
+};
+const wrapperFilter = {
+  shouldForwardProp: (prop: string) => !["$variant"].includes(prop),
+};
+const itemFilter = {
+  shouldForwardProp: (prop: string) => !["$isError", "$variant"].includes(prop),
+};
+
+const RadioGroupRoot = styled(RadioGroupPrimitive.Root, groupFilter)<{
   $direction: "row" | "column";
   $variant: RadioVariant;
+  $gap?: keyof Theme["spacing"] | (string & {}) | number;
 }>`
   display: flex;
-  gap: ${({ theme }) => theme.spacing.sm};
+  flex-direction: ${({ $direction }) => $direction};
 
-  ${({ $direction }) => css`
-    flex-direction: ${$direction};
-  `}
+  /* 💡 4. 커스텀 숫자, 픽셀, 테마 토큰을 모두 지원하는 gap 폴백 */
+  gap: ${({ theme, $gap }) => {
+    if (!$gap) return theme.spacing.sm;
+    if (typeof $gap === "number") return `${$gap}px`;
+    return theme.spacing[$gap as keyof typeof theme.spacing] || $gap;
+  }};
 
   ${({ theme, $variant }) =>
     $variant === "segmented" &&
@@ -185,12 +208,18 @@ const RadioGroupRoot = styled(RadioGroupPrimitive.Root)<{
     `}
 `;
 
-const RadioOptionWrapper = styled.div<{
+const RadioOptionWrapper = styled("label", wrapperFilter)<{
   $variant: RadioVariant;
 }>`
   display: flex;
   align-items: flex-start;
   gap: ${({ theme }) => theme.spacing.sm};
+  cursor: pointer;
+
+  &[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 
   ${({ theme, $variant }) =>
     $variant === "card" &&
@@ -201,16 +230,15 @@ const RadioOptionWrapper = styled.div<{
         ${theme.colors.border.strong};
       border-radius: ${theme.borderRadius.md};
       background-color: ${theme.colors.background.surface};
-      cursor: pointer;
       ${transitionBase(theme)}
 
       &:hover:not([data-disabled]) {
-        border-color: ${theme.colors.brand.cyan};
+        border-color: ${theme.colors.brand.cyan || theme.colors.brand.primary};
         background-color: ${theme.colors.background.hover};
       }
 
       &:has([data-state="checked"]) {
-        border-color: ${theme.colors.brand.cyan};
+        border-color: ${theme.colors.brand.cyan || theme.colors.brand.primary};
         background-color: ${theme.colors.statusBg.info};
       }
     `}
@@ -222,7 +250,7 @@ const RadioOptionWrapper = styled.div<{
     `}
 `;
 
-const RadioItem = styled(RadioGroupPrimitive.Item)<{
+const RadioItem = styled(RadioGroupPrimitive.Item, itemFilter)<{
   $isError?: boolean;
   $variant: RadioVariant;
 }>`
@@ -241,14 +269,15 @@ const RadioItem = styled(RadioGroupPrimitive.Item)<{
         ${$isError ? theme.colors.status.danger : theme.colors.border.strong};
       background-color: ${theme.colors.background.input};
       flex-shrink: 0;
-      margin-top: ${theme.spacing["2xs"]};
+
+      transform: translateY(2px);
 
       &:hover:not(:disabled):not([data-disabled]) {
-        border-color: ${theme.colors.brand.cyan};
+        border-color: ${theme.colors.brand.cyan || theme.colors.brand.primary};
       }
 
       &[data-state="checked"] {
-        border-color: ${theme.colors.brand.cyan};
+        border-color: ${theme.colors.brand.cyan || theme.colors.brand.primary};
       }
     `}
 
@@ -268,7 +297,7 @@ const RadioItem = styled(RadioGroupPrimitive.Item)<{
 
       &[data-state="checked"] {
         background-color: ${theme.colors.background.surface};
-        color: ${theme.colors.brand.cyan};
+        color: ${theme.colors.brand.cyan || theme.colors.brand.primary};
         box-shadow: ${theme.colors.effect.shadow.sm};
       }
     `}
@@ -285,7 +314,8 @@ const RadioIndicator = styled(RadioGroupPrimitive.Indicator)`
   width: ${({ theme }) => theme.sizes.component.radioIndicator};
   height: ${({ theme }) => theme.sizes.component.radioIndicator};
   border-radius: ${({ theme }) => theme.borderRadius.round};
-  background-color: ${({ theme }) => theme.colors.brand.cyan};
+  background-color: ${({ theme }) =>
+    theme.colors.brand.cyan || theme.colors.brand.primary};
 `;
 
 const RadioLabelContent = styled.div`
@@ -295,17 +325,22 @@ const RadioLabelContent = styled.div`
   cursor: inherit;
 `;
 
-const LabelTitleWrapper = styled.div`
+const RadioTitleWrapper = styled.span<{ $disabled?: boolean }>`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.xs};
-  font-weight: inherit;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  color: ${({ theme, $disabled }) =>
+    $disabled ? theme.colors.text.disabled : theme.colors.text.primary};
+  line-height: 1.4;
 `;
 
 const OptionDescription = styled.span<{ $disabled?: boolean }>`
   font-size: ${({ theme }) => theme.fontSizes.xs};
   color: ${({ theme, $disabled }) =>
     $disabled ? theme.colors.text.disabled : theme.colors.text.secondary};
+  line-height: 1.4;
 `;
 
 const SegmentedLabel = styled.span`

@@ -5,13 +5,13 @@ import { css, useTheme } from "@emotion/react";
 import { Search, ChevronDown, Check } from "lucide-react";
 import {
   formControlBase,
-  disabledState,
   flexCenter,
   controlSizeBase,
   squareIconSize,
-  ControlSize,
   popoverContentBase,
   popoverItemBase,
+  type ControlSize,
+  type FontSize,
 } from "../../styles";
 import { resolveDisabled } from "../../utils";
 import { Spinner } from "../feedback/Spinner";
@@ -31,6 +31,7 @@ export interface ComboBoxProps {
   isError?: boolean;
   isLoading?: boolean;
   size?: ControlSize;
+  fontSize?: FontSize;
   width?: string;
 }
 
@@ -45,6 +46,7 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
       isError,
       isLoading,
       size = "md",
+      fontSize,
       width,
     },
     ref,
@@ -53,6 +55,7 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
     const { t } = useUiConfig();
     const [open, setOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+
     const trulyDisabled = resolveDisabled({ disabled, loading: isLoading });
 
     const filteredOptions = useMemo(() => {
@@ -64,7 +67,7 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
     const selectedLabel =
       options.find((opt) => opt.value === value)?.label || "";
 
-    const handleSelect = (val: string, label: string) => {
+    const handleSelect = (val: string) => {
       onChange(val);
       setSearchTerm("");
       setOpen(false);
@@ -77,33 +80,37 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
           onOpenChange={setOpen}
         >
           <PopoverPrimitive.Anchor asChild>
-            <div style={{ width: "100%", position: "relative" }}>
-              <InputIconWrapper $position="left">
+            <InputContainer>
+              <InputIconWrapper $position="left" $size={size}>
                 <Search />
               </InputIconWrapper>
 
               <StyledComboBoxInput
                 ref={ref}
                 $size={size}
+                $fontSize={fontSize}
                 $isError={isError}
                 placeholder={selectedLabel || placeholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={() => setOpen(true)}
                 disabled={trulyDisabled}
+                data-disabled={trulyDisabled ? "" : undefined}
                 role="combobox"
                 aria-expanded={open}
                 aria-controls="combobox-listbox"
               />
 
-              <InputIconWrapper $position="right">
+              <InputIconWrapper $position="right" $size={size}>
                 {isLoading ? (
-                  <Spinner size="sm" color="currentColor" />
+                  <Spinner
+                    size={size === "xs" || size === "sm" ? "xs" : "sm"}
+                  />
                 ) : (
                   <ChevronDown />
                 )}
               </InputIconWrapper>
-            </div>
+            </InputContainer>
           </PopoverPrimitive.Anchor>
 
           <PopoverPrimitive.Portal>
@@ -120,7 +127,7 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
                     key={opt.value}
                     role="option"
                     aria-selected={value === opt.value}
-                    onClick={() => handleSelect(opt.value, opt.label)}
+                    onClick={() => handleSelect(opt.value)}
                   >
                     {opt.label}
                     {value === opt.value && (
@@ -145,54 +152,75 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
 
 ComboBox.displayName = "ComboBox";
 
-// --- Styled Components ---
+// ==========================================
+// Styled Components
+// ==========================================
 
-const ComboBoxWrapper = styled.div<{ $width?: string }>`
+const filterProps = {
+  shouldForwardProp: (prop: string) =>
+    !["$width", "$size", "$fontSize", "$isError", "$position"].includes(prop),
+};
+
+const ComboBoxWrapper = styled("div", filterProps)<{ $width?: string }>`
   position: relative;
   display: inline-flex;
   width: ${({ $width }) => $width || "100%"};
 `;
 
-const StyledComboBoxInput = styled.input<{
-  $isError?: boolean;
-  $size: ControlSize;
-}>`
-  ${({ theme, $isError }) => formControlBase(theme, $isError)}
-  ${({ theme, $size }) => controlSizeBase(theme, $size)}
-  
-  padding-left: ${({ theme }) => theme.spacing.xl};
-  padding-right: ${({ theme }) => theme.spacing.xl};
-  cursor: text;
-
-  ${({ theme }) => disabledState(theme)}
+const InputContainer = styled.div`
+  width: 100%;
+  position: relative;
 `;
 
-const InputIconWrapper = styled.div<{ $position: "left" | "right" }>`
+const StyledComboBoxInput = styled("input", filterProps)<{
+  $isError?: boolean;
+  $size: ControlSize | (string & {});
+  $fontSize?: FontSize | (string & {});
+}>`
+  ${({ theme, $isError }) => formControlBase(theme, $isError)}
+
+  ${({ theme, $size, $fontSize }) =>
+    controlSizeBase(theme, $size as ControlSize, $fontSize)}
+  
+  padding-left: ${({ theme, $size }) =>
+    theme.sizes.control[$size as keyof typeof theme.sizes.control] || $size};
+  padding-right: ${({ theme, $size }) =>
+    theme.sizes.control[$size as keyof typeof theme.sizes.control] || $size};
+
+  cursor: text;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.text.disabled};
+  }
+`;
+
+const InputIconWrapper = styled("div", filterProps)<{
+  $position: "left" | "right";
+  $size: ControlSize | (string & {});
+}>`
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
+  width: ${({ theme, $size }) =>
+    theme.sizes.control[$size as keyof typeof theme.sizes.control] || $size};
+  height: 100%;
   ${flexCenter}
-  color: ${({ theme }) => theme.colors.text.disabled};
 
-  ${({ $position, theme }) =>
-    $position === "left"
-      ? css`
-          left: ${theme.spacing.base};
-        `
-      : css`
-          right: ${theme.spacing.base};
-        `}
-
+  ${({ $position }) => ($position === "left" ? "left: 0;" : "right: 0;")}
+  
+  color: ${({ theme }) => theme.colors.text.secondary};
   pointer-events: none;
+  z-index: 1;
 
   & > svg {
-    ${({ theme }) => squareIconSize(theme, "sm")}
+    ${({ theme, $size }) =>
+      squareIconSize(theme, $size === "xs" || $size === "sm" ? "xs" : "sm")}
   }
 `;
 
 const CheckIconWrapper = styled.span`
   ${flexCenter}
-  color: inherit;
+  color: ${({ theme }) =>
+    theme.colors.brand.cyan || theme.colors.brand.primary};
 
   & > svg {
     ${({ theme }) => squareIconSize(theme, "xs")}
@@ -212,6 +240,6 @@ const ComboBoxItem = styled.div`
 const NoResult = styled.div`
   padding: ${({ theme }) => theme.spacing.md};
   text-align: center;
-  color: ${({ theme }) => theme.colors.text.disabled};
-  font-size: ${({ theme }) => theme.fontSizes.xs};
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
 `;

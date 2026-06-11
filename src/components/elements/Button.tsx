@@ -3,10 +3,12 @@ import styled from "@emotion/styled";
 import { css } from "@emotion/react";
 import {
   type AppearanceVariant,
-  type ComponentColor,
+  type ColorVariant,
   type ControlSize,
   type ComponentShape,
   type Spacing,
+  type FontWeight,
+  type FontSize,
 } from "../../styles/types";
 import {
   componentColorStyle,
@@ -33,30 +35,20 @@ export interface ButtonProps extends Omit<
   as?: React.ElementType;
   href?: string;
   target?: string;
-  /** 버튼의 형태 (기본값: "solid") */
   variant?: AppearanceVariant;
-  /** 버튼의 색상 (기본값: "primary") - 테마 토큰 및 Hex 문자열 지원 */
-  color?: ComponentColor;
-  /** 버튼 크기 (기본값: "md") */
+  color?: ColorVariant;
   size?: ControlSize;
-  /** 버튼 모양 (기본값: "square") */
   shape?: ComponentShape;
-  /** 부모 컨테이너의 너비를 100% 채울지 여부 */
   fullWidth?: boolean;
-  /** 로딩 상태 여부 */
   isLoading?: boolean;
-  /** 텍스트 좌측에 배치할 아이콘 */
   leftIcon?: React.ReactNode;
-  /** 텍스트 우측에 배치할 아이콘 */
   rightIcon?: React.ReactNode;
-  /** 아이콘 전용 버튼 여부 (텍스트 숨김) */
   isIconOnly?: boolean;
-  /** 아이콘 배치 방식 (inline: 텍스트 옆, edge: 양 끝단) */
   iconLayout?: IconLayout;
-  /** 텍스트 정렬 */
   textAlign?: TextAlign;
-  /** 아이콘과 텍스트 사이의 간격 */
   spacing?: Spacing;
+  weight?: FontWeight;
+  fontSize?: FontSize;
 }
 
 export const Button = forwardRef<
@@ -81,6 +73,8 @@ export const Button = forwardRef<
       iconLayout = "inline",
       textAlign = "center",
       spacing = "xs",
+      weight = "medium",
+      fontSize,
       ...props
     },
     ref,
@@ -113,6 +107,8 @@ export const Button = forwardRef<
         $fullWidth={fullWidth}
         $isIconOnly={isIconOnly}
         $spacing={spacing}
+        $weight={weight}
+        $fontSize={fontSize}
         disabled={!isAnchor ? trulyDisabled : undefined}
         data-disabled={trulyDisabled ? "" : undefined}
         aria-disabled={trulyDisabled}
@@ -149,9 +145,20 @@ export const Button = forwardRef<
 
 Button.displayName = "Button";
 
-// ==========================================
-// Styled Components
-// ==========================================
+const filterProps = {
+  shouldForwardProp: (prop: string) =>
+    ![
+      "$variant",
+      "$color",
+      "$size",
+      "$shape",
+      "$fullWidth",
+      "$isIconOnly",
+      "$spacing",
+      "$weight",
+      "$fontSize",
+    ].includes(prop),
+};
 
 const ButtonIconWrapper = styled.span<{ $size: ControlSize }>`
   display: inline-flex;
@@ -172,14 +179,16 @@ const ButtonTextWrapper = styled.span<{
   ${textEllipsis}
 `;
 
-const StyledButton = styled.button<{
+const StyledButton = styled("button", filterProps)<{
   $size: ControlSize;
   $variant: AppearanceVariant;
-  $color: ComponentColor;
+  $color: ColorVariant;
   $shape: ComponentShape;
   $fullWidth: boolean;
   $isIconOnly: boolean;
-  $spacing?: Spacing;
+  $spacing?: Spacing | string;
+  $weight: FontWeight | string;
+  $fontSize?: FontSize | string;
   href?: string;
   target?: string;
 }>`
@@ -187,7 +196,7 @@ const StyledButton = styled.button<{
 
   gap: ${({ theme, $spacing }) => {
     if (!$spacing) return theme.spacing.xs;
-    return theme.spacing[$spacing] || $spacing;
+    return theme.spacing[$spacing as keyof typeof theme.spacing] || $spacing;
   }};
 
   font-family: inherit;
@@ -203,7 +212,7 @@ const StyledButton = styled.button<{
     ${({ theme }) => focusRing(theme)};
   }
 
-  ${({ $size, $shape, $isIconOnly, theme }) => {
+  ${({ $size, $shape, $isIconOnly, $fontSize, theme }) => {
     if ($shape === "circle" || $isIconOnly) {
       return css`
         ${squareComponentSize(theme, $size)}
@@ -214,10 +223,13 @@ const StyledButton = styled.button<{
       `;
     }
     return css`
-      ${controlSizeBase(theme, $size)}
+      ${controlSizeBase(theme, $size, $fontSize)}
       border-radius: ${theme.borderRadius.md};
     `;
   }}
+
+  font-weight: ${({ theme, $weight }) =>
+    theme.fontWeights[$weight as keyof typeof theme.fontWeights] || $weight};
 
   ${({ theme, $variant, $color }) =>
     componentColorStyle(theme, $variant, $color, true)};

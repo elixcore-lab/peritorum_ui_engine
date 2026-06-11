@@ -11,7 +11,8 @@ import {
   squareIconSize,
   popoverContentBase,
   popoverItemBase,
-  ControlSize,
+  type ControlSize,
+  type FontSize,
 } from "../../styles";
 import { resolveDisabled } from "../../utils";
 
@@ -28,6 +29,7 @@ export interface MultiSelectProps {
   disabled?: boolean;
   isError?: boolean;
   size?: ControlSize;
+  fontSize?: FontSize;
   width?: string;
 }
 
@@ -41,6 +43,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
       disabled,
       isError,
       size = "md",
+      fontSize,
       width,
     },
     ref,
@@ -56,6 +59,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 
     const removeTag = (e: React.MouseEvent, val: string) => {
       e.stopPropagation();
+      e.preventDefault();
       onChange(value.filter((v) => v !== val));
     };
 
@@ -66,6 +70,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
             ref={ref}
             $isError={isError}
             $size={size}
+            $fontSize={fontSize}
             disabled={trulyDisabled}
           >
             <SelectedContainer>
@@ -73,7 +78,10 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                 value.map((val) => (
                   <Tag key={val}>
                     {options.find((o) => o.value === val)?.label}
-                    <TagCloseButton onClick={(e) => removeTag(e, val)}>
+                    <TagCloseButton
+                      type="button"
+                      onClick={(e) => removeTag(e, val)}
+                    >
                       <X />
                     </TagCloseButton>
                   </Tag>
@@ -114,7 +122,8 @@ MultiSelect.displayName = "MultiSelect";
 // ==========================================
 
 const filterProps = {
-  shouldForwardProp: (prop: string) => !["$isError", "$size"].includes(prop),
+  shouldForwardProp: (prop: string) =>
+    !["$isError", "$size", "$fontSize"].includes(prop),
 };
 
 const MultiSelectWrapper = styled.div<{ $width?: string }>`
@@ -124,25 +133,34 @@ const MultiSelectWrapper = styled.div<{ $width?: string }>`
 
 const StyledMultiSelectTrigger = styled(PopoverPrimitive.Trigger, filterProps)<{
   $isError?: boolean;
-  $size: ControlSize;
+  $size: ControlSize | (string & {});
+  $fontSize?: FontSize | (string & {});
 }>`
   ${({ theme, $isError }) => formControlBase(theme, $isError)}
-  ${({ theme, $size }) => controlSizeBase(theme, $size)}
+
+  ${({ theme, $size, $fontSize }) =>
+    controlSizeBase(theme, $size as ControlSize, $fontSize)}
   
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+
   height: auto;
-  min-height: ${({ theme, $size }) => theme.sizes.control[$size]};
-  padding: ${({ theme }) => `${theme.spacing["2xs"]} ${theme.spacing.sm}`};
+  min-height: ${({ theme, $size }) =>
+    theme.sizes.control[$size as keyof typeof theme.sizes.control] || $size};
+
+  padding-top: ${({ theme }) => theme.spacing["2xs"]};
+  padding-bottom: ${({ theme }) => theme.spacing["2xs"]};
+
   cursor: pointer;
   gap: ${({ theme }) => theme.spacing.sm};
 
   ${({ theme }) => disabledState(theme)}
 
   & > svg {
-    ${({ theme }) => squareIconSize(theme, "sm")}
+    ${({ theme, $size }) =>
+      squareIconSize(theme, $size === "xs" || $size === "sm" ? "xs" : "sm")}
     flex-shrink: 0;
   }
 `;

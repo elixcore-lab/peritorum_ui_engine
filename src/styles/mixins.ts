@@ -3,13 +3,13 @@ import {
   ControlSize,
   ColorVariant,
   AppearanceVariant,
-  ComponentColor,
   IconSize,
+  FontSize,
 } from "./types";
 import { slideDownAndFade } from "./animation";
 
 // ==========================================
-// 1. Layout & Resets (레이아웃 및 초기화)
+// 1. Layout & Resets
 // ==========================================
 
 export const flexCenter = css`
@@ -78,7 +78,7 @@ export const visuallyHidden = css`
 `;
 
 // ==========================================
-// 2. Typography & Scroll (타이포그래피 및 스크롤)
+// 2. Typography & Scroll
 // ==========================================
 
 export const textEllipsis = css`
@@ -114,17 +114,16 @@ export const customScrollbar = (theme: Theme) => css`
   }
 `;
 
-// 💡 텍스트에 그라데이션을 입히는 믹스인 (Text 컴포넌트 등에서 사용)
 export const textGradientStyle = (gradientString: string) => css`
   background: ${gradientString};
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: transparent; /* Fallback */
+  color: transparent;
 `;
 
 // ==========================================
-// 3. Animation & Transition (애니메이션 및 트랜지션)
+// 3. Animation & Transition
 // ==========================================
 
 export const applyAnimation = (
@@ -158,7 +157,7 @@ export const transitionBase = (theme: Theme) =>
   );
 
 // ==========================================
-// 4. States & Effects (전역 상태 및 시각 효과)
+// 4. States & Effects
 // ==========================================
 
 export const disabledState = (theme: Theme) => css`
@@ -197,7 +196,7 @@ export const floatingSurface = (theme: Theme) => css`
 `;
 
 // ==========================================
-// 5. Component Bases (컴포넌트 조립용 베이스)
+// 5. Component Bases (조립용 베이스)
 // ==========================================
 
 export const thinBorder = (
@@ -206,11 +205,7 @@ export const thinBorder = (
   color: string = theme.colors.border.divider,
 ) => {
   const borderStyle = `${theme.sizes.component.dividerThin} solid ${color}`;
-
-  if (edge === "all") {
-    return css({ border: borderStyle });
-  }
-
+  if (edge === "all") return css({ border: borderStyle });
   return css({
     [`border${edge.charAt(0).toUpperCase() + edge.slice(1)}`]: borderStyle,
   });
@@ -218,84 +213,104 @@ export const thinBorder = (
 
 export const componentBorder = (theme: Theme, color: string) =>
   thinBorder(theme, "all", color);
-
 export const transparentBorder = (theme: Theme) =>
   componentBorder(theme, theme.colors.utility.transparent);
-
 export const controlBorder = (theme: Theme, isError?: boolean) =>
   componentBorder(
     theme,
     isError ? theme.colors.status.danger : theme.colors.border.strong,
   );
 
-export const squareIconSize = (theme: Theme, size: IconSize) => css`
-  width: ${theme.sizes.icon[size]};
-  height: ${theme.sizes.icon[size]};
-`;
+export const squareIconSize = (theme: Theme, size: IconSize) => {
+  const finalSize =
+    theme.sizes.icon[size as keyof typeof theme.sizes.icon] || size;
+  return css`
+    width: ${finalSize};
+    height: ${finalSize};
+  `;
+};
 
-export const squareComponentSize = (theme: Theme, size: ControlSize) => css`
-  width: ${theme.sizes.control[size]};
-  height: ${theme.sizes.control[size]};
-`;
+export const squareComponentSize = (theme: Theme, size: ControlSize) => {
+  const finalSize =
+    theme.sizes.control[size as keyof typeof theme.sizes.control] || size;
+  return css`
+    width: ${finalSize};
+    height: ${finalSize};
+  `;
+};
 
-export const controlSizeBase = (theme: Theme, size: ControlSize) => {
-  switch (size) {
-    case "xs":
-      return css`
-        height: ${theme.sizes.control.xs};
-        padding: 0 ${theme.spacing["2xs"]};
-        font-size: ${theme.fontSizes["2xs"]};
-      `;
-    case "sm":
-      return css`
-        height: ${theme.sizes.control.sm};
-        padding: 0 ${theme.spacing.sm};
-        font-size: ${theme.fontSizes.sm};
-      `;
-    case "lg":
-      return css`
-        height: ${theme.sizes.control.lg};
-        padding: 0 ${theme.spacing.lg};
-        font-size: ${theme.fontSizes.lg};
-      `;
-    case "md":
-    default:
-      return css`
-        height: ${theme.sizes.control.md};
-        padding: 0 ${theme.spacing.base};
-        font-size: ${theme.fontSizes.base};
-      `;
-  }
+export const controlSizeBase = (
+  theme: Theme,
+  size: ControlSize,
+  fontSize?: FontSize,
+) => {
+  const themeHeight =
+    theme.sizes.control[size as keyof typeof theme.sizes.control];
+  const finalHeight = themeHeight || size;
+  const refSize = themeHeight
+    ? (size as "xs" | "sm" | "md" | "lg" | "xl")
+    : "md";
+
+  const paddingX = {
+    xs: theme.spacing["2xs"],
+    sm: theme.spacing.sm,
+    md: theme.spacing.base,
+    lg: theme.spacing.lg,
+    xl: theme.spacing.xl,
+  }[refSize];
+
+  const finalFontSize = fontSize
+    ? theme.fontSizes[fontSize as keyof typeof theme.fontSizes] || fontSize
+    : {
+        xs: theme.fontSizes["2xs"],
+        sm: theme.fontSizes.sm,
+        md: theme.fontSizes.base,
+        lg: theme.fontSizes.lg,
+        xl: theme.fontSizes.xl,
+      }[refSize];
+
+  return css`
+    height: ${finalHeight};
+    padding: 0 ${paddingX};
+    font-size: ${finalFontSize};
+  `;
 };
 
 export const compactSizeBase = (theme: Theme, size: ControlSize) => {
-  switch (size) {
-    case "lg":
-      return css`
-        padding: ${theme.spacing.xs} ${theme.spacing.md};
-        font-size: ${theme.fontSizes.sm};
-        gap: ${theme.spacing.xs};
-      `;
-    case "sm":
-      return css`
-        padding: ${theme.spacing["2xs"]} ${theme.spacing.xs};
-        font-size: ${theme.fontSizes["2xs"]};
-        gap: ${theme.spacing["2xs"]};
-      `;
-    case "xs":
-      return css`
-        padding: ${theme.spacing["2xs"]} ${theme.spacing["2xs"]};
-        font-size: ${theme.fontSizes["2xs"]};
-        gap: ${theme.spacing["2xs"]};
-      `;
-    case "md":
-    default:
-      return css`
-        padding: ${theme.spacing["2xs"]} ${theme.spacing.sm};
-        font-size: ${theme.fontSizes.xs};
-        gap: ${theme.spacing["2xs"]};
-      `;
-  }
+  const safeSize = theme.sizes.control[size as keyof typeof theme.sizes.control]
+    ? size
+    : "md";
+  const refSize = safeSize as "xs" | "sm" | "md" | "lg" | "xl";
+
+  const padding = {
+    xs: `${theme.spacing["2xs"]} ${theme.spacing["2xs"]}`,
+    sm: `${theme.spacing["2xs"]} ${theme.spacing.xs}`,
+    md: `${theme.spacing["2xs"]} ${theme.spacing.sm}`,
+    lg: `${theme.spacing.xs} ${theme.spacing.md}`,
+    xl: `${theme.spacing.sm} ${theme.spacing.lg}`,
+  }[refSize];
+
+  const fontSize = {
+    xs: theme.fontSizes["2xs"],
+    sm: theme.fontSizes["2xs"],
+    md: theme.fontSizes.xs,
+    lg: theme.fontSizes.sm,
+    xl: theme.fontSizes.base,
+  }[refSize];
+
+  const gap = {
+    xs: theme.spacing["2xs"],
+    sm: theme.spacing["2xs"],
+    md: theme.spacing["2xs"],
+    lg: theme.spacing.xs,
+    xl: theme.spacing.sm,
+  }[refSize];
+
+  return css`
+    padding: ${padding};
+    font-size: ${fontSize};
+    gap: ${gap};
+  `;
 };
 
 export const formControlBase = (theme: Theme, isError?: boolean) => css`
@@ -390,7 +405,6 @@ export const interactiveTextColor = (
     theme.transitions.duration.fast,
     theme.transitions.function.easeInOut,
   )}
-
   &:hover:not(:disabled):not([data-disabled]) {
     color: ${hoverColor};
   }
@@ -402,18 +416,69 @@ export const activeTabUnderline = (theme: Theme) => css`
 `;
 
 // ==========================================
-// 6. 외형(Appearance), 색상(Color), 인터랙션(Hover)을 통제하는 마스터 믹스인
+// 6. Utility Mixins (컬러, 높이 리졸버)
 // ==========================================
+
+export const resolveThemeColor = (theme: Theme, color: string) => {
+  switch (color) {
+    case "brand":
+      return (
+        theme.colors.brand.gradient ||
+        theme.colors.brand.cyan ||
+        theme.colors.brand.primary
+      );
+    case "primary":
+      return theme.colors.brand.primary;
+    case "secondary":
+    case "default":
+      return theme.colors.brand.accentSoft;
+    case "success":
+    case "danger":
+    case "warning":
+    case "info":
+    case "offline":
+      return theme.colors.status[
+        color as "success" | "danger" | "warning" | "info" | "offline"
+      ];
+    default:
+      return color;
+  }
+};
+
+export const progressBarHeight = (theme: Theme, size: string) => {
+  const heightMap: Record<string, string> = {
+    xs: theme.spacing.xs,
+    sm: theme.spacing.sm,
+    md: theme.spacing.base,
+    lg: theme.spacing.md,
+  };
+  return heightMap[size] || size;
+};
+
+// ==========================================
+// 7. Master Mixin: Appearance, Color, Hover
+// ==========================================
+
 export const componentColorStyle = (
   theme: Theme,
   variant: AppearanceVariant,
-  color: ComponentColor,
+  color: ColorVariant,
   isInteractive: boolean = false,
 ) => {
   let bg = "transparent",
     textColor = "inherit",
     borderColor = "transparent",
     hoverCss = css``;
+
+  const opacities = theme.stateOpacity || {
+    subtleBg: "1A",
+    subtleBorder: "40",
+    hoverBg: "26",
+  };
+  const filters = theme.stateFilter || {
+    hoverLighten: "brightness(1.1)",
+    hoverDarken: "brightness(0.9)",
+  };
 
   const isThemeColor = [
     "primary",
@@ -449,6 +514,7 @@ export const componentColorStyle = (
       case "success":
       case "danger":
       case "warning":
+      case "info":
       case "offline": {
         const statusKey = color as
           | "success"
@@ -456,20 +522,19 @@ export const componentColorStyle = (
           | "warning"
           | "info"
           | "offline";
-
         if (variant === "solid") {
           bg = theme.colors.status[statusKey];
           textColor = theme.colors.text.inverse || "#FFFFFF";
           borderColor = "transparent";
           hoverCss = css`
-            filter: brightness(0.9);
+            filter: ${filters.hoverDarken};
           `;
         } else if (variant === "subtle") {
           bg = theme.colors.statusBg[statusKey];
           textColor = theme.colors.status[statusKey];
           borderColor = theme.colors.status[statusKey];
           hoverCss = css`
-            filter: brightness(0.9);
+            filter: ${filters.hoverDarken};
           `;
         } else {
           textColor = theme.colors.status[statusKey];
@@ -480,34 +545,38 @@ export const componentColorStyle = (
         }
         break;
       }
-      case "brand":
-        // 테마에 그라데이션 값이 있으면 사용하고, 없으면 안전하게 폴백 컬러 사용
+
+      case "brand": {
         const hasGradient = !!theme.colors.brand.gradient;
-        const brandBaseColor =
-          theme.colors.brand.cyan || theme.colors.brand.primary;
+        const brandPrimary = theme.colors.brand.primary;
+        const brandText = theme.colors.brand.textColor || brandPrimary;
 
         if (variant === "solid") {
-          bg = hasGradient ? theme.colors.brand.gradient! : brandBaseColor;
-          textColor = theme.colors.text.inverse || "#FFFFFF";
+          bg = hasGradient ? theme.colors.brand.gradient! : brandPrimary;
+          textColor =
+            theme.colors.brand.textColor ||
+            theme.colors.text.inverse ||
+            "#FFFFFF";
           borderColor = "transparent";
           hoverCss = css`
-            filter: brightness(1.1);
+            filter: ${filters.hoverLighten};
           `;
         } else if (variant === "subtle") {
-          bg = `${brandBaseColor}1A`;
-          textColor = brandBaseColor;
-          borderColor = brandBaseColor;
+          bg = `${brandPrimary}${opacities.subtleBg}`;
+          textColor = brandText;
+          borderColor = brandPrimary;
           hoverCss = css`
-            filter: brightness(1.1);
+            filter: ${filters.hoverLighten};
           `;
         } else {
-          textColor = brandBaseColor;
-          borderColor = brandBaseColor;
+          textColor = brandText;
+          borderColor = brandPrimary;
           hoverCss = css`
             background: ${theme.colors.background.hover};
           `;
         }
         break;
+      }
 
       case "secondary":
       case "default":
@@ -542,23 +611,20 @@ export const componentColorStyle = (
         break;
     }
   } else {
-    // --------------------------------------------------------
-    // 직접 주입된 커스텀 Hex 컬러 (#RRGGBB) 처리
-    // --------------------------------------------------------
     if (variant === "solid") {
       bg = color;
       textColor = "#FFFFFF";
       borderColor = "transparent";
       hoverCss = css`
-        filter: brightness(1.1);
+        filter: ${filters.hoverLighten};
       `;
     } else if (variant === "subtle") {
-      bg = `${color}1A`;
+      bg = `${color}${opacities.subtleBg}`;
       textColor = color;
-      borderColor = `${color}40`;
+      borderColor = `${color}${opacities.subtleBorder}`;
       hoverCss = css`
-        background: ${color}26;
-      `; // 10% -> 15% 투명도 증가 (Hover)
+        background: ${color}${opacities.hoverBg};
+      `;
     } else {
       textColor = color;
       borderColor = color;
@@ -568,7 +634,6 @@ export const componentColorStyle = (
     }
   }
 
-  // Ghost, Outline은 기본적으로 배경과 테두리를 투명/없음 처리
   if (variant === "ghost") {
     bg = "transparent";
     borderColor = "transparent";
@@ -576,18 +641,17 @@ export const componentColorStyle = (
     bg = "transparent";
   }
 
-  // --------------------------------------------------------
-  // 최종 CSS 조립 (background 속성을 사용하여 그라데이션까지 완벽 지원)
-  // --------------------------------------------------------
+  const finalBorder =
+    borderColor !== "transparent"
+      ? `${theme.sizes.component.dividerThin} solid ${borderColor}`
+      : "none";
+
   return css`
     background: ${bg};
     color: ${textColor};
-    /* border: ${borderColor !== "transparent"
-      ? `1px solid ${borderColor}`
-      : "none"}; */
-    border: 1px solid ${borderColor};
+    border: ${finalBorder};
     background-origin: border-box;
-    /* 인터랙션 플래그가 true인 요소(버튼 등)에만 Hover 효과 부여 */
+
     ${isInteractive &&
     css`
       &:hover:not(:disabled):not([data-disabled]) {

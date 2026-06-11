@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import { X } from "lucide-react";
 import {
   type AppearanceVariant,
-  type ComponentColor,
+  type ColorVariant,
   type ControlSize,
 } from "../../styles/types";
 import {
@@ -26,7 +26,7 @@ export interface TagProps extends Omit<
   /** * 태그의 색상 (기본값: "default")
    * - 테마 토큰 (primary, warning 등) 또는 Hex Color 지원
    */
-  color?: ComponentColor;
+  color?: ColorVariant;
   /** 태그의 크기 (기본값: "md") */
   size?: ControlSize;
   /** 닫기 버튼 클릭 이벤트 (함수 주입 시 우측에 'X' 버튼이 자동 렌더링됩니다) */
@@ -93,7 +93,7 @@ Tag.displayName = "Tag";
 
 const StyledTag = styled.span<{
   $variant: AppearanceVariant;
-  $color: ComponentColor;
+  $color: ColorVariant;
   $size: ControlSize;
 }>`
   ${({ theme }) => inlineComponentBase(theme)};

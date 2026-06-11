@@ -1,9 +1,13 @@
 import React, { CSSProperties, forwardRef } from "react";
 import * as CheckBoxPrimitive from "@radix-ui/react-checkbox";
 import styled from "@emotion/styled";
-import { css, Theme } from "@emotion/react";
+import { css } from "@emotion/react";
 import { Check, Minus } from "lucide-react";
-import { type SelectionVariant, type SelectionValue } from "../../styles/types";
+import {
+  type SelectionVariant,
+  type SelectionValue,
+  Spacing,
+} from "../../styles/types";
 import {
   flexCenter,
   focusRing,
@@ -12,7 +16,6 @@ import {
   squareIconSize,
 } from "../../styles/mixins";
 import { resolveDisabled } from "../../utils";
-import { Label } from "./Label";
 import { Spinner } from "../feedback/Spinner";
 
 export interface CheckBoxOption {
@@ -47,7 +50,7 @@ export interface CheckBoxGroupProps {
   direction?: CSSProperties["flexDirection"];
   variant?: SelectionVariant;
   className?: string;
-  gap?: keyof Theme["spacing"] | CSSProperties["gap"];
+  gap?: Spacing | number;
 }
 
 export const CheckBox = forwardRef<HTMLButtonElement, CheckBoxProps>(
@@ -72,7 +75,12 @@ export const CheckBox = forwardRef<HTMLButtonElement, CheckBoxProps>(
     const domId = id || (value !== undefined ? String(value) : undefined);
 
     return (
-      <CheckBoxWrapper className={className} $variant={variant}>
+      <CheckBoxWrapper
+        htmlFor={domId}
+        className={className}
+        $variant={variant}
+        data-disabled={trulyDisabled ? "" : undefined}
+      >
         <StyledCheckBox
           ref={ref}
           id={domId}
@@ -87,7 +95,7 @@ export const CheckBox = forwardRef<HTMLButtonElement, CheckBoxProps>(
         >
           {isLoading ? (
             <SpinnerWrapper>
-              <Spinner size="xxs" color="currentColor" />
+              <Spinner size={12} color="currentColor" />
             </SpinnerWrapper>
           ) : (
             <CheckBoxPrimitive.Indicator asChild>
@@ -103,13 +111,7 @@ export const CheckBox = forwardRef<HTMLButtonElement, CheckBoxProps>(
         {(label || description) && (
           <CheckBoxLabelContent>
             {label && (
-              <Label
-                htmlFor={domId}
-                disabled={trulyDisabled}
-                style={{ cursor: "inherit" }}
-              >
-                {label}
-              </Label>
+              <CheckBoxTitle $disabled={trulyDisabled}>{label}</CheckBoxTitle>
             )}
             {description && (
               <CheckBoxDescription $disabled={trulyDisabled}>
@@ -191,26 +193,45 @@ export const CheckBoxGroup = forwardRef<HTMLDivElement, CheckBoxGroupProps>(
 
 CheckBoxGroup.displayName = "CheckBoxGroup";
 
-const CheckBoxGroupRoot = styled.div<{
+// ==========================================
+// Styled Components
+// ==========================================
+
+const groupFilter = {
+  shouldForwardProp: (prop: string) => !["$direction", "$gap"].includes(prop),
+};
+const wrapperFilter = {
+  shouldForwardProp: (prop: string) => !["$variant"].includes(prop),
+};
+const checkboxFilter = {
+  shouldForwardProp: (prop: string) => !["$isError", "$variant"].includes(prop),
+};
+
+const CheckBoxGroupRoot = styled("div", groupFilter)<{
   $direction: CSSProperties["flexDirection"];
-  $gap?: keyof Theme["spacing"] | CSSProperties["gap"];
+  $gap?: Spacing | number;
 }>`
   display: flex;
   flex-direction: ${({ $direction }) => $direction};
 
   gap: ${({ theme, $gap }) => {
     if (!$gap) return theme.spacing.sm;
-    if ($gap in theme.spacing) {
-      return theme.spacing[$gap as keyof Theme["spacing"]];
-    }
-    return $gap;
+    if (typeof $gap === "number") return `${$gap}px`;
+    return theme.spacing[$gap as keyof typeof theme.spacing] || $gap;
   }};
 `;
 
-const CheckBoxWrapper = styled.div<{ $variant: SelectionVariant }>`
+const CheckBoxWrapper = styled("label", wrapperFilter)<{
+  $variant: SelectionVariant;
+}>`
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: ${({ theme }) => theme.spacing.sm};
+  cursor: pointer;
+  &[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 
   ${({ theme, $variant }) =>
     $variant === "card" &&
@@ -221,25 +242,22 @@ const CheckBoxWrapper = styled.div<{ $variant: SelectionVariant }>`
         ${theme.colors.border.strong};
       border-radius: ${theme.borderRadius.md};
       background-color: ${theme.colors.background.surface};
-      cursor: pointer;
       ${transitionBase(theme)}
 
       &:hover:not([data-disabled]) {
-        border-color: ${theme.colors.brand.cyan};
+        border-color: ${theme.colors.brand.cyan || theme.colors.brand.primary};
         background-color: ${theme.colors.background.hover};
       }
 
       &:has([data-state="checked"]),
       &:has([data-state="indeterminate"]) {
-        border-color: ${theme.colors.brand.cyan};
+        border-color: ${theme.colors.brand.cyan || theme.colors.brand.primary};
         background-color: ${theme.colors.statusBg.info};
       }
     `}
 `;
 
-const StyledCheckBox = styled(CheckBoxPrimitive.Root, {
-  shouldForwardProp: (prop) => prop !== "$isError" && prop !== "$variant",
-})<{
+const StyledCheckBox = styled(CheckBoxPrimitive.Root, checkboxFilter)<{
   $isError?: boolean;
   $variant: SelectionVariant;
 }>`
@@ -254,12 +272,12 @@ const StyledCheckBox = styled(CheckBoxPrimitive.Root, {
   background-color: ${({ theme }) => theme.colors.background.input};
   cursor: pointer;
   flex-shrink: 0;
-  margin-top: ${({ theme }) => theme.spacing["2xs"]};
 
   ${({ theme }) => transitionBase(theme)}
 
   &:hover:not(:disabled):not([data-disabled]) {
-    border-color: ${({ theme }) => theme.colors.brand.cyan};
+    border-color: ${({ theme }) =>
+      theme.colors.brand.cyan || theme.colors.brand.primary};
   }
 
   &:focus-visible {
@@ -268,15 +286,17 @@ const StyledCheckBox = styled(CheckBoxPrimitive.Root, {
 
   &[data-state="checked"],
   &[data-state="indeterminate"] {
-    background-color: ${({ theme }) => theme.colors.brand.cyan};
-    border-color: ${({ theme }) => theme.colors.brand.cyan};
+    background-color: ${({ theme }) =>
+      theme.colors.brand.cyan || theme.colors.brand.primary};
+    border-color: ${({ theme }) =>
+      theme.colors.brand.cyan || theme.colors.brand.primary};
   }
 
   ${({ theme }) => disabledState(theme)}
 `;
 
 const CheckBoxIndicator = styled.div`
-  color: ${({ theme }) => theme.colors.text.inverse};
+  color: ${({ theme }) => theme.colors.text.inverse || "#FFFFFF"};
   ${flexCenter}
 `;
 
@@ -297,7 +317,7 @@ const SpinnerWrapper = styled.div`
 
   [data-state="checked"] &,
   &[data-state="indeterminate"] & {
-    color: ${({ theme }) => theme.colors.text.inverse};
+    color: ${({ theme }) => theme.colors.text.inverse || "#FFFFFF"};
   }
 `;
 
@@ -306,6 +326,13 @@ const CheckBoxLabelContent = styled.div`
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing["2xs"]};
   cursor: inherit;
+`;
+
+const CheckBoxTitle = styled.span<{ $disabled?: boolean }>`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  color: ${({ theme, $disabled }) =>
+    $disabled ? theme.colors.text.disabled : theme.colors.text.primary};
 `;
 
 const CheckBoxDescription = styled.span<{ $disabled?: boolean }>`

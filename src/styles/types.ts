@@ -3,11 +3,11 @@ import { type Theme } from "@emotion/react";
 // ==========================================
 // 1. 테마 기반 동적 타입 (Theme-dependent)
 // ==========================================
-export type ControlSize = keyof Theme["sizes"]["control"];
-export type IconSize = keyof Theme["sizes"]["icon"];
-export type FontSize = keyof Theme["fontSizes"];
-export type FontWeight = keyof Theme["fontWeights"];
-export type Spacing = keyof Theme["spacing"];
+export type ControlSize = keyof Theme["sizes"]["control"] | (string & {});
+export type IconSize = keyof Theme["sizes"]["icon"] | (string & {});
+export type FontSize = keyof Theme["fontSizes"] | (string & {});
+export type FontWeight = keyof Theme["fontWeights"] | (number & {});
+export type Spacing = keyof Theme["spacing"] | (string & {});
 
 // ==========================================
 // 2. 의미론적 타입 (Semantic & Intent)
@@ -30,9 +30,8 @@ export type ColorVariant =
   | "warning" // 경고 상태 (노란색)
   | "info" // 정보 상태 (파란색)
   | "offline"
-  | "brand"; // 브랜드 고유 컬러
-
-export type ComponentColor = ColorVariant | (string & {});
+  | "brand" // 브랜드 고유 컬러
+  | (string & {});
 
 export type TextColorIntent =
   | "primary"
@@ -46,7 +45,8 @@ export type TextColorIntent =
   | "brand"
   | "inherit"
   | "white"
-  | "black";
+  | "black"
+  | (string & {});
 
 export type TextAlign = "left" | "center" | "right" | "justify";
 

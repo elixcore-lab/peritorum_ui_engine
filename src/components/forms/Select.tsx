@@ -3,7 +3,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import styled from "@emotion/styled";
 import { css, useTheme } from "@emotion/react";
 import { ChevronDown, Check, XCircle } from "lucide-react";
-import { type ControlSize } from "../../styles/types";
+import { type ControlSize, type FontSize } from "../../styles/types";
 import {
   customScrollbar,
   formControlBase,
@@ -46,6 +46,7 @@ export interface SelectProps {
   width?: string;
   icon?: React.ReactNode;
   size?: ControlSize;
+  fontSize?: FontSize;
   isError?: boolean;
   onChange?: (value: string) => void;
   onOpenChange?: (open: boolean) => void;
@@ -54,11 +55,6 @@ export interface SelectProps {
 
 const isGroupData = (opt: SelectOption): opt is SelectGroupData => {
   return "groupLabel" in opt;
-};
-
-const filterProps = {
-  shouldForwardProp: (prop: string) =>
-    !["$inputSize", "$isError", "$fullWidth", "$hasClearBtn"].includes(prop),
 };
 
 export const Select = forwardRef<HTMLButtonElement, SelectProps>(
@@ -74,6 +70,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       width,
       icon,
       size = "md",
+      fontSize,
       isError = false,
       onChange,
       onOpenChange,
@@ -108,7 +105,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           </ItemTextLayout>
         </ItemContentWrapper>
         <SelectPrimitive.ItemIndicator>
-          <ActionIconWrapper>
+          <ActionIconWrapper $size={size}>
             <Check />
           </ActionIconWrapper>
         </SelectPrimitive.ItemIndicator>
@@ -127,6 +124,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           <SelectTrigger
             ref={ref}
             $inputSize={size}
+            $fontSize={fontSize}
             $isError={isError}
             $hasClearBtn={showClearBtn}
             aria-invalid={isError}
@@ -138,10 +136,13 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
             <RightSlot>
               {isLoading ? (
-                <Spinner size="sm" color="currentColor" />
+                <Spinner
+                  size={size === "xs" || size === "sm" ? "xs" : "sm"}
+                  color="currentColor"
+                />
               ) : (
                 <SelectPrimitive.Icon asChild>
-                  <ActionIconWrapper>
+                  <ActionIconWrapper $size={size}>
                     <ChevronDown />
                   </ActionIconWrapper>
                 </SelectPrimitive.Icon>
@@ -177,7 +178,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             aria-label={t("common.clear")}
             $inputSize={size}
           >
-            <ActionIconWrapper>
+            <ActionIconWrapper $size={size}>
               <XCircle />
             </ActionIconWrapper>
           </ClearButton>
@@ -189,20 +190,38 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
 Select.displayName = "Select";
 
-const SelectWrapper = styled.div<{ $fullWidth?: string }>`
+// ==========================================
+// Styled Components
+// ==========================================
+
+const wrapperFilter = {
+  shouldForwardProp: (prop: string) => !["$fullWidth"].includes(prop),
+};
+const triggerFilter = {
+  shouldForwardProp: (prop: string) =>
+    !["$inputSize", "$fontSize", "$isError", "$hasClearBtn"].includes(prop),
+};
+const iconFilter = {
+  shouldForwardProp: (prop: string) => !["$size"].includes(prop),
+};
+
+const SelectWrapper = styled("div", wrapperFilter)<{ $fullWidth?: string }>`
   position: relative;
   display: inline-flex;
   align-items: center;
   width: ${({ $fullWidth }) => $fullWidth || "100%"};
 `;
 
-const SelectTrigger = styled(SelectPrimitive.Trigger, filterProps)<{
-  $inputSize: ControlSize;
+const SelectTrigger = styled(SelectPrimitive.Trigger, triggerFilter)<{
+  $inputSize: ControlSize | (string & {});
+  $fontSize?: FontSize | (string & {});
   $isError?: boolean;
   $hasClearBtn?: boolean;
 }>`
   ${({ theme, $isError }) => formControlBase(theme, $isError)}
-  ${({ theme, $inputSize }) => controlSizeBase(theme, $inputSize)}
+
+  ${({ theme, $inputSize, $fontSize }) =>
+    controlSizeBase(theme, $inputSize as ControlSize, $fontSize)}
 
   display: inline-flex;
   align-items: center;
@@ -211,11 +230,12 @@ const SelectTrigger = styled(SelectPrimitive.Trigger, filterProps)<{
   gap: ${({ theme }) => theme.spacing.sm};
   width: 100%;
 
-  ${({ theme, $hasClearBtn }) =>
-    $hasClearBtn &&
-    css`
-      padding-right: calc(${theme.spacing.xl} + ${theme.spacing.sm});
-    `}
+  padding-right: ${({ theme, $inputSize, $hasClearBtn }) => {
+    const iconArea =
+      theme.sizes.control[$inputSize as keyof typeof theme.sizes.control] ||
+      $inputSize;
+    return $hasClearBtn ? `calc(${iconArea} * 1.5)` : iconArea;
+  }};
 
   &[data-placeholder] {
     color: ${({ theme }) => theme.colors.text.disabled};
@@ -226,13 +246,16 @@ const SelectTrigger = styled(SelectPrimitive.Trigger, filterProps)<{
   }
 `;
 
-const ActionIconWrapper = styled.span`
+const ActionIconWrapper = styled("span", iconFilter)<{
+  $size?: ControlSize | (string & {});
+}>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   & > svg {
-    ${({ theme }) => squareIconSize(theme, "sm")}
+    ${({ theme, $size }) =>
+      squareIconSize(theme, $size === "xs" || $size === "sm" ? "xs" : "sm")}
     flex-shrink: 0;
   }
 `;
@@ -306,7 +329,7 @@ const ValueContent = styled.div`
 const RightSlot = styled.div`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing.xs};
+  justify-content: center;
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
@@ -314,13 +337,20 @@ const IconSlot = styled.span`
   ${flexCenter}
 `;
 
-const ClearButton = styled.button<{ $inputSize: ControlSize }>`
+const ClearButton = styled.button<{ $inputSize: ControlSize | (string & {}) }>`
   ${resetButton}
   ${flexCenter}
   position: absolute;
+  top: 0;
 
   right: ${({ theme, $inputSize }) =>
-    $inputSize === "lg" ? theme.spacing.xl : theme.spacing.lg};
+    theme.sizes.control[$inputSize as keyof typeof theme.sizes.control] ||
+    $inputSize};
+
+  width: ${({ theme, $inputSize }) =>
+    theme.sizes.control[$inputSize as keyof typeof theme.sizes.control] ||
+    $inputSize};
+  height: 100%;
 
   color: ${({ theme }) => theme.colors.text.disabled};
   z-index: 1;

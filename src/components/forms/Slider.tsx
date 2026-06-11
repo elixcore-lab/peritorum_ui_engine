@@ -1,46 +1,88 @@
 import React, { forwardRef } from "react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import styled from "@emotion/styled";
-import { disabledState, focusRing, applyTransition } from "../../styles/mixins";
+import { type ColorVariant, type ControlSize } from "../../styles/types";
+import {
+  disabledState,
+  focusRing,
+  applyTransition,
+  resolveThemeColor,
+  progressBarHeight,
+} from "../../styles/mixins";
 
-export interface SliderProps extends React.ComponentPropsWithoutRef<
-  typeof SliderPrimitive.Root
+export interface SliderProps extends Omit<
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>,
+  "color"
 > {
   value?: number[];
   defaultValue?: number[];
-  color?: string;
+  color?: ColorVariant;
+  size?: ControlSize;
+  thumbAriaLabels?: string[];
 }
 
 export const Slider = forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   SliderProps
->(({ value, defaultValue, color, disabled, ...props }, ref) => {
-  const values = value || defaultValue || [0];
+>(
+  (
+    {
+      value,
+      defaultValue,
+      color = "brand",
+      size = "md",
+      disabled,
+      thumbAriaLabels = ["Slider thumb"],
+      ...props
+    },
+    ref,
+  ) => {
+    const values = value || defaultValue || [0];
 
-  return (
-    <StyledSliderRoot
-      ref={ref}
-      value={value}
-      defaultValue={defaultValue}
-      disabled={disabled}
-      {...props}
-    >
-      <StyledTrack>
-        <StyledRange $color={color} />
-      </StyledTrack>
+    return (
+      <StyledSliderRoot
+        ref={ref}
+        value={value}
+        defaultValue={defaultValue}
+        disabled={disabled}
+        $size={size}
+        {...props}
+      >
+        <StyledTrack $size={size}>
+          <StyledRange $color={color} />
+        </StyledTrack>
 
-      {values.map((_, index) => (
-        <StyledThumb key={index} aria-label="Volume" />
-      ))}
-    </StyledSliderRoot>
-  );
-});
+        {values.map((_, index) => (
+          <StyledThumb
+            key={index}
+            aria-label={thumbAriaLabels[index] || "Slider thumb"}
+          />
+        ))}
+      </StyledSliderRoot>
+    );
+  },
+);
 
 Slider.displayName = "Slider";
 
-// --- Styled Components ---
+// ==========================================
+// Styled Components
+// ==========================================
 
-const StyledSliderRoot = styled(SliderPrimitive.Root)`
+// 💡 DOM 에러(프롭 누수) 완벽 차단
+const rootFilter = {
+  shouldForwardProp: (prop: string) => !["$size"].includes(prop),
+};
+const rangeFilter = {
+  shouldForwardProp: (prop: string) => !["$color"].includes(prop),
+};
+const trackFilter = {
+  shouldForwardProp: (prop: string) => !["$size"].includes(prop),
+};
+
+const StyledSliderRoot = styled(SliderPrimitive.Root, rootFilter)<{
+  $size: ControlSize | (string & {});
+}>`
   position: relative;
   display: flex;
   align-items: center;
@@ -56,7 +98,7 @@ const StyledSliderRoot = styled(SliderPrimitive.Root)`
     flex-direction: column;
     width: ${({ theme }) => theme.sizes.component.radio};
     height: 100%;
-    min-height: 120px; /* 세로 모드의 최소 높이 보장 */
+    /* min-height: ${({ theme }) => theme.sizes.component.emptyStateHeight}; */
   }
 
   &[data-disabled] {
@@ -64,7 +106,9 @@ const StyledSliderRoot = styled(SliderPrimitive.Root)`
   }
 `;
 
-const StyledTrack = styled(SliderPrimitive.Track)`
+const StyledTrack = styled(SliderPrimitive.Track, trackFilter)<{
+  $size: ControlSize;
+}>`
   background-color: ${({ theme }) => theme.colors.surface.sunken};
   position: relative;
   flex-grow: 1;
@@ -72,18 +116,20 @@ const StyledTrack = styled(SliderPrimitive.Track)`
   box-shadow: inset 0 1px 2px ${({ theme }) => theme.colors.utility.shadowColor};
 
   &[data-orientation="horizontal"] {
-    height: ${({ theme }) => theme.spacing.xs}; /* 4px 두께 */
+    height: ${({ theme, $size }) => progressBarHeight(theme, $size as string)};
   }
 
   &[data-orientation="vertical"] {
-    width: ${({ theme }) => theme.spacing.xs};
+    width: ${({ theme, $size }) => progressBarHeight(theme, $size as string)};
   }
 `;
 
-const StyledRange = styled(SliderPrimitive.Range)<{ $color?: string }>`
+const StyledRange = styled(SliderPrimitive.Range, rangeFilter)<{
+  $color: string;
+}>`
   position: absolute;
-  background-color: ${({ theme, $color }) => $color || theme.colors.brand.cyan};
   border-radius: inherit;
+  background: ${({ theme, $color }) => resolveThemeColor(theme, $color)};
 
   &[data-orientation="horizontal"] {
     height: 100%;

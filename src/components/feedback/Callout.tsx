@@ -4,9 +4,12 @@ import { Info, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { type AlertVariant } from "../overlays/AlertModal";
 import { flexCenter, squareIconSize } from "../../styles/mixins";
 
-export interface CalloutProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CalloutProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "title"
+> {
   variant?: AlertVariant;
-  title?: string;
+  title?: React.ReactNode;
   icon?: React.ReactNode;
 }
 
@@ -22,34 +25,52 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(
     const IconComponent = ICONS[variant];
 
     return (
-      <CalloutContainer ref={ref} $variant={variant} {...props}>
+      <CalloutContainer
+        ref={ref}
+        $variant={variant}
+        role="region"
+        aria-label={typeof title === "string" ? title : `${variant} callout`}
+        {...props}
+      >
         <IconWrapper $variant={variant}>
           {icon || <IconComponent />}
         </IconWrapper>
         <ContentWrapper>
           {title && <CalloutTitle>{title}</CalloutTitle>}
-          <CalloutBody>{children}</CalloutBody>
+          {/* children이 없을 때 빈 div가 렌더링되지 않도록 방어 */}
+          {children && <CalloutBody>{children}</CalloutBody>}
         </ContentWrapper>
       </CalloutContainer>
     );
   },
 );
+
 Callout.displayName = "Callout";
 
-const CalloutContainer = styled.div<{ $variant: AlertVariant }>`
+// ==========================================
+// Styled Components
+// ==========================================
+
+const filterProps = {
+  shouldForwardProp: (prop: string) => !["$variant"].includes(prop),
+};
+
+const CalloutContainer = styled("div", filterProps)<{ $variant: AlertVariant }>`
   display: flex;
   gap: ${({ theme }) => theme.spacing.md};
   padding: ${({ theme }) => theme.spacing.md};
   border-radius: ${({ theme }) => theme.borderRadius.md};
   background-color: ${({ theme, $variant }) => theme.colors.statusBg[$variant]};
+
   border: ${({ theme }) => theme.sizes.component.dividerThin} solid
-    ${({ theme }) => theme.colors.border.divider};
+    ${({ theme, $variant }) => theme.colors.status[$variant]}40;
 `;
 
-const IconWrapper = styled.div<{ $variant: AlertVariant }>`
+const IconWrapper = styled("div", filterProps)<{ $variant: AlertVariant }>`
   ${flexCenter}
   color: ${({ theme, $variant }) => theme.colors.status[$variant]};
   flex-shrink: 0;
+
   & > svg {
     ${({ theme }) => squareIconSize(theme, "md")}
   }
@@ -59,9 +80,12 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing["2xs"]};
+
+  flex: 1;
+  min-width: 0;
 `;
 
-const CalloutTitle = styled.h5`
+const CalloutTitle = styled.div`
   margin: 0;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
@@ -71,5 +95,11 @@ const CalloutTitle = styled.h5`
 const CalloutBody = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.text.secondary};
-  line-height: 1.5;
+
+  & > *:first-of-type {
+    margin-top: 0;
+  }
+  & > *:last-of-type {
+    margin-bottom: 0;
+  }
 `;

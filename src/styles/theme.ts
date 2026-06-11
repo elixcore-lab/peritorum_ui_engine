@@ -1,3 +1,5 @@
+import { FontWeight } from "./types";
+
 const palette = {
   white: "#FFFFFF",
   black: "#000000",
@@ -26,6 +28,8 @@ const palette = {
   red500: "#F43F5E",
   green500: "#10B981",
   orange500: "#F59E0B",
+  rgbBlack: "0, 0, 0",
+  rgbWhite: "255, 255, 255",
 };
 
 const breakpoints = { mobile: "768px", tablet: "1024px" };
@@ -75,17 +79,17 @@ const common = {
   fontWeights: { regular: 400, medium: 500, bold: 700, extraBold: 800 },
   transitions: {
     duration: {
-      fast: "150ms", // 모달, 툴팁, 오버레이 페이드
-      normal: "200ms", // 버튼 호버, 체크박스 트랜지션
-      slow: "400ms", // 아코디언, 드로어 등 큰 영역의 움직임
+      fast: "150ms",
+      normal: "200ms",
+      slow: "400ms",
     },
     function: {
-      default: "cubic-bezier(0.4, 0, 0.2, 1)", // 가장 자연스러운 기본 곡선
+      default: "cubic-bezier(0.4, 0, 0.2, 1)",
       linear: "linear",
       easeInOut: "ease-in-out",
       easeOut: "ease-out",
-      spring: "cubic-bezier(0.16, 1, 0.3, 1)", // 통통 튀는 팝업용 (Alert, Modal)
-      bounce: "cubic-bezier(0.87, 0, 0.13, 1)", // 회전, 아이콘 움직임 (Chevron)
+      spring: "cubic-bezier(0.16, 1, 0.3, 1)",
+      bounce: "cubic-bezier(0.87, 0, 0.13, 1)",
     },
   },
   zIndices: {
@@ -97,63 +101,16 @@ const common = {
     toast: 1600,
     tooltip: 1700,
   },
+  stateOpacity: {
+    subtleBg: "1A", // 약 10% 투명도
+    subtleBorder: "40", // 약 25% 투명도
+    hoverBg: "26", // 약 15% 투명도
+  },
+  stateFilter: {
+    hoverLighten: "brightness(1.1)", // 밝아짐
+    hoverDarken: "brightness(0.9)", // 어두워짐
+  },
 };
-
-// const sizes = {
-//   sidebarWidth: "240px",
-//   sidebarCollapsedWidth: "64px",
-//   headerHeight: "60px",
-//   control: {
-//     xs: "20px",
-//     sm: "32px",
-//     md: "40px",
-//     lg: "48px",
-//   },
-//   icon: {
-//     "2xs": "12px",
-//     xs: "14px",
-//     sm: "16px",
-//     md: "20px",
-//     lg: "24px",
-//     loading: "28px",
-//     xl: "32px",
-//   },
-//   component: {
-//     checkbox: "20px",
-//     radio: "20px",
-//     radioIndicator: "10px",
-//     switch: {
-//       sm: { width: "36px", height: "20px", thumb: "14px", offset: "18px" },
-//       md: { width: "44px", height: "24px", thumb: "18px", offset: "22px" },
-//       lg: { width: "56px", height: "32px", thumb: "26px", offset: "26px" },
-//     },
-//     badgeMinHeight: "24px",
-//     emptyStateHeight: "120px",
-//     textareaMinHeight: "80px",
-//     dropdownMinWidth: "160px",
-//     selectViewportMaxHeight: "250px",
-//     tooltipMaxWidth: "250px",
-//     modalDefaultWidth: "900px",
-//     modalAlertWidth: "400px",
-//     datePickerModalWidth: "420px",
-//     tabFixedWidth: "120px",
-//     calendarDay: "36px",
-//     calendarHeaderLabelWidth: "100px",
-//     virtualRowHeight: 36,
-//     timeWheelHeight: "120px",
-//     timeWheelItemHeight: "40px",
-//     alertIcon: "56px",
-//     eventLineWidth: "16px",
-//     dividerThin: "1px",
-//     dividerMedium: "2px",
-//     overlayBlur: "2px",
-//   },
-//   offset: {
-//     popover: 6,
-//     tooltip: 4,
-//     toastGutter: 8,
-//   },
-// };
 
 export const sizes = {
   sidebarWidth: "240px",
@@ -182,21 +139,15 @@ export const sizes = {
       md: { width: "40px", height: "24px", thumb: "18px", offset: "16px" },
       lg: { width: "48px", height: "32px", thumb: "24px", offset: "16px" },
     },
-
-    // 높이 및 너비 제약
     badgeMinHeight: "24px",
     emptyStateHeight: "120px",
     textareaMinHeight: "80px",
     dropdownMinWidth: "160px",
     selectViewportMaxHeight: "240px",
     tooltipMaxWidth: "240px",
-
-    // 모달 및 팝업
     modalAlertWidth: "400px",
     datePickerModalWidth: "420px",
     modalDefaultWidth: "900px",
-
-    // 기타 특수 컴포넌트
     tabFixedWidth: "120px",
     calendarDay: "32px",
     calendarHeaderLabelWidth: "100px",
@@ -205,8 +156,6 @@ export const sizes = {
     timeWheelItemHeight: "40px",
     alertIcon: "56px",
     eventLineWidth: "16px",
-
-    // 선 두께 (디자인 토큰)
     dividerThin: "1px",
     dividerMedium: "2px",
     overlayBlur: "4px",
@@ -230,7 +179,7 @@ export const darkTheme = {
       modal: palette.slate800,
       input: palette.slate950,
       hover: palette.slate800,
-      overlay: "rgba(0, 0, 0, 0.7)",
+      overlay: `rgba(${palette.rgbBlack}, 0.7)`,
       loadingOverlay: "rgba(11, 12, 16, 0.7)",
       scrollbar: palette.slate600,
       scrollbarHover: palette.brandPurple,
@@ -248,12 +197,12 @@ export const darkTheme = {
       warning: palette.orange500,
     },
     border: {
-      default: "rgba(255, 255, 255, 0.06)",
-      divider: "rgba(255, 255, 255, 0.06)",
-      subtle: "rgba(255, 255, 255, 0.04)",
+      default: `rgba(${palette.rgbWhite}, 0.06)`,
+      divider: `rgba(${palette.rgbWhite}, 0.06)`,
+      subtle: `rgba(${palette.rgbWhite}, 0.04)`,
       strong: palette.slate500,
       focused: palette.brandCyan,
-      inverse: "rgba(255, 255, 255, 0.2)",
+      inverse: `rgba(${palette.rgbWhite}, 0.2)`,
     },
     action: {
       primary: palette.brandBlue,
@@ -277,10 +226,10 @@ export const darkTheme = {
     },
     effect: {
       shadow: {
-        base: "0 2px 8px rgba(0, 0, 0, 0.25)",
-        sm: "0 1px 2px rgba(4, 4, 4, 0.3)",
-        md: "0 4px 6px rgba(0, 0, 0, 0.4)",
-        lg: "0 10px 25px rgba(0, 0, 0, 0.5)",
+        base: `0 2px 8px rgba(${palette.rgbBlack}, 0.25)`,
+        sm: `0 1px 2px rgba(${palette.rgbBlack}, 0.3)`,
+        md: `0 4px 6px rgba(${palette.rgbBlack}, 0.4)`,
+        lg: `0 10px 25px rgba(${palette.rgbBlack}, 0.5)`,
       },
       glow: "0 0 12px rgba(0, 229, 255, 0.4)",
     },
@@ -295,15 +244,16 @@ export const darkTheme = {
       cyan: palette.brandCyan,
       purple: palette.brandPurple,
       gradient: null as string | null,
-      // gradient: `linear-gradient(135deg, ${palette.brandCyan} 0%, ${palette.brandBlue} 50%, ${palette.brandPurple} 100%)`,
+      textColor: palette.white,
+      fontWeight: null as number | null,
     },
     surface: {
       canvas: palette.slate900,
       raised: palette.slate800,
-      sunken: "rgba(0, 0, 0, 0.2)", //palette.slate700,
+      sunken: `rgba(${palette.rgbBlack}, 0.2)`,
       inverse: palette.slate950,
       panel: palette.slate800,
-      overlay: "rgba(0, 0, 0, 0.7)",
+      overlay: `rgba(${palette.rgbBlack}, 0.7)`,
     },
     chart: {
       blue: palette.brandBlue,
@@ -315,9 +265,9 @@ export const darkTheme = {
     },
     utility: {
       transparent: "transparent",
-      shadowColor: "rgba(0, 0, 0, 0.34)",
-      shadowStrongColor: "rgba(0, 0, 0, 0.5)",
-      canvasLine: "rgba(255, 255, 255, 0.22)",
+      shadowColor: `rgba(${palette.rgbBlack}, 0.34)`,
+      shadowStrongColor: `rgba(${palette.rgbBlack}, 0.5)`,
+      canvasLine: `rgba(${palette.rgbWhite}, 0.22)`,
       canvasNode: "rgba(244, 244, 245, 0.86)",
       canvasGlow: "rgba(0, 210, 255, 0.3)",
     },
@@ -340,8 +290,8 @@ export const lightTheme: ThemeType = {
       modal: palette.white,
       input: palette.white,
       hover: palette.gray100,
-      overlay: "rgba(0, 0, 0, 0.4)",
-      loadingOverlay: "rgba(255, 255, 255, 0.7)",
+      overlay: `rgba(${palette.rgbBlack}, 0.4)`,
+      loadingOverlay: `rgba(${palette.rgbWhite}, 0.7)`,
       scrollbar: palette.gray300,
       scrollbarHover: palette.brandBlue,
     },
@@ -363,7 +313,7 @@ export const lightTheme: ThemeType = {
       subtle: palette.gray100,
       strong: palette.gray400,
       focused: palette.brandBlue,
-      inverse: "rgba(255, 255, 255, 0.22)",
+      inverse: `rgba(${palette.rgbWhite}, 0.22)`,
     },
     action: {
       primary: palette.brandBlue,
@@ -387,10 +337,10 @@ export const lightTheme: ThemeType = {
     },
     effect: {
       shadow: {
-        base: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        sm: "0 1px 2px rgba(0, 0, 0, 0.05)",
-        md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+        base: `0 2px 8px rgba(${palette.rgbBlack}, 0.1)`,
+        sm: `0 1px 2px rgba(${palette.rgbBlack}, 0.05)`,
+        md: `0 4px 6px -1px rgba(${palette.rgbBlack}, 0.1)`,
+        lg: `0 10px 15px -3px rgba(${palette.rgbBlack}, 0.1)`,
       },
       glow: "0 0 12px rgba(58, 123, 213, 0.4)",
     },
@@ -405,7 +355,8 @@ export const lightTheme: ThemeType = {
       cyan: palette.brandCyan,
       purple: palette.brandPurple,
       gradient: null as string | null,
-      // gradient: `linear-gradient(135deg, ${palette.brandCyan} 0%, ${palette.brandBlue} 50%, ${palette.brandPurpleDark} 100%)`,
+      textColor: palette.black,
+      fontWeight: null as number | null,
     },
     surface: {
       canvas: palette.gray50,
@@ -413,7 +364,7 @@ export const lightTheme: ThemeType = {
       sunken: palette.gray100,
       inverse: palette.gray900,
       panel: palette.gray800,
-      overlay: "rgba(0, 0, 0, 0.4)",
+      overlay: `rgba(${palette.rgbBlack}, 0.4)`,
     },
     chart: {
       blue: palette.brandBlue,
@@ -425,14 +376,13 @@ export const lightTheme: ThemeType = {
     },
     utility: {
       transparent: "transparent",
-      shadowColor: "rgba(0, 0, 0, 0.12)",
-      shadowStrongColor: "rgba(0, 0, 0, 0.22)",
-      canvasLine: "rgba(255, 255, 255, 0.34)",
-      canvasNode: "rgba(255, 255, 255, 0.9)",
+      shadowColor: `rgba(${palette.rgbBlack}, 0.12)`,
+      shadowStrongColor: `rgba(${palette.rgbBlack}, 0.22)`,
+      canvasLine: `rgba(${palette.rgbWhite}, 0.34)`,
+      canvasNode: `rgba(${palette.rgbWhite}, 0.9)`,
       canvasGlow: "rgba(58, 123, 213, 0.3)",
     },
   },
 };
 
-// 호스트 앱에서 사용할 기본 테마
 export const theme = darkTheme;

@@ -2,8 +2,7 @@ import React, { forwardRef, useId } from "react";
 import styled from "@emotion/styled";
 import { Label } from "./Label";
 import { Text } from "../typography/Text";
-import { fadeIn } from "../../styles/animation";
-import { applyAnimation } from "../../styles/mixins";
+import { fadeIn, applyAnimation, flexColumn } from "../../styles";
 
 export interface FormFieldProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
@@ -39,6 +38,11 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
   ) => {
     const generatedId = useId();
 
+    if (!React.isValidElement(children)) {
+      console.warn("FormField: children must be a valid React Element.");
+      return <>{children}</>;
+    }
+
     const childId = children.props.id || generatedId;
     const errorId = `${childId}-error`;
     const descriptionId = `${childId}-description`;
@@ -46,6 +50,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     const hasError =
       error !== undefined && error !== null && error !== false && error !== "";
 
+    // 에러와 설명을 모두 읽어주도록 조합
     const ariaDescribedBy =
       [hasError ? errorId : undefined, description ? descriptionId : undefined]
         .filter(Boolean)
@@ -56,9 +61,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       if (React.isValidElement(label)) {
         return React.cloneElement(
           label as React.ReactElement<{ htmlFor?: string }>,
-          {
-            htmlFor: childId,
-          },
+          { htmlFor: childId },
         );
       }
       return (
@@ -73,9 +76,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       if (React.isValidElement(description)) {
         return React.cloneElement(
           description as React.ReactElement<{ id?: string }>,
-          {
-            id: descriptionId,
-          },
+          { id: descriptionId },
         );
       }
       return (
@@ -86,7 +87,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     };
 
     const renderError = () => {
-      // 에러가 존재하지만 단순히 true(불리언)라면 에러 박스는 그리지 않고 input 색상만 바꿈
+      // 단순히 에러 상태(boolean)만 넘긴 경우 텍스트 영역 렌더링 생략
       if (!hasError || error === true) return null;
 
       if (React.isValidElement(error)) {
@@ -144,16 +145,18 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
 
 FormField.displayName = "FormField";
 
+// ==========================================
+// Styled Components
+// ==========================================
+
 const FieldWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${flexColumn} /* 💡 mixins 재활용 */
   gap: ${({ theme }) => theme.spacing.sm};
   width: 100%;
 `;
 
 const HeaderWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${flexColumn} /* 💡 mixins 재활용 */
   gap: ${({ theme }) => theme.spacing["2xs"]};
 `;
 

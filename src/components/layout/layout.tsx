@@ -9,7 +9,7 @@ export interface StackProp {
   $justify?: React.CSSProperties["justifyContent"];
   $spacing?: Spacing;
   $wrap?: React.CSSProperties["flexWrap"];
-  $padding?: Spacing | string;
+  $padding?: Spacing;
   $backgroundColor?: string;
   $width?: string;
   $maxWidth?: string;
@@ -30,15 +30,20 @@ const Stack = styled.div<StackProp>`
   align-items: ${({ $align }) => $align};
   justify-content: ${({ $justify }) => $justify};
   flex-wrap: ${({ $wrap }) => $wrap};
+
   gap: ${({ theme, $spacing }) => {
     if (!$spacing) return theme.spacing.sm;
-    return theme.spacing[$spacing as Spacing] || $spacing;
+    return (
+      theme.spacing[$spacing as keyof (typeof theme)["spacing"]] || $spacing
+    );
   }};
 
   flex: ${({ $flex }) => $flex};
   padding: ${({ theme, $padding }) => {
     if (!$padding) return undefined;
-    return theme.spacing[$padding as Spacing] || $padding;
+    return (
+      theme.spacing[$padding as keyof (typeof theme)["spacing"]] || $padding
+    );
   }};
 
   width: ${({ $width, $flex }) => ($flex ? undefined : $width || "100%")};
@@ -60,12 +65,19 @@ const ResponsiveGrid = styled.div<{
   $padding?: Spacing;
 }>`
   display: grid;
+
+  /* theme.spacing[$spacing as keyof (typeof theme)["spacing"]] || $spacing */
+
   gap: ${({ theme, $spacing }) =>
-    $spacing ? theme.spacing[$spacing] : theme.spacing.md};
+    $spacing
+      ? theme.spacing[$spacing as keyof (typeof theme)["spacing"]] || $spacing
+      : theme.spacing.md};
   width: 100%;
   height: ${({ $height }) => $height || "100%"};
   padding: ${({ theme, $padding }) =>
-    $padding ? theme.spacing[$padding] : undefined};
+    $padding
+      ? theme.spacing[$padding as keyof (typeof theme)["spacing"]] || $padding
+      : undefined};
 
   ${({ theme, $columns, $minItemWidth }) => {
     if ($columns) {

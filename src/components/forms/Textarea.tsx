@@ -1,6 +1,7 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
 import { css } from "@emotion/react";
+import { type ControlSize, type FontSize } from "../../styles/types";
 import {
   applyTransition,
   formControlBase,
@@ -8,7 +9,12 @@ import {
 } from "../../styles/mixins";
 import { resolveDisabled } from "../../utils";
 
-export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps extends Omit<
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "size"
+> {
+  size?: ControlSize;
+  fontSize?: FontSize;
   isError?: boolean;
   autoResize?: boolean;
   showCount?: boolean;
@@ -20,6 +26,8 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     {
+      size = "md",
+      fontSize,
       isError = false,
       autoResize = true,
       showCount = false,
@@ -52,13 +60,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const trulyDisabled = resolveDisabled({ disabled });
 
     const [textLength, setTextLength] = useState(
-      String(value || defaultValue || "").length,
+      String(value ?? defaultValue ?? "").length,
     );
 
     const handleResize = () => {
       if (!autoResize || !textareaRef.current) return;
       const textarea = textareaRef.current;
 
+      // scrollHeight 재계산을 위해 일시적으로 auto 설정 (정석적인 패턴 유지)
       textarea.style.height = "auto";
       const nextHeight = textarea.scrollHeight;
       textarea.style.height = `${nextHeight}px`;
@@ -93,12 +102,13 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     };
 
     const isNearLimit = maxLength ? textLength >= maxLength * 0.9 : false;
-    const presentationProps = { className, style };
 
     return (
-      <TextareaWrapper {...presentationProps}>
+      <TextareaWrapper className={className} style={style}>
         <StyledTextarea
           ref={setTextareaRef}
+          $inputSize={size}
+          $fontSize={fontSize}
           $isError={isError}
           $autoResize={autoResize}
           $maxRows={maxRows}
@@ -124,7 +134,26 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
 Textarea.displayName = "Textarea";
 
-// --- Styled Components ---
+// ==========================================
+// Styled Components
+// ==========================================
+
+// 💡 1. DOM 에러(프롭 누수) 완벽 차단
+const textareaFilter = {
+  shouldForwardProp: (prop: string) =>
+    ![
+      "$inputSize",
+      "$fontSize",
+      "$isError",
+      "$autoResize",
+      "$maxRows",
+    ].includes(prop),
+};
+
+const countFilter = {
+  shouldForwardProp: (prop: string) =>
+    !["$isNearLimit", "$disabled"].includes(prop),
+};
 
 const TextareaWrapper = styled.div`
   display: flex;
@@ -133,7 +162,9 @@ const TextareaWrapper = styled.div`
   gap: ${({ theme }) => theme.spacing.xs};
 `;
 
-const StyledTextarea = styled.textarea<{
+const StyledTextarea = styled("textarea", textareaFilter)<{
+  $inputSize: ControlSize | (string & {});
+  $fontSize?: FontSize | (string & {});
   $isError?: boolean;
   $autoResize?: boolean;
   $maxRows?: number;
@@ -141,23 +172,82 @@ const StyledTextarea = styled.textarea<{
   ${({ theme, $isError }) => formControlBase(theme, $isError)}
   ${({ theme }) => customScrollbar(theme)} 
 
-  padding: ${({ theme }) => theme.spacing.base};
+  /* 💡 2. Input 컴포넌트와 시각적 일관성을 맞추기 위한 동적 사이즈 매핑 */
+  ${({ theme, $inputSize, $fontSize }) => {
+    // 안전한 폴백 처리
+    const safeSize = theme.sizes.control[
+      $inputSize as keyof typeof theme.sizes.control
+    ]
+      ? $inputSize
+      : "md";
+    const refSize = safeSize as "xs" | "sm" | "md" | "lg" | "xl";
+
+    const paddingY = {
+      xs: theme.spacing["2xs"],
+      sm: theme.spacing.xs,
+      md: theme.spacing.sm,
+      lg: theme.spacing.md,
+      xl: theme.spacing.lg,
+    }[refSize];
+
+    const paddingX = {
+      xs: theme.spacing.sm,
+      sm: theme.spacing.base,
+      md: theme.spacing.md,
+      lg: theme.spacing.md,
+      xl: theme.spacing.lg,
+    }[refSize];
+
+    const finalFontSize = $fontSize
+      ? theme.fontSizes[$fontSize as keyof typeof theme.fontSizes] || $fontSize
+      : {
+          xs: theme.fontSizes["2xs"],
+          sm: theme.fontSizes.sm,
+          md: theme.fontSizes.base,
+          lg: theme.fontSizes.lg,
+          xl: theme.fontSizes.xl,
+        }[refSize];
+
+    return css`
+      padding: ${paddingY} ${paddingX};
+      font-size: ${finalFontSize};
+    `;
+  }}
+
   line-height: 1.5;
   resize: ${({ $autoResize }) => ($autoResize ? "none" : "vertical")};
   overflow-y: ${({ $autoResize }) => ($autoResize ? "hidden" : "auto")};
 
-  ${({ theme, $maxRows }) =>
-    $maxRows &&
-    css`
-      max-height: calc(${$maxRows} * 1.5em + (${theme.spacing.base} * 2));
-    `}
+  ${({ theme, $maxRows, $inputSize }) => {
+    if (!$maxRows) return null;
+
+    // 💡 3. 하드코딩된 패딩 연산 대신, 동적 연산을 통해 max-height를 정확히 제어
+    const safeSize = theme.sizes.control[
+      $inputSize as keyof typeof theme.sizes.control
+    ]
+      ? $inputSize
+      : "md";
+    const refSize = safeSize as "xs" | "sm" | "md" | "lg" | "xl";
+
+    const paddingY = {
+      xs: theme.spacing["2xs"],
+      sm: theme.spacing.xs,
+      md: theme.spacing.sm,
+      lg: theme.spacing.md,
+      xl: theme.spacing.lg,
+    }[refSize];
+
+    return css`
+      max-height: calc(${$maxRows} * 1.5em + (${paddingY} * 2));
+    `;
+  }}
 
   &::placeholder {
     color: ${({ theme }) => theme.colors.text.disabled};
   }
 `;
 
-const TextareaCount = styled.div<{
+const TextareaCount = styled("div", countFilter)<{
   $isNearLimit: boolean;
   $disabled?: boolean;
 }>`

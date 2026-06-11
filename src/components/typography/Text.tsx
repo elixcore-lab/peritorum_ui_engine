@@ -23,7 +23,7 @@ export interface TextProps extends Omit<
   variant?: TextVariant;
   size?: FontSize;
   weight?: FontWeight;
-  color?: TextColorIntent | (string & {});
+  color?: TextColorIntent;
   align?: TextAlign;
   ellipsis?: boolean;
   clamp?: number;
@@ -92,7 +92,6 @@ const filterProps = {
     ].includes(prop),
 };
 
-// 💡 weight의 굴레를 벗어던지고, 오직 '기본 크기'만 제안하는 가벼운 매핑
 const variantSizeMap: Record<TextVariant, FontSize> = {
   h1: "4xl",
   h2: "3xl",
@@ -110,7 +109,7 @@ const StyledText = styled("span", filterProps)<{
   $variant?: TextVariant;
   $size?: FontSize;
   $weight?: FontWeight;
-  $color: TextColorIntent | (string & {});
+  $color: TextColorIntent;
   $align: TextAlign;
   $ellipsis: boolean;
   $clamp?: number;
@@ -123,15 +122,16 @@ const StyledText = styled("span", filterProps)<{
   white-space: ${({ $ellipsis }) => ($ellipsis ? undefined : "pre-wrap")};
 
   ${({ theme, $variant, $size, $weight }) => {
-    // 💡 크기는 명시된 사이즈 > Variant 기본 사이즈 > base 순서로 적용
     const finalSize = $size || ($variant ? variantSizeMap[$variant] : "base");
-
-    // 💡 굵기는 더 이상 Variant의 눈치를 보지 않습니다. 명시 안 하면 무조건 regular!
     const finalWeight = $weight || "regular";
 
     return css`
-      font-size: ${theme.fontSizes[finalSize]};
-      font-weight: ${theme.fontWeights[finalWeight]};
+      font-size: ${theme.fontSizes[finalSize as keyof typeof theme.fontSizes] ||
+      finalSize};
+
+      font-weight: ${theme.fontWeights[
+        finalWeight as keyof typeof theme.fontWeights
+      ] || finalWeight};
     `;
   }}
 

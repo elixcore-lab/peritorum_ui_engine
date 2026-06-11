@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import styled from "@emotion/styled";
 import {
   type AppearanceVariant,
-  type ComponentColor,
+  type ColorVariant,
   type ControlSize,
 } from "../../styles/types";
 import {
@@ -26,7 +26,7 @@ export interface BadgeProps extends Omit<
   /** * 뱃지의 색상 (기본값: "default")
    * - 테마 토큰 (primary, danger, offline 등) 또는 Hex Color (#RRGGBB) 지원
    */
-  color?: ComponentColor;
+  color?: ColorVariant;
   /** 뱃지의 크기 (기본값: "sm") */
   size?: ControlSize;
 }
@@ -58,7 +58,7 @@ Badge.displayName = "Badge";
 
 const StyledBadge = styled.span<{
   $variant: AppearanceVariant;
-  $color: ComponentColor;
+  $color: ColorVariant;
   $size: ControlSize;
 }>`
   ${({ theme }) => inlineComponentBase(theme)};
