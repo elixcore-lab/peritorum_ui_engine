@@ -17,11 +17,17 @@ import { resolveDisabled } from "../../utils";
 import { Spinner } from "../feedback/Spinner";
 import { useUiConfig } from "../../ConfigProvider";
 
+/**
+ * ComboBox에서 선택 가능한 단일 옵션 모델입니다.
+ */
 export interface ComboBoxOption {
   value: string;
   label: string;
 }
 
+/**
+ * 검색 가능한 단일 선택 ComboBox의 옵션, 값, 상태, 크기 토큰을 정의합니다.
+ */
 export interface ComboBoxProps {
   options: ComboBoxOption[];
   value?: string;
@@ -35,6 +41,12 @@ export interface ComboBoxProps {
   width?: string;
 }
 
+/**
+ * input 검색과 popover 선택 목록을 결합한 단일 선택 컴포넌트입니다.
+ *
+ * Radix Popover를 사용해 listbox를 렌더링하고, loading/disabled 상태는
+ * `resolveDisabled`로 통합합니다.
+ */
 export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
   (
     {
@@ -57,6 +69,7 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
     const [searchTerm, setSearchTerm] = useState("");
 
     const trulyDisabled = resolveDisabled({ disabled, loading: isLoading });
+    const isPopoverOpen = open && !trulyDisabled;
 
     const filteredOptions = useMemo(() => {
       return options.filter((opt) =>
@@ -75,10 +88,7 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
 
     return (
       <ComboBoxWrapper $width={width}>
-        <PopoverPrimitive.Root
-          open={open && !trulyDisabled}
-          onOpenChange={setOpen}
-        >
+        <PopoverPrimitive.Root open={isPopoverOpen} onOpenChange={setOpen}>
           <PopoverPrimitive.Anchor asChild>
             <InputContainer>
               <InputIconWrapper $position="left" $size={size}>
@@ -97,7 +107,7 @@ export const ComboBox = forwardRef<HTMLInputElement, ComboBoxProps>(
                 disabled={trulyDisabled}
                 data-disabled={trulyDisabled ? "" : undefined}
                 role="combobox"
-                aria-expanded={open}
+                aria-expanded={isPopoverOpen}
                 aria-controls="combobox-listbox"
               />
 
