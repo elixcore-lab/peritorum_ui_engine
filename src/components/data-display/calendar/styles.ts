@@ -203,8 +203,8 @@ export const HighlightBar = styled.div`
   position: absolute;
   top: ${({ theme }) =>
     `calc((${theme.sizes.component.timeWheelHeight} - ${theme.sizes.component.timeWheelItemHeight}) / 2)`};
-  left: 0;
-  right: 0;
+  left: ${({ theme }) => theme.spacing.none};
+  right: ${({ theme }) => theme.spacing.none};
   height: ${({ theme }) => theme.sizes.component.timeWheelItemHeight};
   background-color: ${({ theme }) => theme.colors.background.hover};
   border-top: ${({ theme }) => theme.sizes.component.dividerThin} solid
@@ -263,7 +263,7 @@ export const TabItem = styled.div<{
   align-items: center;
   justify-content: center;
   gap: ${({ theme }) => theme.sizes.component.dividerMedium};
-  padding: ${({ theme }) => theme.spacing.sm} 0;
+  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.none}`};
   cursor: ${({ $isDisabled }) => ($isDisabled ? "not-allowed" : "pointer")};
   border-radius: ${({ theme }) => theme.borderRadius.md};
   background-color: ${({ $isActive, theme }) =>
