@@ -7,7 +7,7 @@ import { useUiConfig } from "../../ConfigProvider";
 /**
  * EmptyState가 표시할 아이콘, 제목, 설명, 후속 액션을 정의합니다.
  *
- * 모든 간격은 내부 margin이 아니라 flex gap으로 제어되며, 컨테이너는 표준 div
+ * 모든 간격은 자체 외부 여백이 아니라 flex gap으로 제어되며, 컨테이너는 표준 div
  * 속성을 상속합니다.
  */
 export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
