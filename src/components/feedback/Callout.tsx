@@ -91,7 +91,7 @@ const ContentWrapper = styled.div`
   gap: ${({ theme }) => theme.spacing["2xs"]};
 
   flex: 1;
-  min-width: 0;
+  min-width: ${({ theme }) => theme.spacing.none};
 `;
 
 const CalloutTitle = styled.div`
