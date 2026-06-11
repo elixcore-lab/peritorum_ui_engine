@@ -9,9 +9,14 @@ import {
 } from "../../styles/mixins";
 import { resolveDisabled } from "../../utils";
 
+/**
+ * Textarea의 크기, 상태, 자동 높이 조절, 글자 수 표시 옵션을 정의합니다.
+ *
+ * 디자인 시스템 규칙상 inline style 유입을 막기 위해 native `style` prop은 제외합니다.
+ */
 export interface TextareaProps extends Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-  "size"
+  "size" | "style"
 > {
   size?: ControlSize;
   fontSize?: FontSize;
@@ -23,6 +28,12 @@ export interface TextareaProps extends Omit<
   onSubmitOnEnter?: () => void;
 }
 
+/**
+ * 여러 줄 텍스트 입력을 위한 form control 컴포넌트입니다.
+ *
+ * 자동 높이 조절, 최대 행 수 제한, Enter submit 패턴, 글자 수 카운트를 지원하며
+ * ref는 실제 textarea 엘리먼트로 전달됩니다.
+ */
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     {
@@ -41,7 +52,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       onKeyDown,
       onSubmitOnEnter,
       className,
-      style,
       ...props
     },
     ref,
@@ -104,7 +114,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const isNearLimit = maxLength ? textLength >= maxLength * 0.9 : false;
 
     return (
-      <TextareaWrapper className={className} style={style}>
+      <TextareaWrapper className={className}>
         <StyledTextarea
           ref={setTextareaRef}
           $inputSize={size}
