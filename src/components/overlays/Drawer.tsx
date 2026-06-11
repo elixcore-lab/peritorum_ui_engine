@@ -24,7 +24,7 @@ import { Text } from "../typography/Text";
 export interface DrawerProps
   extends Omit<
     React.ComponentPropsWithoutRef<typeof Dialog.Content>,
-    "children" | "title"
+    "children" | "style" | "title"
   > {
   children: React.ReactNode;
   description?: React.ReactNode;
