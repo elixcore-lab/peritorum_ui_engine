@@ -128,7 +128,7 @@ const StyledText = styled("span", filterProps)<{
   $isInlineToken: boolean;
   $fullWidth: boolean;
 }>`
-  padding: 0;
+  padding: ${({ theme }) => theme.spacing.none};
   text-align: ${({ $align }) => $align};
   white-space: ${({ $ellipsis }) => ($ellipsis ? undefined : "pre-wrap")};
 
@@ -152,7 +152,7 @@ const StyledText = styled("span", filterProps)<{
 
     if (colorStr === "brand") {
       return theme.colors.brand.gradient
-        ? "transparent"
+        ? theme.colors.utility.transparent
         : theme.colors.brand.cyan || theme.colors.brand.primary;
     }
 
