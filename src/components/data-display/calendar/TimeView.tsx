@@ -9,6 +9,9 @@ const TP = "ui.component.calendar";
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTES_SECONDS = Array.from({ length: 60 }, (_, i) => i);
 
+/**
+ * TimeView가 범위 선택 상태와 시/분/초 변경 콜백을 렌더링하기 위해 필요한 props입니다.
+ */
 interface TimeViewProps {
   selectionMode: SelectionMode;
   editingTarget: "start" | "end";
@@ -19,6 +22,11 @@ interface TimeViewProps {
   onTimeChange: (type: "h" | "m" | "s", value: number) => void;
 }
 
+/**
+ * 선택된 날짜의 시/분/초를 조정하는 time picker 하위 뷰입니다.
+ *
+ * 범위 모드에서는 시작/종료 탭을 제공하고, 각 wheel column은 TimeColumn으로 분리합니다.
+ */
 export const TimeView = ({
   selectionMode,
   editingTarget,
