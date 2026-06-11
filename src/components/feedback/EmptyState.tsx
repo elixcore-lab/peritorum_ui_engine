@@ -1,10 +1,15 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import styled from "@emotion/styled";
 import { Inbox } from "lucide-react";
-import { useTheme } from "@emotion/react";
 import { flexCenter, flexColumn, squareIconSize } from "../../styles/mixins";
 import { useUiConfig } from "../../ConfigProvider";
 
+/**
+ * EmptyState가 표시할 아이콘, 제목, 설명, 후속 액션을 정의합니다.
+ *
+ * 모든 간격은 내부 margin이 아니라 flex gap으로 제어되며, 컨테이너는 표준 div
+ * 속성을 상속합니다.
+ */
 export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode;
   title?: string;
@@ -12,29 +17,37 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   action?: React.ReactNode;
 }
 
-export const EmptyState = ({
-  icon,
-  title,
-  description,
-  action,
-  ...props
-}: EmptyStateProps) => {
-  const theme = useTheme();
-  const { t } = useUiConfig();
+/**
+ * 데이터가 없거나 결과가 비어 있는 상태를 일관되게 표현하는 feedback 컴포넌트입니다.
+ *
+ * 기본 문구는 i18n dictionary를 사용하며, 커스텀 action 슬롯을 통해 다음 행동을
+ * 연결할 수 있습니다.
+ */
+export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
+  ({ icon, title, description, action, ...props }, ref) => {
+    const { t } = useUiConfig();
 
-  return (
-    <Container {...props}>
-      <IconWrapper>{icon || <Inbox />}</IconWrapper>
-      <Title>{title || t("common.noData")}</Title>
-      {description && <Description>{description}</Description>}
-      {action && <ActionWrapper>{action}</ActionWrapper>}
-    </Container>
-  );
-};
+    return (
+      <Container ref={ref} {...props}>
+        <IconWrapper>{icon || <Inbox />}</IconWrapper>
+        <ContentWrapper>
+          <Title role="heading" aria-level={4}>
+            {title || t("common.noData")}
+          </Title>
+          {description && <Description>{description}</Description>}
+        </ContentWrapper>
+        {action && <ActionWrapper>{action}</ActionWrapper>}
+      </Container>
+    );
+  },
+);
+
+EmptyState.displayName = "EmptyState";
 
 const Container = styled.div`
   ${flexColumn}
   ${flexCenter}
+  gap: ${({ theme }) => theme.spacing.md};
   width: 100%;
   min-height: ${({ theme }) => theme.sizes.component.emptyStateHeight};
   padding: ${({ theme }) => theme.spacing.xl};
@@ -45,27 +58,30 @@ const Container = styled.div`
 
 const IconWrapper = styled.div`
   color: ${({ theme }) => theme.colors.text.disabled};
-  margin-bottom: ${({ theme }) => theme.spacing.md};
 
   & > svg {
     ${({ theme }) => squareIconSize(theme, "xl")}
   }
 `;
 
-const Title = styled.h4`
-  margin: 0;
+const ContentWrapper = styled.div`
+  ${flexColumn}
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  max-width: ${({ theme }) => theme.sizes.component.modalAlertWidth};
+`;
+
+const Title = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.md};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
-const Description = styled.p`
-  margin: ${({ theme }) => theme.spacing.sm} 0 0 0;
+const Description = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   color: ${({ theme }) => theme.colors.text.disabled};
-  max-width: 400px;
 `;
 
 const ActionWrapper = styled.div`
-  margin-top: ${({ theme }) => theme.spacing.lg};
+  ${flexCenter}
 `;
