@@ -8,6 +8,7 @@ import {
   applyAnimation,
   applyTransition,
   customScrollbar,
+  disabledState,
   focusRing,
   textEllipsis,
   squareIconSize,
@@ -18,6 +19,12 @@ import { resolveDisabled } from "../../utils";
 
 export type TabLayoutMode = "fit" | "scroll" | "fixed";
 
+/**
+ * Tabs에서 렌더링할 단일 tab의 식별자, 라벨, 아이콘, 콘텐츠를 정의합니다.
+ *
+ * id는 Radix value로 사용되며, disabled 상태는 `resolveDisabled`를 거쳐 trigger에
+ * 전달됩니다.
+ */
 export interface TabItem {
   id: string;
   label?: string | React.ReactNode;
@@ -26,6 +33,12 @@ export interface TabItem {
   content: React.ReactNode;
 }
 
+/**
+ * Tabs root의 제어/비제어 값과 레이아웃 모드를 정의합니다.
+ *
+ * Radix Tabs 속성을 상속하되, items 기반 렌더링을 보장하기 위해 value 관련 핵심
+ * props는 디자인 시스템 API로 재정의합니다.
+ */
 export interface TabsProps extends Omit<
   TabsPrimitive.TabsProps,
   "defaultValue" | "value" | "onValueChange"
@@ -41,6 +54,12 @@ export interface TabsProps extends Omit<
 
 // --- Component ---
 
+/**
+ * 화면 안에서 관련 콘텐츠 패널을 전환하는 Radix 기반 Tabs 컴포넌트입니다.
+ *
+ * fit, scroll, fixed 레이아웃을 지원하고, 비활성 탭의 mount 정책은 keepAlive로
+ * 제어합니다.
+ */
 export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
   (
     {
@@ -127,7 +146,6 @@ const StyledTabsList = styled(TabsPrimitive.List)<{
   width: 100%;
   border-bottom: ${({ theme }) => theme.sizes.component.dividerThin} solid
     ${({ theme }) => theme.colors.border.divider};
-  margin: 0;
   padding: 0;
   list-style: none;
   background-color: ${({ theme }) => theme.colors.background.surface};
@@ -140,8 +158,8 @@ const StyledTabsList = styled(TabsPrimitive.List)<{
           scrollbar-width: none;
 
           &::-webkit-scrollbar {
-            width: 0;
-            height: 0;
+            width: ${theme.spacing.none};
+            height: ${theme.spacing.none};
             background: ${theme.colors.utility.transparent};
           }
         `
@@ -211,10 +229,7 @@ const StyledTabsTrigger = styled(TabsPrimitive.Trigger)<{
     ${({ theme }) => activeTabUnderline(theme)}
   }
 
-  &[data-disabled] {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  ${({ theme }) => disabledState(theme)}
 `;
 
 const TabLabel = styled.span`
