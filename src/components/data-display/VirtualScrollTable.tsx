@@ -22,12 +22,21 @@ import {
 import { useUiConfig } from "../../ConfigProvider";
 import { useVirtualScroll } from "../../hooks/useVirtualScroll";
 
-// --- Types (동일) ---
+/**
+ * 셀 내부 텍스트에 적용할 폰트 관련 토큰 또는 호스트 앱 제공 값을 정의합니다.
+ */
 export interface FontItem {
   name?: string;
   size?: string;
   color?: string;
 }
+
+/**
+ * 테이블 셀별 시각 스타일 override를 정의합니다.
+ *
+ * 공통 theme token 사용을 권장하며, 컬럼 단위로 header/body 스타일을 분리할 수
+ * 있습니다.
+ */
 export interface CellStyleProps {
   font?: FontItem;
   background?: string;
@@ -35,6 +44,10 @@ export interface CellStyleProps {
   textAlign?: "center" | "left" | "right";
   borderColor?: string;
 }
+
+/**
+ * VirtualScrollTable의 컬럼 렌더링, 정렬, 셀 스타일 정책을 정의합니다.
+ */
 export interface ColumnDef<T> {
   id: string;
   header: React.ReactNode;
@@ -46,6 +59,12 @@ export interface ColumnDef<T> {
   bodyStyle?: CellStyleProps;
 }
 
+/**
+ * 대용량 목록을 가상 스크롤로 렌더링하기 위한 테이블 props입니다.
+ *
+ * 정렬, 선택 행, 무한 스크롤 이벤트, 셀 클릭 이벤트를 지원하며 rowHeight는
+ * theme의 virtualRowHeight를 기본값으로 사용합니다.
+ */
 export interface VirtualScrollTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
@@ -73,6 +92,12 @@ export interface VirtualScrollTableProps<T> {
 
 const DEFAULT_ALIGN = "center";
 
+/**
+ * 많은 행을 가진 데이터를 고정 헤더와 가상 스크롤 body로 렌더링하는 table 컴포넌트입니다.
+ *
+ * 정렬 로직은 SortUtils를 재사용하고, viewport 계산은 useVirtualScroll hook에
+ * 위임합니다.
+ */
 export const VirtualScrollTable = <T,>({
   data,
   columns,
@@ -96,6 +121,7 @@ export const VirtualScrollTable = <T,>({
   const theme = useTheme();
   const headerRef = useRef<HTMLDivElement>(null);
   const resolvedRowHeight = rowHeight ?? theme.sizes.component.virtualRowHeight;
+  const scrollEndThreshold = theme.sizes.offset.toastGutter;
 
   const [sortConfigs, setSortConfigs] = useState<SortConfig[]>([]);
   const precalculatedStyles = useMemo(
@@ -144,10 +170,10 @@ export const VirtualScrollTable = <T,>({
       // 스크롤 시작/끝 감지 로직 유지
       const { scrollTop: top, scrollHeight, clientHeight } = e.currentTarget;
       if (top === 0 && onScrollStart) onScrollStart();
-      else if (scrollHeight - top <= clientHeight + 10 && onScrollEnd)
+      else if (scrollHeight - top <= clientHeight + scrollEndThreshold && onScrollEnd)
         onScrollEnd();
     },
-    [handleScroll, onScrollStart, onScrollEnd],
+    [handleScroll, onScrollStart, onScrollEnd, scrollEndThreshold],
   );
 
   const onHandleSort = useCallback(
@@ -230,7 +256,7 @@ export const VirtualScrollTable = <T,>({
       >
         {isLoading && (
           <LoadingOverlay>
-            <Spinner size={theme.sizes.icon.md} />
+            <Spinner size="md" />
           </LoadingOverlay>
         )}
         {sortedData.length === 0 ? (
@@ -331,7 +357,10 @@ const Row = styled.div<{
   display: flex;
   min-width: 100%;
   width: max-content;
-  height: ${({ $rowHeight }) => ($rowHeight ? `${$rowHeight}px` : "auto")};
+  height: ${({ $rowHeight, theme }) =>
+    $rowHeight
+      ? `calc(${theme.sizes.component.dividerThin} * ${$rowHeight})`
+      : "auto"};
   background-color: ${({ $active, theme }) =>
     $active ? theme.colors.statusBg.info : theme.colors.utility.transparent};
   cursor: ${({ $isHeader }) => ($isHeader ? "default" : "pointer")};
@@ -340,7 +369,7 @@ const Row = styled.div<{
   &:hover {
     background-color: ${({ $isHeader, $active, theme }) =>
       $isHeader
-        ? "transparent"
+        ? theme.colors.utility.transparent
         : $active
           ? theme.colors.statusBg.info
           : theme.colors.background.hover};
@@ -423,7 +452,8 @@ const EmptyCell = styled.div`
 `;
 
 const SpacerDiv = styled.div<{ $height: number }>`
-  height: ${({ $height }) => `${$height}px`};
+  height: ${({ $height, theme }) =>
+    `calc(${theme.sizes.component.dividerThin} * ${$height})`};
 `;
 
 const LoadingOverlay = styled.div`
