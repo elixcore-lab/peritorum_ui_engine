@@ -9,9 +9,11 @@ import { flexCenter, squareComponentSize } from "../../styles/mixins";
  *
  * Radix Avatar Root 속성을 상속하며, 크기는 theme control size token을 사용합니다.
  */
-export interface AvatarProps extends React.ComponentPropsWithoutRef<
-  typeof AvatarPrimitive.Root
-> {
+export interface AvatarProps
+  extends Omit<
+    React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>,
+    "style"
+  > {
   src?: string;
   alt?: string;
   fallback: string;
