@@ -1,11 +1,23 @@
 import React, { forwardRef } from "react";
 import styled from "@emotion/styled";
 
+/**
+ * Divider 컴포넌트가 지원하는 방향과 라벨 콘텐츠를 정의합니다.
+ *
+ * 라벨이 있는 구분선은 수평 방향에서만 렌더링되며, 외부 간격은 부모 Layout의
+ * gap 또는 padding으로 제어해야 합니다.
+ */
 export interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: "horizontal" | "vertical";
   children?: React.ReactNode;
 }
 
+/**
+ * 레이아웃 사이의 시각적 구분을 제공하는 테마 기반 구분선입니다.
+ *
+ * `orientation`에 따라 수평/수직 렌더링을 지원하고, 표준 div 속성과 ref를
+ * 그대로 전달할 수 있습니다.
+ */
 export const Divider = forwardRef<HTMLDivElement, DividerProps>(
   ({ orientation = "horizontal", children, ...props }, ref) => {
     if (children && orientation === "horizontal") {
@@ -42,7 +54,6 @@ Divider.displayName = "Divider";
 const StyledDivider = styled.div<{ $orientation: "horizontal" | "vertical" }>`
   background-color: ${({ theme }) => theme.colors.border.divider};
   flex-shrink: 0;
-  margin: 0;
 
   ${({ $orientation, theme }) =>
     $orientation === "horizontal"
