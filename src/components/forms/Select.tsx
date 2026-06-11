@@ -310,7 +310,7 @@ const ItemContentWrapper = styled.div`
   align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
   flex: 1;
-  min-width: 0;
+  min-width: ${({ theme }) => theme.spacing.none};
 `;
 
 const ItemTextLayout = styled.div`
