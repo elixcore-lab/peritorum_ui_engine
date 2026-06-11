@@ -1,10 +1,14 @@
 import React, { forwardRef } from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react";
 import { type ControlSize } from "../../styles/types";
 import { flexCenter, squareComponentSize } from "../../styles/mixins";
 
+/**
+ * Avatar가 표시할 이미지, 대체 텍스트, fallback, 크기 토큰을 정의합니다.
+ *
+ * Radix Avatar Root 속성을 상속하며, 크기는 theme control size token을 사용합니다.
+ */
 export interface AvatarProps extends React.ComponentPropsWithoutRef<
   typeof AvatarPrimitive.Root
 > {
@@ -14,6 +18,12 @@ export interface AvatarProps extends React.ComponentPropsWithoutRef<
   size?: ControlSize;
 }
 
+/**
+ * 사용자 또는 엔티티의 시각적 식별자를 표시하는 Radix 기반 Avatar 컴포넌트입니다.
+ *
+ * 이미지 로드 실패 시 fallback 텍스트를 표시하며, 모든 크기/색상은 theme token과
+ * 공통 mixin으로 계산됩니다.
+ */
 export const Avatar = forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
   AvatarProps
@@ -21,7 +31,7 @@ export const Avatar = forwardRef<
   return (
     <AvatarRoot ref={ref} $size={size} {...props}>
       <AvatarImage src={src} alt={alt} />
-      <AvatarFallback delayMs={600}>{fallback}</AvatarFallback>
+      <AvatarFallback>{fallback}</AvatarFallback>
     </AvatarRoot>
   );
 });
@@ -44,13 +54,7 @@ const AvatarRoot = styled(AvatarPrimitive.Root, filterProps)<{
   border: ${({ theme }) => theme.sizes.component.dividerThin} solid
     ${({ theme }) => theme.colors.border.divider};
 
-  ${({ theme, $size }) =>
-    $size === "xl"
-      ? css`
-          width: calc(${theme.sizes.control.lg} + ${theme.spacing.md});
-          height: calc(${theme.sizes.control.lg} + ${theme.spacing.md});
-        `
-      : squareComponentSize(theme, $size)}
+  ${({ theme, $size }) => squareComponentSize(theme, $size)}
 `;
 
 const AvatarImage = styled(AvatarPrimitive.Image)`
@@ -64,7 +68,6 @@ const AvatarFallback = styled(AvatarPrimitive.Fallback)`
   width: 100%;
   height: 100%;
   ${flexCenter}
-  /* background-color: ${({ theme }) => theme.colors.brand.accentSoft}; */
   color: ${({ theme }) => theme.colors.brand.cyan};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
