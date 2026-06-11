@@ -354,7 +354,7 @@ const ClearButton = styled.button<{ $inputSize: ControlSize | (string & {}) }>`
   ${resetButton}
   ${flexCenter}
   position: absolute;
-  top: 0;
+  top: ${({ theme }) => theme.spacing.none};
 
   right: ${({ theme, $inputSize }) =>
     theme.sizes.control[$inputSize as keyof typeof theme.sizes.control] ||
