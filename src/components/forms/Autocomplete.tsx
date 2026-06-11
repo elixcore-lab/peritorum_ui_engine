@@ -41,7 +41,7 @@ export interface ComboboxOption {
  */
 export interface AutocompleteProps extends Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  "size" | "onSelect"
+  "onSelect" | "size" | "style"
 > {
   options: ComboboxOption[];
   isLoading?: boolean;
