@@ -109,6 +109,9 @@
         "searching": "검색 중...",
         "noResults": "일치하는 결과가 없습니다."
       },
+      "slider": {
+        "thumb": "슬라이더 핸들"
+      },
       "modal": {
         "title": "모달",
         "description": "모달 대화상자입니다.",

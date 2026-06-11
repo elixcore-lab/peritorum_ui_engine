@@ -109,6 +109,9 @@
         "searching": "Searching...",
         "noResults": "No matching results."
       },
+      "slider": {
+        "thumb": "Slider thumb"
+      },
       "modal": {
         "title": "Modal",
         "description": "Modal dialog.",
