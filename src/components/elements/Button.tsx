@@ -28,6 +28,12 @@ import { Spinner } from "../feedback/Spinner";
 type IconLayout = "inline" | "edge";
 type TextAlign = "left" | "center" | "right";
 
+/**
+ * Button의 시각 variant, 색상 intent, 크기, 아이콘 배치, 로딩 상태를 정의합니다.
+ *
+ * 표준 button 속성을 상속하며, `href` 또는 `as="a"` 사용 시 anchor처럼 동작합니다.
+ * 간격과 크기는 theme token 및 공통 mixin으로 계산됩니다.
+ */
 export interface ButtonProps extends Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   "color"
@@ -51,6 +57,12 @@ export interface ButtonProps extends Omit<
   fontSize?: FontSize;
 }
 
+/**
+ * 디자인 시스템의 기본 action 컴포넌트입니다.
+ *
+ * 버튼/링크 렌더링, 로딩 상태, 좌우 아이콘, icon-only 버튼을 하나의 API로 제공하며
+ * `resolveDisabled`, `controlSizeBase`, `componentColorStyle` 컨벤션을 따릅니다.
+ */
 export const Button = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
   ButtonProps
