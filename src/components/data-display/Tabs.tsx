@@ -202,13 +202,13 @@ const StyledTabsTrigger = styled(TabsPrimitive.Trigger)<{
       case "fit":
         return css`
           flex: 1;
-          min-width: 0;
+          min-width: ${theme.spacing.none};
         `;
       case "fixed":
         return css`
           flex: none;
           width: ${$fixedWidth || theme.sizes.component.tabFixedWidth};
-          min-width: 0;
+          min-width: ${theme.spacing.none};
         `;
       default:
         return css`
