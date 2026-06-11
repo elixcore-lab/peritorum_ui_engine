@@ -80,6 +80,7 @@ const common = {
   lineHeights: {
     tight: 1.2,
     normal: 1.4,
+    comfortable: 1.5,
     relaxed: 1.6,
   },
   transitions: {
