@@ -1,14 +1,35 @@
 import { useMemo } from "react";
 import { Toaster, ToasterProps } from "react-hot-toast";
-import { useTheme } from "@emotion/react";
+import { css, Global, useTheme } from "@emotion/react";
+
+type ToastOptions = NonNullable<ToasterProps["toastOptions"]>;
+type ToastVariantOptions = NonNullable<ToastOptions["success"]>;
+type ToastOptionsWithoutInlineStyle = Omit<
+  ToastOptions,
+  "error" | "loading" | "style" | "success"
+> & {
+  success?: Omit<ToastVariantOptions, "style">;
+  error?: Omit<ToastVariantOptions, "style">;
+  loading?: Omit<ToastVariantOptions, "style">;
+};
+
+const TOAST_CLASS_NAME = "peritorum-ui-toast";
+const TOAST_SUCCESS_CLASS_NAME = "peritorum-ui-toast-success";
+const TOAST_ERROR_CLASS_NAME = "peritorum-ui-toast-error";
+
+const mergeClassNames = (...classNames: Array<string | undefined>) =>
+  classNames.filter(Boolean).join(" ");
 
 /**
  * 전역 ToastProvider가 react-hot-toast에 전달할 옵션입니다.
  *
- * 기본 스타일은 theme token으로 병합되며, 호스트 앱은 ToasterProps를 그대로
- * 오버라이드할 수 있습니다.
+ * 기본 스타일은 Emotion Global class로 제공되며, inline style 유입을 막기 위해
+ * toastOptions/style 계열 prop은 제외합니다.
  */
-export interface ToastProviderProps extends ToasterProps {}
+export interface ToastProviderProps
+  extends Omit<ToasterProps, "containerStyle" | "toastOptions"> {
+  toastOptions?: ToastOptionsWithoutInlineStyle;
+}
 
 /**
  * 디자인 시스템 theme을 적용한 전역 toast host입니다.
@@ -27,45 +48,40 @@ export const ToastProvider = ({
 
   const mergedToastOptions = useMemo(
     () => ({
-      // 호스트 앱에서 넘겨준 toastOptions와 우리 엔진의 기본 스타일을 병합
       ...toastOptions,
-      style: {
-        backgroundColor: theme.colors.background.modal,
-        color: theme.colors.text.primary,
-        border: `${theme.sizes.component.dividerThin} solid ${theme.colors.border.divider}`,
-        borderRadius: theme.borderRadius.md,
-        boxShadow: theme.colors.effect.shadow.lg,
-        fontSize: theme.fontSizes.sm,
-        padding: `${theme.spacing.sm} ${theme.spacing.base}`,
-        fontWeight: theme.fontWeights.medium,
-        ...toastOptions?.style,
-      },
+      className: mergeClassNames(TOAST_CLASS_NAME, toastOptions?.className),
       success: {
         ...toastOptions?.success,
+        className: mergeClassNames(
+          TOAST_CLASS_NAME,
+          TOAST_SUCCESS_CLASS_NAME,
+          toastOptions?.success?.className,
+        ),
         iconTheme: {
           primary: theme.colors.status.success,
           secondary: theme.colors.text.inverse,
           ...toastOptions?.success?.iconTheme,
         },
-        style: {
-          borderColor: theme.colors.statusBg.success,
-          ...toastOptions?.success?.style,
-        },
       },
       error: {
         ...toastOptions?.error,
+        className: mergeClassNames(
+          TOAST_CLASS_NAME,
+          TOAST_ERROR_CLASS_NAME,
+          toastOptions?.error?.className,
+        ),
         iconTheme: {
           primary: theme.colors.status.danger,
           secondary: theme.colors.text.inverse,
           ...toastOptions?.error?.iconTheme,
         },
-        style: {
-          borderColor: theme.colors.statusBg.danger,
-          ...toastOptions?.error?.style,
-        },
       },
       loading: {
         ...toastOptions?.loading,
+        className: mergeClassNames(
+          TOAST_CLASS_NAME,
+          toastOptions?.loading?.className,
+        ),
         iconTheme: {
           primary: theme.colors.brand.cyan,
           secondary: theme.colors.utility.transparent,
@@ -77,12 +93,37 @@ export const ToastProvider = ({
   );
 
   return (
-    <Toaster
-      position={position}
-      gutter={resolvedGutter}
-      toastOptions={mergedToastOptions}
-      {...props}
-    />
+    <>
+      <Global
+        styles={css`
+          .${TOAST_CLASS_NAME} {
+            background-color: ${theme.colors.background.modal};
+            color: ${theme.colors.text.primary};
+            border: ${theme.sizes.component.dividerThin} solid
+              ${theme.colors.border.divider};
+            border-radius: ${theme.borderRadius.md};
+            box-shadow: ${theme.colors.effect.shadow.lg};
+            font-size: ${theme.fontSizes.sm};
+            font-weight: ${theme.fontWeights.medium};
+            padding: ${theme.spacing.sm} ${theme.spacing.base};
+          }
+
+          .${TOAST_SUCCESS_CLASS_NAME} {
+            border-color: ${theme.colors.statusBg.success};
+          }
+
+          .${TOAST_ERROR_CLASS_NAME} {
+            border-color: ${theme.colors.statusBg.danger};
+          }
+        `}
+      />
+      <Toaster
+        position={position}
+        gutter={resolvedGutter}
+        toastOptions={mergedToastOptions}
+        {...props}
+      />
+    </>
   );
 };
 
