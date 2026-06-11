@@ -3,8 +3,11 @@ import { useTheme } from "@emotion/react";
 import * as S from "./styles";
 import { type TimeColumnProps } from "./types";
 
-const DEBOUNCE_DELAY = 150;
-
+/**
+ * 시간 단위 하나(시/분/초)를 wheel list로 렌더링하는 picker column입니다.
+ *
+ * scroll snap과 theme transition duration을 이용해 선택값과 스크롤 위치를 동기화합니다.
+ */
 export const TimeColumn = ({
   label,
   data,
@@ -17,6 +20,8 @@ export const TimeColumn = ({
     theme.sizes.component.timeWheelItemHeight,
     10,
   );
+  const scrollIdleDelay = Number.parseInt(theme.transitions.duration.fast, 10);
+  const smoothScrollDelay = Number.parseInt(theme.transitions.duration.slow, 10);
   const ref = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isScrolling = useRef(false);
@@ -67,8 +72,8 @@ export const TimeColumn = ({
 
     timeoutRef.current = setTimeout(() => {
       isScrolling.current = false;
-    }, DEBOUNCE_DELAY);
-  }, [canSelect, data, itemHeight, onChange, value]);
+    }, scrollIdleDelay);
+  }, [canSelect, data, itemHeight, onChange, scrollIdleDelay, value]);
 
   const handleItemClick = useCallback(
     (item: number) => {
@@ -86,9 +91,9 @@ export const TimeColumn = ({
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
         isScrolling.current = false;
-      }, DEBOUNCE_DELAY + 300);
+      }, scrollIdleDelay + smoothScrollDelay);
     },
-    [canSelect, onChange, data, itemHeight],
+    [canSelect, onChange, data, itemHeight, scrollIdleDelay, smoothScrollDelay],
   );
 
   return (
