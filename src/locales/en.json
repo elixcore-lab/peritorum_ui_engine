@@ -131,10 +131,13 @@
         "sortNone": "Remove sort"
       },
       "pagination": {
+        "label": "Pagination",
         "prev": "Previous page",
         "next": "Next page",
         "first": "First page",
-        "last": "Last page"
+        "last": "Last page",
+        "page": "Page {{page}}",
+        "ellipsis": "More pages"
       },
       "breadcrumb": {
         "label": "Breadcrumb"
