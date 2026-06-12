@@ -1,11 +1,5 @@
 import React, { forwardRef } from "react";
-import {
-  Section,
-  SectionHeader,
-  SectionTitleGroup,
-  SectionBody,
-  SectionFooter,
-} from "../layout";
+import { Section } from "../layout";
 
 /**
  * Card root가 상속하는 section HTML 속성입니다.
@@ -45,9 +39,9 @@ export interface CardBodyProps
  */
 const CardBody = forwardRef<HTMLDivElement, CardBodyProps>(
   ({ children, ...props }, ref) => (
-    <SectionBody ref={ref} {...props}>
+    <Section.Body ref={ref} {...props}>
       {children}
-    </SectionBody>
+    </Section.Body>
   ),
 );
 CardBody.displayName = "CardBody";
@@ -56,8 +50,8 @@ CardBody.displayName = "CardBody";
  * Header, TitleGroup, Body, Footer를 포함하는 compound Card API입니다.
  */
 export const Card = Object.assign(CardRoot, {
-  Header: SectionHeader,
-  TitleGroup: SectionTitleGroup,
+  Header: Section.Header,
+  TitleGroup: Section.TitleGroup,
   Body: CardBody,
-  Footer: SectionFooter,
+  Footer: Section.Footer,
 });
