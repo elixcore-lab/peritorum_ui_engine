@@ -135,6 +135,9 @@
         "next": "Next page",
         "first": "First page",
         "last": "Last page"
+      },
+      "breadcrumb": {
+        "label": "Breadcrumb"
       }
     }
   }
