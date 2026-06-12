@@ -6,13 +6,7 @@ import { Overlay } from "./Overlay";
 import { useUiConfig } from "../../ConfigProvider";
 import { slideInRight, slideInLeft } from "../../styles/animation";
 import { applyAnimation, visuallyHidden } from "../../styles";
-import {
-  SectionHeader,
-  SectionTitleGroup,
-  SectionBody,
-  SectionFooter,
-  Divider,
-} from "../layout";
+import { Divider, Section } from "../layout";
 import { Text } from "../typography/Text";
 
 /**
@@ -73,8 +67,8 @@ export const Drawer = ({
             event.preventDefault();
           }}
         >
-          <SectionHeader padding="none">
-            <SectionTitleGroup>
+          <Section.Header padding="none">
+            <Section.TitleGroup>
               {title ? (
                 <Dialog.Title asChild>
                   {typeof title === "string" ? (
@@ -108,15 +102,15 @@ export const Drawer = ({
                   </VisuallyHidden>
                 </Dialog.Description>
               )}
-            </SectionTitleGroup>
-          </SectionHeader>
+            </Section.TitleGroup>
+          </Section.Header>
           <Divider />
-          <SectionBody padding="none">{children}</SectionBody>
+          <Section.Body padding="none">{children}</Section.Body>
 
           {footer ? (
             <>
               <Divider />
-              <SectionFooter padding="none">{footer}</SectionFooter>
+              <Section.Footer padding="none">{footer}</Section.Footer>
             </>
           ) : null}
         </Content>
