@@ -2,6 +2,7 @@ export * from "./Box";
 export * from "./Divider";
 export * from "./Flex";
 export * from "./Grid";
+export * from "./Spacer";
 export * from "./Stack";
 export {
   InlineActions,
@@ -11,5 +12,4 @@ export {
   SectionFooter,
   SectionHeader,
   SectionTitleGroup,
-  Spacer,
 } from "./layout";
