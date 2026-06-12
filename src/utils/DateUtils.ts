@@ -16,10 +16,8 @@ interface ExtendedLocale extends Intl.Locale {
 export const toDate = (date: DateInput): Date => {
   const parsedDate = new Date(date);
 
-  // 🚀 방어 로직: 유효하지 않은 날짜 값이 들어오면 현재 시간(또는 null) 반환
   if (isNaN(parsedDate.getTime())) {
-    console.warn(`[DateUtils] Invalid date input: ${date}`);
-    return new Date(); // 프로젝트 정책에 따라 null을 던질 수도 있습니다.
+    return new Date();
   }
 
   return parsedDate;
