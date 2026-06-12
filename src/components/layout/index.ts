@@ -2,4 +2,14 @@ export * from "./Box";
 export * from "./Divider";
 export * from "./Flex";
 export * from "./Grid";
-export * from "./layout";
+export * from "./Stack";
+export {
+  InlineActions,
+  ResponsiveGrid,
+  Section,
+  SectionBody,
+  SectionFooter,
+  SectionHeader,
+  SectionTitleGroup,
+  Spacer,
+} from "./layout";
