@@ -126,10 +126,7 @@ const StyledTrack = styled(SliderPrimitive.Track, trackFilter)<{
   position: relative;
   flex-grow: 1;
   border-radius: ${({ theme }) => theme.borderRadius.round};
-  box-shadow: inset ${({ theme }) => theme.spacing.none}
-    ${({ theme }) => theme.sizes.component.dividerThin}
-    ${({ theme }) => theme.spacing["2xs"]}
-    ${({ theme }) => theme.colors.utility.shadowColor};
+  box-shadow: inset ${({ theme }) => theme.colors.effect.shadow.sm};
 
   &[data-orientation="horizontal"] {
     height: ${({ theme, $size }) => progressBarHeight(theme, $size as string)};

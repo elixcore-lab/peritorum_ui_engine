@@ -64,10 +64,7 @@ const ProgressRoot = styled(ProgressPrimitive.Root, rootFilter)<{
   background-color: ${({ theme }) => theme.colors.surface.sunken};
   border-radius: ${({ theme }) => theme.borderRadius.round};
   width: 100%;
-  box-shadow: inset ${({ theme }) => theme.spacing.none}
-    ${({ theme }) => theme.sizes.component.dividerThin}
-    ${({ theme }) => theme.spacing["2xs"]}
-    ${({ theme }) => theme.colors.utility.shadowColor};
+  box-shadow: inset ${({ theme }) => theme.colors.effect.shadow.sm};
 
   height: ${({ theme, $size }) => progressBarHeight(theme, $size)};
 `;

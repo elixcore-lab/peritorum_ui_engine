@@ -408,11 +408,10 @@ const StyledInput = styled("input", inputFilterProps)<{
       &:focus,
       &:focus-within {
         border-color: ${theme.colors.status.success};
-        box-shadow: ${theme.spacing.none} ${theme.spacing.none}
-          ${theme.spacing.none} ${theme.sizes.component.dividerMedium}
-          ${theme.colors.statusBg.success};
+        box-shadow: 0 0 0
+          ${theme.sizes.component.dividerMedium}${theme.colors.statusBg.success};
       }
-    `}
+    `};
 
   ${({ theme, $inputSize, $hasLeftIcon, $rightIconCount }) =>
     getSizeStyle(theme, $inputSize, $hasLeftIcon, $rightIconCount)}
