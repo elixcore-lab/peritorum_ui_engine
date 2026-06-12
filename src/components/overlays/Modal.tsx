@@ -12,12 +12,7 @@ import { useUiConfig } from "../../ConfigProvider";
 import { Overlay } from "./Overlay";
 import { IconButton } from "../elements/IconButton";
 import { Text } from "../typography/Text";
-import {
-  SectionHeader,
-  SectionTitleGroup,
-  SectionBody,
-  SectionFooter,
-} from "../layout";
+import { Section } from "../layout";
 import { contentShow } from "../../styles";
 
 /**
@@ -110,8 +105,8 @@ export const Modal = ({
           onEscapeKeyDown={handleEscapeKeyDown}
         >
           {(title || !hideCloseButton) && (
-            <SectionHeader>
-              <SectionTitleGroup>
+            <Section.Header>
+              <Section.TitleGroup>
                 {title ? (
                   <Dialog.Title asChild>
                     {typeof title === "string" ? (
@@ -147,7 +142,7 @@ export const Modal = ({
                     </VisuallyHidden>
                   </Dialog.Description>
                 )}
-              </SectionTitleGroup>
+              </Section.TitleGroup>
 
               {!hideCloseButton && (
                 <Dialog.Close asChild>
@@ -159,12 +154,12 @@ export const Modal = ({
                   />
                 </Dialog.Close>
               )}
-            </SectionHeader>
+            </Section.Header>
           )}
 
-          <SectionBody>{children}</SectionBody>
+          <Section.Body>{children}</Section.Body>
 
-          {footer && <SectionFooter>{footer}</SectionFooter>}
+          {footer && <Section.Footer>{footer}</Section.Footer>}
         </Content>
       </Dialog.Portal>
     </Dialog.Root>
