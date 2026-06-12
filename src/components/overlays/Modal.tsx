@@ -3,17 +3,14 @@ import * as Dialog from "@radix-ui/react-dialog";
 import styled from "@emotion/styled";
 import { X } from "lucide-react";
 import { useTheme } from "@emotion/react";
-import {
-  applyAnimation,
-  visuallyHidden,
-  floatingSurface,
-} from "../../styles/mixins";
+import { applyAnimation, floatingSurface } from "../../styles/mixins";
 import { useUiConfig } from "../../ConfigProvider";
 import { Overlay } from "./Overlay";
 import { IconButton } from "../elements/IconButton";
 import { Text } from "../typography/Text";
 import { Section } from "../layout";
 import { contentShow } from "../../styles";
+import { VisuallyHidden } from "../a11y";
 
 /**
  * Modal 컴포넌트의 열림 상태, 접근성 문구, 콘텐츠 슬롯, 닫힘 정책을 정의합니다.
@@ -190,8 +187,4 @@ const Content = styled(Dialog.Content)<{ $maxWidth: string }>`
       theme.transitions.duration.fast,
       theme.transitions.function.spring,
     )}
-`;
-
-const VisuallyHidden = styled.span`
-  ${visuallyHidden}
 `;
