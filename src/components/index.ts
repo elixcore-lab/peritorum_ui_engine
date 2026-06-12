@@ -5,6 +5,7 @@ export * from "./data-display/Accordion";
 export * from "./data-display/Avatar";
 export * from "./data-display/calendar";
 export * from "./data-display/Card";
+export * from "./data-display/Table";
 export * from "./data-display/Tabs";
 export * from "./data-display/VirtualScrollTable";
 
