@@ -1,3 +1,5 @@
+export * from "./a11y";
+
 export * from "./data-display/Accordion";
 export * from "./data-display/Avatar";
 export * from "./data-display/calendar";
