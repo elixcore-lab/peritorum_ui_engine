@@ -26,7 +26,6 @@ export const handleError = (
   error: unknown,
   defaultMsg: string = "An error occurred",
 ) => {
-  console.error("[UI Error]", defaultMsg, error);
   const msg = getErrorMessage(error, defaultMsg);
   toast.error(msg);
 };
