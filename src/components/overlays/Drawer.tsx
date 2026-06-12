@@ -5,9 +5,10 @@ import { useTheme } from "@emotion/react";
 import { Overlay } from "./Overlay";
 import { useUiConfig } from "../../ConfigProvider";
 import { slideInRight, slideInLeft } from "../../styles/animation";
-import { applyAnimation, visuallyHidden } from "../../styles";
+import { applyAnimation } from "../../styles";
 import { Divider, Section } from "../layout";
 import { Text } from "../typography/Text";
+import { VisuallyHidden } from "../a11y";
 
 /**
  * Drawer 컴포넌트의 열림 상태, 배치 방향, 콘텐츠 슬롯을 정의합니다.
@@ -154,10 +155,6 @@ const Content = styled(Dialog.Content, filterProps)<{
       theme.transitions.duration.fast,
       theme.transitions.function.easeOut,
     )}
-`;
-
-const VisuallyHidden = styled.span`
-  ${visuallyHidden}
 `;
 
 const DrawerDescriptionText = styled(Text)`
