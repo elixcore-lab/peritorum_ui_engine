@@ -63,7 +63,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref,
   ) => {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-    const resizeFrameRef = useRef<number>();
+    const resizeFrameRef = useRef<number | undefined>(undefined);
 
     const setTextareaRef = (element: HTMLTextAreaElement | null) => {
       textareaRef.current = element;
