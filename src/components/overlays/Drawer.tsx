@@ -73,7 +73,7 @@ export const Drawer = ({
             event.preventDefault();
           }}
         >
-          <SectionHeader $padding="none">
+          <SectionHeader padding="none">
             <SectionTitleGroup>
               {title ? (
                 <Dialog.Title asChild>
@@ -111,12 +111,12 @@ export const Drawer = ({
             </SectionTitleGroup>
           </SectionHeader>
           <Divider />
-          <SectionBody $padding="none">{children}</SectionBody>
+          <SectionBody padding="none">{children}</SectionBody>
 
           {footer ? (
             <>
               <Divider />
-              <SectionFooter $padding="none">{footer}</SectionFooter>
+              <SectionFooter padding="none">{footer}</SectionFooter>
             </>
           ) : null}
         </Content>
