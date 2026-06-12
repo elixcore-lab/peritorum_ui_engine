@@ -1,1 +1,4 @@
 node_modules
+
+auto_refactor.sh
+REFACTORING_RULES.md
