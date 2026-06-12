@@ -20,7 +20,7 @@ import {
 import { type ColorVariant } from "../../styles/types";
 import { Overlay } from "./Overlay";
 import { useUiConfig } from "../../ConfigProvider";
-import { SectionBody, SectionFooter } from "../layout";
+import { Section } from "../layout";
 import { Text } from "../typography/Text";
 import { contentShow } from "../../styles/animation";
 
@@ -113,7 +113,7 @@ export const AlertModal = ({
         </AlertDialog.Overlay>
 
         <Content>
-          <SectionBody>
+          <Section.Body>
             <Header>
               <IconWrapper $variant={variant}>
                 <VariantIcon as={IconComponent} />
@@ -137,9 +137,9 @@ export const AlertModal = ({
                 </AlertDialog.Description>
               )}
             </Header>
-          </SectionBody>
+          </Section.Body>
 
-          <SectionFooter>
+          <Section.Footer>
             <ButtonContainer>
               {showCancel && (
                 <AlertDialog.Cancel asChild>
@@ -166,7 +166,7 @@ export const AlertModal = ({
                 </Button>
               </AlertDialog.Action>
             </ButtonContainer>
-          </SectionFooter>
+          </Section.Footer>
         </Content>
       </AlertDialog.Portal>
     </AlertDialog.Root>
