@@ -1,4 +1,4 @@
 node_modules
-
+package-lock.json
 auto_refactor.sh
 REFACTORING_RULES.md
